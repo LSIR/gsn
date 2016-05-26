@@ -170,9 +170,9 @@ class ConfigurationHandlerClass():
         servicewakeupminutes = None
         wlandutycyclewhileresending = None
         platformVersion = None
-        bolt_i2c_device = None
-        bolt_i2c_address = None
-        boltI2cPollingIntervalSec = None
+        dpp_i2c_device = None
+        dpp_i2c_address = None
+        dppI2cPollingIntervalSec = None
 
         try:
             # readout options from config
@@ -211,12 +211,12 @@ class ConfigurationHandlerClass():
                         configHashFile = value
                     elif name == 'platform':
                         platformVersion = int(value)
-                    elif name == 'bolt_i2c_device':
-                        boltI2cDevice = int(value, 16)
-                    elif name == 'bolt_i2c_address':
-                        boltI2cAddress = int(value, 16)
-                    elif name == 'bolt_i2c_polling_interval_sec':
-                        boltI2cPollingIntervalSec = int(value)
+                    elif name == 'dpp_i2c_device':
+                        dppI2cDevice = int(value, 16)
+                    elif name == 'dpp_i2c_address':
+                        dppI2cAddress = int(value, 16)
+                    elif name == 'dpp_i2c_polling_interval_sec':
+                        dppI2cPollingIntervalSec = int(value)
         except ConfigParser.NoSectionError:
             raise TypeError('no [options] section specified in %s' % (config_file,))
         
@@ -325,11 +325,11 @@ class ConfigurationHandlerClass():
         else:
             raise TypeError('platform has to be set to 1 or 2')
         
-        if boltI2cDevice is not None and (boltI2cPollingIntervalSec is None or boltI2cAddress is None):
-            raise TypeError('if bolt_i2c_device is specified: bolt_i2c_address and bolt_i2c_polling_interval_sec have to be specified as well')
-        ret.update(bolt_i2c_device=boltI2cDevice)
-        ret.update(bolt_i2c_address=boltI2cAddress)
-        ret.update(bolt_i2c_polling_interval_sec=boltI2cPollingIntervalSec)
+        if dppI2cDevice is not None and (dppI2cPollingIntervalSec is None or dppI2cAddress is None):
+            raise TypeError('if dpp_i2c_device is specified: dpp_i2c_address and dpp_i2c_polling_interval_sec have to be specified as well')
+        ret.update(dpp_i2c_device=dppI2cDevice)
+        ret.update(dpp_i2c_address=dppI2cAddress)
+        ret.update(dpp_i2c_polling_interval_sec=dppI2cPollingIntervalSec)
         
         # get schedule section from config files
         try:

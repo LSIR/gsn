@@ -8,7 +8,7 @@ __id__          = "$Id$"
 
 
 '''
-    BOLT message structure
+    DPP message structure
     Byte         |0   |1   |2   |3   |4          |5 |6 |7|8|9|10|11|12|13|14|15...31|
     Msg queue    |size|
     Header            |device_id|type|payload_len|seqnr|   generation_time  |
@@ -16,7 +16,7 @@ __id__          = "$Id$"
 '''
 
 '''
- The BOLT Msg Types
+ The DPP Msg Types
 '''
 
 MSG_TYPE_INVALID = 0

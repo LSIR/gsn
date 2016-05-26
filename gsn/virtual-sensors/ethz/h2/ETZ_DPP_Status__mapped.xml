@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_BOLT_Status__mapped" priority="10" >
+<virtual-sensor name="ETZ_DPP_Status__mapped" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -28,7 +28,7 @@
             <field name="RSSI3" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>BOLT Status messages from the ETZ deployment</description>
+    <description>DPP Status messages from the ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -36,7 +36,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="remote-rest">
-                    <predicate key="query"> select * from ETZ_BOLT_Status</predicate>
+                    <predicate key="query"> select * from ETZ_DPP_Status</predicate>
                     <predicate key="remote-contact-point">http://tpvt.permasense.ethz.ch/streaming/</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>

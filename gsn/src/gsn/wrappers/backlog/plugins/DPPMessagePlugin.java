@@ -10,11 +10,11 @@ import gsn.beans.DataField;
 
 
 /**
- * This plugin listens for incoming LWB BOLT messages.
+ * This plugin listens for incoming LWB DPP messages.
  * 
  * @author Tonio Gsell
  */
-public class BOLTMessagePlugin extends AbstractPlugin {
+public class DPPMessagePlugin extends AbstractPlugin {
 	
 	private static DataField[] dataField = {
 			new DataField("TIMESTAMP", "BIGINT"),
@@ -37,11 +37,11 @@ public class BOLTMessagePlugin extends AbstractPlugin {
 			new DataField("RSSI2", "SMALLINT"),
 			new DataField("RSSI3", "SMALLINT")};
 
-	private final transient Logger logger = Logger.getLogger( BOLTMessagePlugin.class );
+	private final transient Logger logger = Logger.getLogger( DPPMessagePlugin.class );
 
 	@Override
 	public String getPluginName() {
-		return "BOLTMessagPlugin";
+		return "DPPMessagPlugin";
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class BOLTMessagePlugin extends AbstractPlugin {
 
 	@Override
 	public short getMessageType() {
-		return gsn.wrappers.backlog.BackLogMessage.BOLT_MESSAGE_TYPE;
+		return gsn.wrappers.backlog.BackLogMessage.DPP_MESSAGE_TYPE;
 	}
 
 	@Override

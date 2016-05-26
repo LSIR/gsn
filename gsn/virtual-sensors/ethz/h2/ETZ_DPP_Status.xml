@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_BOLT_Status" priority="10" >
+<virtual-sensor name="ETZ_DPP_Status" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -24,7 +24,7 @@
             <field name="RSSI3" type="SMALLINT" />
         </output-structure>
     </processing-class>
-    <description>BOLT Status messages from the ETZ deployment</description>
+    <description>DPP Status messages from the ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -33,7 +33,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-bs01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BOLTMessagePlugin</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.DPPMessagePlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -43,7 +43,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-bs02.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BOLTMessagePlugin</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.DPPMessagePlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -53,7 +53,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-bs03.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BOLTMessagePlugin</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.DPPMessagePlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -63,7 +63,7 @@
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
-                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.BOLTMessagePlugin</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.DPPMessagePlugin</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

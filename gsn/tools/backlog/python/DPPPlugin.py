@@ -11,14 +11,14 @@ import struct
 from threading import Event
 
 import BackLogMessage
-import BOLTTypes
+import DPPTypes
 from AbstractPlugin import AbstractPluginClass
 
 DEFAULT_BACKLOG = True
 
-class BOLTPluginClass(AbstractPluginClass):
+class DPPPluginClass(AbstractPluginClass):
     '''
-    This plugin forwards all incoming BOLT packets to GSN and vice versa.
+    This plugin forwards all incoming DPP packets to GSN and vice versa.
     
     data/instance attributes:
     _plugstop
@@ -32,21 +32,21 @@ class BOLTPluginClass(AbstractPluginClass):
         self._QueueClosedEvent = Event()
         
         # register all possible packet types (except for invalid and timesync messages)
-        self.registerBOLTListener([BOLTTypes.MSG_TYPE_INVALID, BOLTTypes.MSG_TYPE_TIMESYNC], True)
+        self.registerDPPListener([DPPTypes.MSG_TYPE_INVALID, DPPTypes.MSG_TYPE_TIMESYNC], True)
         
     
     def stop(self):
         self._plugstop = True
-        self.deregisterBOLTListener()
+        self.deregisterDPPListener()
         self.info('stopped')
     
     
-    def boltMsgReceived(self, timestamp, boltMsg):
-        return self.processMsg(timestamp, [boltMsg['device_id'], boltMsg['type'], boltMsg['payload_len'], boltMsg['seqnr'], boltMsg['generation_time'], boltMsg['payload']], self._priority, self._backlog)
+    def dppMsgReceived(self, timestamp, dppMsg):
+        return self.processMsg(timestamp, [dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['seqnr'], dppMsg['generation_time'], dppMsg['payload']], self._priority, self._backlog)
     
     
     def msgReceived(self, data):
-        self.sendBOLTmsg(dict(device_id=data[0], type=data[1], payload_len=data[2], seqnr=data[3], generation_time=data[4], payload=data[5]))
+        self.sendDPPmsg(dict(device_id=data[0], type=data[1], payload_len=data[2], seqnr=data[3], generation_time=data[4], payload=data[5]))
     
     
     def isBusy(self):
@@ -57,6 +57,6 @@ class BOLTPluginClass(AbstractPluginClass):
         return False
     
     
-    def _backlog2bolt(self, message):
+    def _backlog2dpp(self, message):
         return array.array('B', message[1:]).tolist()
     
