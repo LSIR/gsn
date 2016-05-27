@@ -18,7 +18,7 @@
                     	if (TEMP != null)
                     		TEMP = (double)TEMP / 100.0;
                     	if (VCC != null)
-                    		VCC = ((double)VCC * 3.0) / 4095.0;
+                    		VCC = ((double)VCC * 4.0) / 1023.0;
                     	if (CPU_DC != null)
                     		CPU_DC = (double)CPU_DC / 10.0;
                     	if (RF_DC != null)
