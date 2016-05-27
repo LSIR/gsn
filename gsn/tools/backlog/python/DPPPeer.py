@@ -123,6 +123,7 @@ class DPPPeerClass(Thread, Statistics):
                 
                 if isEnabledFor(logging.DEBUG):
                     self._logger.debug('rcv (%d,%d,%d,%d,%d,%d,%d)' % (timestamp, dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['seqnr'], dppMsg['generation_time'], len(dppMsg['payload'])))
+                    self._logger.debug('payload [' + ','.join(str(int(x)) for x in dppMsg['payload']) + ']')
     
                 self.counterAction(self._msgReceivedCounterId)
                 # tell BackLogMain to send the packet to the plugins
@@ -222,7 +223,6 @@ class DPPWriter(Thread):
                     if isEnabledFor(logging.DEBUG):
                         self._logger.debug('write MSG_TYPE_TIMESYNC message (%d,%d,%d,%d,%d)' % (dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['seqnr'], int(time.time()*1000000)))
                     packet = array.array('B', struct.pack('<BHBBHQ', self._sendqueue.qsize(), dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['seqnr'], int(time.time()*1000000)))
-                    self._logger.debug(','.join(str(int(x)) for x in packet))
                     acquire()
                     write(self._dppPeer._i2cAddress, I2C_CMD_TIMESYNC, packet.tolist())
                 else:
