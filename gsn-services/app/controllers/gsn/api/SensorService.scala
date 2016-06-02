@@ -7,6 +7,7 @@ import scala.concurrent.Promise
 import scala.util.Try
 import akka.actor._
 import com.typesafe.config.ConfigFactory
+import org.zeromq.ZMQ
 
 import play.Logger
 import play.api.mvc._
@@ -86,7 +87,19 @@ object SensorService extends Controller with GsnService {
          case _ => Future(Forbidden("Page only accessible with a valid oauth token."))
      }
   })
+  
+  def uploadSensorData(sensorid:String) = headings((APIPermissionAction(sensorid) compose Action).async {implicit request =>
+    Try{
+      val vsname=sensorid.toLowerCase
+      val data=queryparam("data")
+      //val pp=JsonSerializer.ser(data.head,Seq(),false)
+      Future(BadRequest("Unimplemented"))        
+    }.recover{
+      case t=>Future(BadRequest("Error: "+t.getMessage))
+    }.get
+  })
 
+  
   def sensorData(sensorid:String) = headings((APIPermissionAction(sensorid) compose Action).async {implicit request =>
     Try{
       val vsname=sensorid.toLowerCase

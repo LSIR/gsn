@@ -44,7 +44,8 @@ import gsn.http.delivery.LocalDeliveryWrapper;
 import gsn.http.delivery.PushDelivery;
 import gsn.monitoring.MemoryMonitor;
 import gsn.monitoring.Monitorable;
-import gsn.networking.zeromq.ZeroMQDelivery;
+import gsn.networking.zeromq.ZeroMQDeliverySync;
+import gsn.networking.zeromq.ZeroMQDeliveryAsync;
 import gsn.networking.zeromq.ZeroMQProxy;
 import gsn.storage.SQLValidator;
 import gsn.storage.StorageManager;
@@ -207,11 +208,13 @@ public final class Main {
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(PushDelivery.class));
 		if (containerConfig.isZMQEnabled())
-			vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(ZeroMQDelivery.class));
+			vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(ZeroMQDeliverySync.class));
+		    vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(ZeroMQDeliveryAsync.class));
 
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
-		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(ZeroMQDelivery.class));
+		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(ZeroMQDeliverySync.class));
+		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(ZeroMQDeliveryAsync.class));
 		vsloader.startLoading();
 
 	}

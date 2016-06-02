@@ -55,7 +55,7 @@ class GSNDataHandler extends DataHandler[User] {
   }
 
   def findClientUser(clientCredential: ClientCredential, scope: Option[String]): Future[Option[User]] = Future {
-    Option(null) //not supported
+    Option(Client.findById(clientCredential.clientId)).flatMap(c => if (c.isLinked) Some(c.user) else None)
   }
 
   def deleteAuthCode(code: String): Future[Unit] = Future{

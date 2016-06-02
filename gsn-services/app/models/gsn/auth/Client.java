@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 
@@ -23,10 +24,21 @@ public class Client extends AppModel{
 	public List<OAuthToken> tokens;
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<OAuthCode> codes;
+	@ManyToOne
+	public User user;
+	public Boolean linked = false;
 
 	public static final play.db.ebean.Model.Finder<Long, Client> find = new play.db.ebean.Model.Finder<Long, Client>(
 			Long.class, Client.class);
 
+	public boolean isLinked() {
+		return linked;
+	}
+
+	public void setLinked(boolean l) {
+		linked = l;
+	}
+	
     public void setName(String n){
     	name = n;
     }
@@ -43,12 +55,20 @@ public class Client extends AppModel{
     	return clientId;
     }
     
-    public void setRedirect(String r){
-    	redirect = r;
+    public void setRedirect(String u){
+    	redirect = u;
     }
     
     public String getRedirect(){
     	return redirect;
+    }
+    
+    public void setUser(User r){
+    	user = r;
+    }
+    
+    public User getUser(){
+    	return user;
     }
     
 	public static Client findByName(String value) {
@@ -57,6 +77,10 @@ public class Client extends AppModel{
 	
 	public static Client findById(String value) {
 		return find.where().eq("clientId", value).findUnique();
+	}
+	
+	public static List<Client> findByUser(User u){
+		return find.where().eq("user", u).findList();
 	}
 	
 }

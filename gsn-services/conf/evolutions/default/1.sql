@@ -9,6 +9,8 @@ create table client (
   client_id                 varchar(255),
   secret                    varchar(255),
   redirect                  varchar(255),
+  user_id                   bigint,
+  linked                    boolean,
   constraint pk_client primary key (id))
 ;
 
@@ -67,7 +69,7 @@ create table token_action (
   type                      varchar(2),
   created                   timestamp,
   expires                   timestamp,
-  constraint ck_token_action_type check (type in ('EV','PR')),
+  constraint ck_token_action_type check (type in ('PR','EV')),
   constraint uq_token_action_token unique (token),
   constraint pk_token_action primary key (id))
 ;
@@ -141,18 +143,20 @@ create sequence users_seq;
 
 create sequence user_permission_seq;
 
-alter table linked_account add constraint fk_linked_account_user_1 foreign key (user_id) references users (id) on delete restrict on update restrict;
-create index ix_linked_account_user_1 on linked_account (user_id);
-alter table oauth_code add constraint fk_oauth_code_user_2 foreign key (user_id) references users (id) on delete restrict on update restrict;
-create index ix_oauth_code_user_2 on oauth_code (user_id);
-alter table oauth_code add constraint fk_oauth_code_client_3 foreign key (client_id) references client (id) on delete restrict on update restrict;
-create index ix_oauth_code_client_3 on oauth_code (client_id);
-alter table oauth_token add constraint fk_oauth_token_user_4 foreign key (user_id) references users (id) on delete restrict on update restrict;
-create index ix_oauth_token_user_4 on oauth_token (user_id);
-alter table oauth_token add constraint fk_oauth_token_client_5 foreign key (client_id) references client (id) on delete restrict on update restrict;
-create index ix_oauth_token_client_5 on oauth_token (client_id);
-alter table token_action add constraint fk_token_action_targetUser_6 foreign key (target_user_id) references users (id) on delete restrict on update restrict;
-create index ix_token_action_targetUser_6 on token_action (target_user_id);
+alter table client add constraint fk_client_user_1 foreign key (user_id) references users (id) on delete restrict on update restrict;
+create index ix_client_user_1 on client (user_id);
+alter table linked_account add constraint fk_linked_account_user_2 foreign key (user_id) references users (id) on delete restrict on update restrict;
+create index ix_linked_account_user_2 on linked_account (user_id);
+alter table oauth_code add constraint fk_oauth_code_user_3 foreign key (user_id) references users (id) on delete restrict on update restrict;
+create index ix_oauth_code_user_3 on oauth_code (user_id);
+alter table oauth_code add constraint fk_oauth_code_client_4 foreign key (client_id) references client (id) on delete restrict on update restrict;
+create index ix_oauth_code_client_4 on oauth_code (client_id);
+alter table oauth_token add constraint fk_oauth_token_user_5 foreign key (user_id) references users (id) on delete restrict on update restrict;
+create index ix_oauth_token_user_5 on oauth_token (user_id);
+alter table oauth_token add constraint fk_oauth_token_client_6 foreign key (client_id) references client (id) on delete restrict on update restrict;
+create index ix_oauth_token_client_6 on oauth_token (client_id);
+alter table token_action add constraint fk_token_action_targetUser_7 foreign key (target_user_id) references users (id) on delete restrict on update restrict;
+create index ix_token_action_targetUser_7 on token_action (target_user_id);
 
 
 

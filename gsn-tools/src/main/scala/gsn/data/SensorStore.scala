@@ -44,6 +44,11 @@ class SensorStore(ds:DataStore) extends Actor{
   private def canonicalName(name:String)=
     name.toLowerCase.replaceAll(" ", "")
   
+  def extract_latest(series:Seq[Series], n:String) =
+      series.filter { x => x.output.fieldName.equalsIgnoreCase(n) }
+        .headOption.flatMap { x => x.series.headOption }
+        .flatMap { x => Some(x.toString().toDouble) }
+    
   def receive ={    
     //vs config messages
     case ModifiedVsConf(vs)=>
@@ -72,7 +77,7 @@ class SensorStore(ds:DataStore) extends Actor{
     //sensor request messages
     case GetAllSensorsInfo =>
       sender ! AllSensorInfo(sensors.values.map{s=>
-        val vsname=s.name.toLowerCase
+        val vsname = s.name.toLowerCase
         SensorInfo(s,vsDatasources.get(vsname),sensorStats.get(vsname))
       }.toSeq)
     case GetSensorInfo(sensorid) =>
@@ -89,8 +94,15 @@ class SensorStore(ds:DataStore) extends Actor{
 
       sensors.foreach{case (sensorid,s)=>
         log.info(s"Stats for sensor $sensorid")
-        implicit val source=vsDatasources.get(sensorid)          
-        sensorStats put(sensorid,stats(s))
+        implicit val source=vsDatasources.get(sensorid)      
+        val stat = stats(s)
+        sensorStats put(sensorid,stat)
+        val dLocation = Location(
+            extract_latest(stat.latestValues,"latitude").orElse(s.location.latitude), 
+            extract_latest(stat.latestValues,"longitude").orElse(s.location.longitude), 
+            extract_latest(stat.latestValues,"altitude").orElse(s.location.altitude))
+        sensors.update(sensorid, Sensor(s.name,s.implements, Platform(s.platform.name,dLocation), s.properties))
+        
       }
   }
 

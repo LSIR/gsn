@@ -19,10 +19,11 @@ object Sensor{
         Sensing(out.name,Output(out.name.toLowerCase,vsConf.name,
             DataUnit(out.unit.getOrElse(null)),DataType(out.dataType) ))
       }
-    val props=vsConf.address.map{kv=>
+    val _props=vsConf.address.map{kv=>
         (kv._1.toLowerCase.trim,kv._2.trim )
       } ++ 
       Map("description"->vsConf.description )
+    val props = if(vsConf.processing.partitionField.isEmpty) _props else _props ++ Map("partitionField"->vsConf.processing.partitionField.get )
     def coord(p:Map[String,String],n:String)=
       try p.get(n).map(_.toDouble)
       catch {case e:Exception=> None}

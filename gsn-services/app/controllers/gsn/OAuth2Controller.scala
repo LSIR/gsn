@@ -78,12 +78,18 @@ object OAuth2Controller extends Controller with OAuth2Provider with DeadboltActi
     }}
    
    def listClients = Restrict(Array(LocalAuthController.USER_ROLE),new GSNScalaDeadboltHandler) { Action.async { implicit request => Future {
-       Context.current.set(JavaHelpers.createJavaContext(request))  
-       Ok(access.clientlist.render(Client.find.all().asScala, editClientForm))
+       Context.current.set(JavaHelpers.createJavaContext(request))
+       val u = User.findByAuthUserIdentity(PlayAuthenticate.getUser(JavaHelpers.createJavaContext(request)))
+       if (u.roles.filter(p => p.getName.equals(LocalAuthController.ADMIN_ROLE)).isEmpty()) {
+           Ok(access.clientlist.render(Client.find.all().asScala, editClientForm))
+       } else {
+           Ok(access.clientlist.render(Client.findByUser(u).asScala, editClientForm))
+       }
     }}}
    
    def editClient = Restrict(Array(LocalAuthController.USER_ROLE),new GSNScalaDeadboltHandler) { Action.async { implicit request => Future {
        Context.current.set(JavaHelpers.createJavaContext(request))
+       val u = User.findByAuthUserIdentity(PlayAuthenticate.getUser(JavaHelpers.createJavaContext(request)))
        var ret:Result = null
        editClientForm.bindFromRequest.fold(
            formWithErrors => {
@@ -98,6 +104,9 @@ object OAuth2Controller extends Controller with OAuth2Provider with DeadboltActi
                                 c.name = clientData.name
                                 c.redirect = clientData.redirect
                                 c.secret = clientData.client_secret
+                                c.user = u
+                                println(clientData)
+                                c.linked = clientData.linked
                                 c.save()
                             }
               case "edit" => {
@@ -109,6 +118,7 @@ object OAuth2Controller extends Controller with OAuth2Provider with DeadboltActi
                                   c.setName(clientData.name)
                                   c.setRedirect(clientData.redirect)
                                   c.setSecret(clientData.client_secret)
+                                  c.setLinked(clientData.linked)
                                   c.update()
                                 }
                              }

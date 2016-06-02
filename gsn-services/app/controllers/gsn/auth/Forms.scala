@@ -8,7 +8,7 @@ import play.data.validation.Constraints.Required;
 
 case class GSNGroup(name: String, description: String, action: String, id: Long) {}
 case class GSNClient(response_type: String, client_secret: String, client_id: String) {}
-case class GSNEditClient(name: String, client_secret: String, client_id: String,  redirect: String, action: String, id: Long)
+case class GSNEditClient(name: String, client_secret: String, client_id: String,  redirect: String, action: String, id: Long, linked: Boolean)
 
 object Forms {
  val groupForm = Form(
@@ -33,7 +33,9 @@ object Forms {
     "client_id" -> nonEmptyText,
     "redirect" -> nonEmptyText,
     "action" -> nonEmptyText,
-    "id" -> longNumber
+    "id" -> longNumber,
+    "linked" -> boolean
+    
   )(GSNEditClient.apply)(GSNEditClient.unapply)
 )
 }

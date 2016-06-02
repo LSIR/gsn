@@ -12,6 +12,7 @@ constraint.email=E-mail
 format.date=Date (''{0}'')
 format.numeric=Numérique
 format.real=Réel
+format.boolean=
 
 # --- Errors
 error.invalid=Valeur non autorisée
@@ -175,6 +176,7 @@ gsn.oauth2.clients.title=Gestion des clients externes
 gsn.oauth2.clients.delete=Supprimer
 gsn.oauth2.clients.edit=Modifier
 gsn.oauth2.clients.name=Nom
+gsn.oauth2.clients.user=Utilisateur lié
 gsn.oauth2.clients.redirect=URI de redirection
 gsn.oauth2.clients.id=ID du client
 gsn.oauth2.clients.secret=Secret du client

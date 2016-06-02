@@ -18,7 +18,7 @@ import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
 import gsn.http.delivery.DeliverySystem;
 
-public class ZeroMQDelivery implements DeliverySystem{
+public class ZeroMQDeliveryAsync implements DeliverySystem{
 	
 	private ZContext context;
 	private Socket publisher;
@@ -26,9 +26,9 @@ public class ZeroMQDelivery implements DeliverySystem{
 	private Kryo kryo = new Kryo();
 	private String name;
 
-	public static transient Logger logger = LoggerFactory.getLogger ( ZeroMQDelivery.class );
+	public static transient Logger logger = LoggerFactory.getLogger ( ZeroMQDeliveryAsync.class );
 	
-	public ZeroMQDelivery(String name){
+	public ZeroMQDeliveryAsync(String name){
 		if (name.endsWith(":")){
 			name = name.substring(0, name.length()-1);
 		}

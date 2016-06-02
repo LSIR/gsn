@@ -32,7 +32,8 @@ import gsn.beans.VSensorConfig;
 import gsn.http.delivery.DefaultDistributionRequest;
 import gsn.http.delivery.DeliverySystem;
 import gsn.http.delivery.DistributionRequest;
-import gsn.networking.zeromq.ZeroMQDelivery;
+import gsn.networking.zeromq.ZeroMQDeliveryAsync;
+import gsn.networking.zeromq.ZeroMQDeliverySync;
 import gsn.storage.DataEnumerator;
 import gsn.storage.SQLValidator;
 
@@ -260,9 +261,9 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
     public boolean vsLoading(VSensorConfig config) {
     	synchronized (listeners) {
-    		if (Main.getContainerConfig().isZMQEnabled() && getInstance(ZeroMQDelivery.class) == this){
+    		if (Main.getContainerConfig().isZMQEnabled() && getInstance(ZeroMQDeliverySync.class) == this){
     			try {
-    				DeliverySystem delivery = new ZeroMQDelivery(config.getName());
+    				DeliverySystem delivery = new ZeroMQDeliveryAsync(config.getName());
 					addListener(DefaultDistributionRequest.create(delivery, config, "select * from "+config.getName(),System.currentTimeMillis()));
 				} catch (IOException e1) {
 					logger.error(e1.getMessage(), e1);
