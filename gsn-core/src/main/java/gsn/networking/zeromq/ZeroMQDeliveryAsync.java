@@ -54,7 +54,6 @@ public class ZeroMQDeliveryAsync implements DeliverySystem{
 		try {
 			ByteArrayOutputStream bais = new ByteArrayOutputStream();
             bais.write((name + ": ").getBytes());
-            System.out.println("sending to " + name);
             Output o = new Output(bais);
             kryo.writeObjectOrNull(o,se,StreamElement.class);
             o.close();

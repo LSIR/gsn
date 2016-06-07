@@ -7,9 +7,9 @@ import scala.util.Try
 import org.zeromq.ZMQ
 import java.io.ByteArrayInputStream
 import java.util.Date
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.{Input => kInput};
-import gsn.beans.StreamElement;
+import com.esotericsoftware.kryo.Kryo
+import com.esotericsoftware.kryo.io.{Input => kInput}
+import gsn.beans.StreamElement
 import gsn.data._
 import gsn.data.format._
 

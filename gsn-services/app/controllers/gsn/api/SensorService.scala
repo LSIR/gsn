@@ -4,10 +4,15 @@ import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.concurrent.Promise
+import scala.concurrent.duration._
 import scala.util.Try
 import akka.actor._
+import akka.pattern.ask
+import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import org.zeromq.ZMQ
+import com.esotericsoftware.kryo.Kryo
+import com.esotericsoftware.kryo.io.{Output => kOutput}
 
 import play.Logger
 import play.api.mvc._
@@ -22,9 +27,13 @@ import scalaoauth2.provider.AuthInfoRequest
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatterBuilder
 import controllers.gsn.Global
+import gsn.config.ConfWatcher
 import gsn.data._
 import gsn.data.format._
 import gsn.xpr.XprConditions
+import gsn.config.GetSensorConf
+import gsn.config.VsConf
+import gsn.beans.StreamElement
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -35,10 +44,13 @@ import controllers.gsn.GSNDataHandler
 import controllers.gsn.APIPermissionAction
 import models.gsn.auth.User
 import scalaoauth2.provider.AuthInfo
+import java.io.ByteArrayOutputStream
 
 
 object SensorService extends Controller with GsnService {   
   val defaultMetaProps=conf.getStringList("gsn.api.defaultMetadataProps")
+  
+  val kryo = new Kryo()
 
   def headings[A](act: Action[A])= Action.async(act.parser) { request =>
      act(request).map{_.withHeaders("Access-Control-Allow-Origin"->"*",
@@ -90,12 +102,40 @@ object SensorService extends Controller with GsnService {
   
   def uploadSensorData(sensorid:String) = headings((APIPermissionAction(sensorid) compose Action).async {implicit request =>
     Try{
-      val vsname=sensorid.toLowerCase
-      val data=queryparam("data")
-      //val pp=JsonSerializer.ser(data.head,Seq(),false)
-      Future(BadRequest("Unimplemented"))        
+      val vsname = sensorid.toLowerCase
+      val data = queryparam("data")
+      val se = StreamElement.fromJSON(data.get)
+    	val baos = new ByteArrayOutputStream()
+      val o = new kOutput(baos)
+      kryo.writeObjectOrNull(o,se,classOf[StreamElement])
+      o.close()
+      
+      implicit val timeout = Timeout(1 seconds)
+      
+      val q = Akka.system.actorOf(Props[ConfWatcher])
+      val p = q ? GetSensorConf(sensorid)
+      p.map{c => c match{
+        case conf:VsConf => {
+            val wconfig = conf.streams.flatMap( s => s.sources.flatMap( so => so.wrappers ) ).filter( w => w.wrapper.equals("zeromq-push")).head
+            val address = wconfig.params.get("local_address").getOrElse("localhost")
+            val port = wconfig.params.get("local_port").orNull
+            val context = ZMQ.context(1)
+    		    val forwarder = context.socket(ZMQ.REQ)
+    		    forwarder.connect("tcp://"+address+":"+port)
+    		    forwarder.setReceiveTimeOut(3000)
+            forwarder.send(baos.toByteArray)
+            val rec = forwarder.recv()
+            if (rec != null && rec.head == 0.asInstanceOf[Byte]){
+              Ok("{\"status\": \"success\"}")       
+            } else {
+              InternalServerError("{\"status\": \"error\", \"message\" : \"Packet forwarding to GSN core failled.\"}")
+            }
+          }
+        case _ => InternalServerError("{\"status\": \"error\", \"message\" : \"Virtual Sensor config not found.\"}")
+        }
+      }
     }.recover{
-      case t=>Future(BadRequest("Error: "+t.getMessage))
+      case t=>Future(BadRequest("{\"status\": \"error\", \"message\" : \""+t.getMessage+"\"}"))
     }.get
   })
 

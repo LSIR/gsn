@@ -59,10 +59,10 @@ public class ZeroMQProxy extends Thread implements Runnable {
 				while (true) {
 					String request = clients.recvStr (0);
 					String [] parts = request.split("\\?");
-					if (parts.length >= 1){
+					if (parts.length > 1){
 						try{
 							long startTime = System.currentTimeMillis();
-							if (parts.length >= 2){
+							if (parts.length > 2){
 								startTime = Long.parseLong(parts[2]);
 							}
 							ZeroMQDeliverySync d = new ZeroMQDeliverySync(parts[0], parts[1]);

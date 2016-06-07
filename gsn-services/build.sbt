@@ -27,7 +27,7 @@ libraryDependencies ++= Seq(
   "org.zeromq" % "jeromq" % "0.3.5",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
   "org.scalatestplus" %% "play" % "1.1.0" % "test",
-  "gsn" % "gsn-tools" % "1.0.0-SNAPSHOT",
+  "gsn" % "gsn-tools" % "2.0.0-SNAPSHOT",
   "com.typesafe.play" %% "play-json" % "2.3.10",
   "com.typesafe.akka" %% "akka-actor" % "2.3.14"
   )

@@ -35,15 +35,15 @@ public class ZeroMQWrapperSync extends AbstractWrapper {
 	@Override
 	public DataField[] getOutputFormat() {
 		if (structure == null){
-				if (requester.send(vsensor + "?tcp://" + laddress + ":" + lport)){
-				    byte[] rec = requester.recv();
-				    if (rec != null){
-				        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
-				        if (structure != null)
-				            requester.close();
-				        return structure;
-				    }
-				}
+			if (requester.send(vsensor + "?tcp://" + laddress + ":" + lport)){
+			    byte[] rec = requester.recv();
+			    if (rec != null){
+			        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
+			        if (structure != null)
+			            requester.close();
+			        return structure;
+			    }
+			}
 		}
     	return structure;
 	}
@@ -59,7 +59,7 @@ public class ZeroMQWrapperSync extends AbstractWrapper {
 		String address = addressBean.getPredicateValue ( "address" ).toLowerCase();
 		int mport = addressBean.getPredicateValueAsInt("meta_port", Main.getContainerConfig().getZMQMetaPort());
 		String _lport = addressBean.getPredicateValue("local_port");
-		laddress = addressBean.getPredicateValue("local_adress");
+		laddress = addressBean.getPredicateValue("local_address");
 		vsensor = addressBean.getPredicateValue ( "vsensor" ).toLowerCase();
 		if ( address == null || address.trim().length() == 0 ) 
 			throw new RuntimeException( "The >address< parameter is missing from the ZeroMQ wrapper." );
