@@ -364,6 +364,25 @@ gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', 'favorit
 
             for (var i = 0; i < $scope.sensors.length; i++) {
 
+                if ($scope.sensors[i].properties.vs_name == "p_osgps"){
+                    for(var j = 0; j < $scope.sensors[i].properties.values.length; j++){
+                        var latLng = new google.maps.LatLng($scope.sensors[i].properties.values[j][2], $scope.sensors[i].properties.values[j][3]);
+
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            title: $scope.sensors[i].properties.vs_name + "[" + $scope.sensors[i].properties.values[j][1] + "]",
+                            url: '#/sensors/' + $scope.sensors[i].properties.vs_name
+                        });
+
+                        google.maps.event.addListener(marker, 'click', function () {
+                            window.location.href = this.url;
+                        });
+
+                        $scope.dynMarkers.push(marker);
+
+                    }
+                    continue;
+                }
                 if ($scope.sensors[i].geometry && $scope.sensors[i].geometry.coordinates[1] && $scope.sensors[i].geometry.coordinates[0]) {
                     var latLng = new google.maps.LatLng($scope.sensors[i].geometry.coordinates[1], $scope.sensors[i].geometry.coordinates[0]);
 
@@ -382,20 +401,9 @@ gsnControllers.controller('SensorListCtrl', ['$scope', 'sensorService', 'favorit
                 }
 
             }
-
             $scope.markerClusterer = new MarkerClusterer(map, $scope.dynMarkers, {});
-
-
         });
     });
-
-
-    //$http.get('sensors').success(function (data) {
-    //        $scope.sensors = data.features;
-    //        $scope.loading = false;
-    //
-    //    }
-    //);
 
 }]);
 

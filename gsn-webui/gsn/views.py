@@ -59,9 +59,14 @@ def sensors(request):
     """
     Return the list of sensors as gotten from the GSN server
     """
+
+    payload = {
+        'latestValues': True,
+    }
+
     if request.user.is_authenticated():
         return JsonResponse(
-            json.loads(requests.get(oauth_sensors_url, headers=create_headers(request.user)).text))
+            json.loads(requests.get(oauth_sensors_url, params=payload, headers=create_headers(request.user)).text))
     else:
         return JsonResponse(json.loads(requests.get(oauth_sensors_url).text))
 
