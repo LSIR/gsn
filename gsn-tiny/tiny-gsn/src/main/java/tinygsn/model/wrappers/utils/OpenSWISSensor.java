@@ -16,8 +16,13 @@ public class OpenSWISSensor extends AbstractSerialProtocol{
 
     public static final int STATE_READY = 0;
     public static final int STATE_WAITING_MEASUREMENT = 1;
+    public static final int STATE_WAITING_TIME = 2;
+    public static final int STATE_WAITING_SYNC = 3;
 
     public int mstate = STATE_READY;
+
+    public long max_offset = 864000;
+    private long device_offset = 0L;
 
     public OpenSWISSensor(WritableBT out) {
         super(out);
@@ -31,23 +36,49 @@ public class OpenSWISSensor extends AbstractSerialProtocol{
 
     @Override
     public void getMeasurements(){
-        mstate = STATE_WAITING_MEASUREMENT;
+        mstate = STATE_WAITING_TIME;
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) { }
-        getOut().write("temp\n".getBytes());
+        getOut().write("date -u\n".getBytes());
     }
 
     @Override
     public void received(String s) {
         switch (mstate){
+            case STATE_WAITING_TIME:
+                Log.d(TAG,"at " + System.currentTimeMillis()/1000 + " current time on device is: " + s);
+                s = s.trim();
+                device_offset = Long.parseLong(s) - System.currentTimeMillis()/1000;
+                if(Math.abs(device_offset) > max_offset){
+                    mstate = STATE_WAITING_SYNC;
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) { }
+                    getOut().write(("date -u " + (System.currentTimeMillis() / 1000) + "\n").getBytes());
+                } else {
+                    mstate = STATE_WAITING_MEASUREMENT;
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) { }
+                    getOut().write("temp\n".getBytes());
+                }
+                break;
+            case STATE_WAITING_SYNC:
+                Log.d(TAG,"Sync done");
+                mstate = STATE_WAITING_MEASUREMENT;
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) { }
+                getOut().write("temp\n".getBytes());
+                break;
             case STATE_READY:
                 Log.d(TAG, "Received: " + s);
                 break;
             case STATE_WAITING_MEASUREMENT:
                 Log.d(TAG, "Measurement: " + s);
                 s = s.trim();
-                getOut().publish(new StreamElement(SerialBLEWrapper.FIELD_NAMES,SerialBLEWrapper.FIELD_TYPES, new Serializable[]{Double.parseDouble(s)}));
+                getOut().publish(new StreamElement(SerialBLEWrapper.FIELD_NAMES,SerialBLEWrapper.FIELD_TYPES, new Serializable[]{Double.parseDouble(s), new Double(device_offset)}));
                 getOut().done();
         }
     }

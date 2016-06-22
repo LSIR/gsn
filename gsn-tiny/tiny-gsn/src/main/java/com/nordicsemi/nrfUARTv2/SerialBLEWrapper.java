@@ -73,13 +73,13 @@ public class SerialBLEWrapper extends AbstractWrapper {
 
     public static final String TAG = "SerialBLEWrapper";
 
-	public static final String[] FIELD_NAMES = new String[]{ "temperature"};
+	public static final String[] FIELD_NAMES = new String[]{ "temperature", "offset"};
 
-	public static final Byte[] FIELD_TYPES = new Byte[]{DataTypes.DOUBLE};
+	public static final Byte[] FIELD_TYPES = new Byte[]{DataTypes.DOUBLE, DataTypes.DOUBLE};
 
-	private static final String[] FIELD_DESCRIPTION = new String[]{"temperature"};
+	private static final String[] FIELD_DESCRIPTION = new String[]{"temperature", "offset"};
 
-	private static final String[] FIELD_TYPES_STRING = new String[]{"double"};
+	private static final String[] FIELD_TYPES_STRING = new String[]{"double", "double"};
 
 	public final Class<? extends WrapperService> getSERVICE() {
 		return SerialBLEService.class;
