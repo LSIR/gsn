@@ -40,10 +40,10 @@ import gsn.beans.VSensorConfig;
 import gsn.config.GsnConf;
 import gsn.config.VsConf;
 import gsn.data.DataStore;
-import gsn.http.delivery.LocalDeliveryWrapper;
-import gsn.http.delivery.PushDelivery;
+import gsn.delivery.LocalDeliveryWrapper;
 import gsn.monitoring.MemoryMonitor;
 import gsn.monitoring.Monitorable;
+import gsn.monitoring.MonitoringServer;
 import gsn.networking.zeromq.ZeroMQDeliverySync;
 import gsn.networking.zeromq.ZeroMQDeliveryAsync;
 import gsn.networking.zeromq.ZeroMQProxy;
@@ -64,54 +64,24 @@ import java.awt.RenderingHints;
 import java.awt.SplashScreen;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.eclipse.jetty.util.security.Constraint;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
-import org.eclipse.jetty.security.HashLoginService;
-import org.eclipse.jetty.security.authentication.BasicAuthenticator;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.session.HashSessionIdManager;
-import org.eclipse.jetty.server.ssl.SslSocketConnector;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.eclipse.jetty.webapp.WebAppContext;
 
 import org.zeromq.ZContext;
 
-import org.eclipse.jetty.server.AbstractConnector;
 
 
-/**
- * Web Service URLs :
- * Microsoft SensorMap: http://localhost:22001/services/Service?wsdl
- * GSN: http://localhost:22001/services/GSNWebService?wsdl
- */
 public final class Main {
 	
     public static final int        DEFAULT_MAX_DB_CONNECTIONS       = 8;
 	public static final String     DEFAULT_GSN_CONF_FOLDER            = "../conf";
-	public static final String     DEFAULT_WEB_APP_FOLDER             = "src/main/webapp";
 	public static final String     DEFAULT_VIRTUAL_SENSOR_FOLDER = "../virtual-sensors";
 	public static transient Logger logger                           = LoggerFactory.getLogger ( Main.class );
 
@@ -120,24 +90,24 @@ public final class Main {
 	 * into the class implementing DataSource.
 	 */
 	private static  Properties                            wrappers ;
-	private static final int                              DEFAULT_JETTY_SERVLETS = 100;
 	private static Main                                   singleton ;
 	private static int                                    gsnControllerPort      = 22232;
 	public static String                                  gsnConfFolder          = DEFAULT_GSN_CONF_FOLDER;
-	public static String                                  webAppPath             = DEFAULT_WEB_APP_FOLDER;
 	public static String                                  virtualSensorDirectory = DEFAULT_VIRTUAL_SENSOR_FOLDER;
 	private static ZeroMQProxy                            zmqproxy;
 	private static StorageManager                         mainStorage;
     private static StorageManager                         windowStorage;
     private static StorageManager                         validationStorage;
-    private static ZContext                                zmqContext             = new ZContext();
+    private static ZContext                               zmqContext              = new ZContext();
     private static HashMap<Integer, StorageManager>       storages                = new HashMap<Integer, StorageManager>();
     private static HashMap<VSensorConfig, StorageManager> storagesConfigs         = new HashMap<VSensorConfig, StorageManager>();
     private GSNController                                 controlSocket;
     private ContainerConfig                               containerConfig;
+    private MonitoringServer                              monitoringServer;
     private static GsnConf gsnConf;
-    private static Map <String,VsConf> vsConf =new HashMap<String,VsConf>();
+    private static Map <String,VsConf> vsConf = new HashMap<String,VsConf>();
     private static ArrayList<Monitorable> toMonitor = new ArrayList<Monitorable>();
+    
     
     /*
      *  Retrieving ThreadMXBean instance of JVM
@@ -150,12 +120,11 @@ public final class Main {
 
 		ValidityTools.checkAccessibilityOfFiles ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , gsnConfFolder + "/gsn.xml");
 		ValidityTools.checkAccessibilityOfDirs ( virtualSensorDirectory );
-		//  initializeConfiguration();
 		try {
 			controlSocket = new GSNController(null, gsnControllerPort);
 			containerConfig = loadContainerConfiguration();
-			updateSplashIfNeeded(new String[] {"GSN is starting at port:"+containerConfig.getContainerPort(),"All GSN logs are available at: logs/gsn.log"});
-			System.out.println("Global Sensor Networks (GSN) is Starting on port "+containerConfig.getContainerPort()+"...");
+			updateSplashIfNeeded(new String[] {"GSN is starting...", "All GSN logs are available at: logs/gsn.log"});
+			System.out.println("Global Sensor Networks (GSN) is starting...");
             System.out.println("The logs of GSN server are available in logs/gsn.log file.");
 			System.out.println("To Stop GSN execute the gsn-stop script.");
 		} catch ( FileNotFoundException e ) {
@@ -164,9 +133,7 @@ public final class Main {
 		}
         int maxDBConnections = System.getProperty("maxDBConnections") == null ? DEFAULT_MAX_DB_CONNECTIONS : Integer.parseInt(System.getProperty("maxDBConnections"));
         int maxSlidingDBConnections = System.getProperty("maxSlidingDBConnections") == null ? DEFAULT_MAX_DB_CONNECTIONS : Integer.parseInt(System.getProperty("maxSlidingDBConnections"));
-        int maxServlets = System.getProperty("maxServlets") == null ? DEFAULT_JETTY_SERVLETS : Integer.parseInt(System.getProperty("maxServlets"));
 
-    	
     	DataStore ds = new DataStore(gsnConf);
 
         mainStorage = StorageManagerFactory.getInstance(containerConfig.getStorage().getJdbcDriver ( ) , containerConfig.getStorage().getJdbcUsername ( ) , containerConfig.getStorage().getJdbcPassword ( ) , containerConfig.getStorage().getJdbcURL ( ) , maxDBConnections);
@@ -178,17 +145,11 @@ public final class Main {
 
         logger.trace ( "The Container Configuration file loaded successfully." );
         
+        // starting the monitoring socket
         toMonitor.add(new MemoryMonitor());
-
-		try {
-			logger.debug("Starting the http-server @ port: "+containerConfig.getContainerPort()+" (maxDBConnections: "+maxDBConnections+", maxSlidingDBConnections: " + maxSlidingDBConnections + ", maxServlets:"+maxServlets+")"+" ...");
-            Server jettyServer = getJettyServer(getContainerConfig().getContainerPort(), getContainerConfig().getSSLPort(), maxServlets);
-			jettyServer.start ( );
-			logger.debug("http-server running @ port: "+containerConfig.getContainerPort());
-		} catch ( Exception e ) {
-			throw new Exception("Start of the HTTP server failed. The HTTP protocol is used for monitoring GSN and some remote communication: "+ e.getMessage(),e);
-		}
-		
+        monitoringServer = new MonitoringServer(containerConfig.getMonitorPort());
+        monitoringServer.start();
+        
 		if (containerConfig.isZMQEnabled()){
 			//start the 0MQ proxy
 			zmqproxy = new ZeroMQProxy(containerConfig.getZMQProxyPort(),containerConfig.getZMQMetaPort());
@@ -206,13 +167,11 @@ public final class Main {
 
 		vsloader.addVSensorStateChangeListener(new SQLValidatorIntegration(SQLValidator.getInstance()));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
-		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(PushDelivery.class));
 		if (containerConfig.isZMQEnabled())
 			vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(ZeroMQDeliverySync.class));
 		    vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(ZeroMQDeliveryAsync.class));
 
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
-		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(PushDelivery.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(ZeroMQDeliverySync.class));
 		ContainerImpl.getInstance().addVSensorDataListener(DataDistributer.getInstance(ZeroMQDeliveryAsync.class));
 		vsloader.startLoading();
@@ -296,29 +255,24 @@ public final class Main {
 		closeSplashIfneeded();
 	}
 
-	public static ContainerConfig loadContainerConfiguration() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, CertificateException, SecurityException, SignatureException, IOException{
-		ValidityTools.checkAccessibilityOfFiles (  WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , gsnConfFolder + "/gsn.xml");
-		ValidityTools.checkAccessibilityOfDirs ( virtualSensorDirectory );
+	public static ContainerConfig loadContainerConfiguration() {
+		ValidityTools.checkAccessibilityOfFiles (WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , gsnConfFolder + "/gsn.xml");
+		ValidityTools.checkAccessibilityOfDirs (virtualSensorDirectory);
 		ContainerConfig toReturn = null;
 		try {
-			toReturn = loadContainerConfig (gsnConfFolder + "/gsn.xml" );
+			toReturn = loadContainerConfig (gsnConfFolder + "/gsn.xml");
 			logger.info ( "Loading wrappers.properties at : " + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE);
 			wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
 			logger.info ( "Wrappers initialization ..." );
-		} catch ( FileNotFoundException e ) {
-			logger.error ("The the configuration file : " + gsnConfFolder + "/gsn.xml doesn't exist. "+ e.getMessage());
-			logger.info ( "Check the path of the configuration file and try again." );
-			System.exit ( 1 );
-		} catch ( ClassNotFoundException e ) {
-			logger.error ( "The file wrapper.properties refers to one or more classes which don't exist in the classpath"+ e.getMessage());
-			System.exit ( 1 );
+		} catch (ClassNotFoundException e) {
+			logger.error ("The file wrapper.properties refers to one or more classes which don't exist in the classpath"+ e.getMessage());
+			System.exit (1);
 		}
 		return toReturn;
 
 	}
 
-	public static ContainerConfig loadContainerConfig (String gsnXMLpath)throws
-	    FileNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, IOException, KeyStoreException, CertificateException, SecurityException, SignatureException, InvalidKeyException, ClassNotFoundException {
+	public static ContainerConfig loadContainerConfig (String gsnXMLpath) throws ClassNotFoundException {
 		if (!new File(gsnXMLpath).isFile()) {
 			logger.error("Couldn't find the gsn.xml file @: "+(new File(gsnXMLpath).getAbsolutePath()));
 			System.exit(1);
@@ -366,84 +320,6 @@ public final class Main {
 			}
 			else
 				return singleton.containerConfig;
-	}
-
-	public Server getJettyServer(int port, int sslPort, int maxThreads) throws IOException {
-		
-        Server server = new Server();
-		HandlerCollection handlers = new HandlerCollection();
-        server.setThreadPool(new QueuedThreadPool(maxThreads));
-
-        SslSocketConnector sslSocketConnector = null;
-        if (sslPort > 0) {
-            System.out.println("SSL is Starting on port "+sslPort+"...");
-            SslContextFactory sslContextFactory = new SslContextFactory();
-            sslContextFactory.addExcludeProtocols("SSLv3");
-            sslContextFactory.setKeyStorePath(getContainerConfig().getSSLKeystore());
-            sslContextFactory.setKeyStorePassword(getContainerConfig().getSSLKeyStorePassword());
-            sslContextFactory.setKeyManagerPassword(getContainerConfig().getSSLKeyPassword());
-            sslContextFactory.setTrustStore(getContainerConfig().getSSLKeystore());
-            sslContextFactory.setTrustStorePassword(getContainerConfig().getSSLKeyStorePassword());
-			sslSocketConnector = new SslSocketConnector(sslContextFactory);
-            sslSocketConnector.setPort(getContainerConfig().getSSLPort());
-        }
-        else if (getContainerConfig().isAcEnabled())
-            logger.error("SSL MUST be configured in the gsn.xml file when Access Control is enabled !");
-        
-        AbstractConnector connector=new SelectChannelConnector ();
-        connector.setPort ( port );
-        connector.setMaxIdleTime(30000);
-        connector.setAcceptors(2);
-        connector.setConfidentialPort(sslPort);
-
-		if (sslSocketConnector==null)
-			server.setConnectors ( new Connector [ ] { connector } );
-		else
-			server.setConnectors ( new Connector [ ] { connector,sslSocketConnector } );
-
-		WebAppContext webAppContext = new WebAppContext();
-		webAppContext.setContextPath("/");
-		webAppContext.setResourceBase(webAppPath);
-		
-		handlers.addHandler(webAppContext);
-		server.setHandler(handlers);
-
-		Properties usernames = new Properties();
-		usernames.load(new FileReader(gsnConfFolder + "/realm.properties"));
-		if (!usernames.isEmpty()){
-			HashLoginService loginService = new HashLoginService();
-			loginService.setName("GSNRealm");
-			loginService.setConfig(gsnConfFolder + "/realm.properties");
-			loginService.setRefreshInterval(10000); //re-reads the file every 10 seconds.
-
-			Constraint constraint = new Constraint();
-			constraint.setName("GSN User");
-			constraint.setRoles(new String[]{"gsnuser"});
-			constraint.setAuthenticate(true);
-
-			ConstraintMapping cm = new ConstraintMapping();
-			cm.setConstraint(constraint);
-			cm.setPathSpec("/*");
-			cm.setMethod("GET");
-
-			ConstraintMapping cm2 = new ConstraintMapping();
-			cm2.setConstraint(constraint);
-			cm2.setPathSpec("/*");
-			cm2.setMethod("POST");
-
-			ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-			securityHandler.setLoginService(loginService);
-			securityHandler.setConstraintMappings(new ConstraintMapping[]{cm, cm2});
-			securityHandler.setAuthenticator(new BasicAuthenticator());
-			webAppContext.setSecurityHandler(securityHandler);
-		}
-
-		server.setSendServerVersion(true);
-		server.setStopAtShutdown ( true );
-		server.setSendServerVersion ( false );
-		server.setSessionIdManager(new HashSessionIdManager(new Random()));
-
-		return server;
 	}
 
     public static StorageManager getValidationStorage() {

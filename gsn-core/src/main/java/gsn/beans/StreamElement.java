@@ -30,7 +30,7 @@
 
 package gsn.beans;
 
-import gsn.http.delivery.StreamElement4Rest;
+import gsn.delivery.StreamElement4Rest;
 import gsn.utils.CaseInsensitiveComparator;
 import play.libs.Json;
 

@@ -29,9 +29,9 @@ package gsn;
 
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
-import gsn.http.delivery.DefaultDistributionRequest;
-import gsn.http.delivery.DeliverySystem;
-import gsn.http.delivery.DistributionRequest;
+import gsn.delivery.DefaultDistributionRequest;
+import gsn.delivery.DeliverySystem;
+import gsn.delivery.DistributionRequest;
 import gsn.networking.zeromq.ZeroMQDeliveryAsync;
 import gsn.networking.zeromq.ZeroMQDeliverySync;
 import gsn.storage.DataEnumerator;

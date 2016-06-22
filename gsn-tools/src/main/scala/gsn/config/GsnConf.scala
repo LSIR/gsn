@@ -4,20 +4,15 @@ import xml._
 import com.typesafe.config.ConfigFactory
 
 
-case class GsnConf(name:String,author:String,description:String,
-    email:String,port:Int,timeFormat:String, 
-    zmqConf:ZmqConf,sslConf:SslConf,
+case class GsnConf(monitorPort:Int,timeFormat:String, 
+    zmqConf:ZmqConf,
     storageConf:StorageConf,slidingConf:Option[StorageConf])
     
 object GsnConf extends Conf {
   def create(xml:Elem)=GsnConf(
-    take(xml \ "name").getOrElse(defaultGsn.name ),
-    take(xml \ "author").getOrElse(defaultGsn.author ),
-    take(xml \ "description").getOrElse(defaultGsn.description ),
-    take(xml \ "email").getOrElse(defaultGsn.email ),
-    takeInt(xml \ "port").getOrElse(defaultGsn.port ),    
+    takeInt(xml \ "monitor-port").getOrElse(defaultGsn.monitorPort ),    
     take(xml \ "time-format").getOrElse(defaultGsn.timeFormat ),
-    ZmqConf.create(xml),SslConf.create(xml),
+    ZmqConf.create(xml),
     StorageConf.create((xml \ "storage").head),
     (xml \ "sliding").headOption.map(a=>StorageConf.create((a \ "storage").head))
   )
@@ -30,15 +25,6 @@ object ZmqConf extends Conf{
     takeBool(xml \ "zmq-enable").getOrElse(defaultZmq.enabled),
     takeInt(xml \ "zmqproxy").getOrElse(defaultZmq .proxyPort),
     takeInt(xml \ "zmqmeta").getOrElse(defaultZmq.metaPort ) )  
-}
-
-case class SslConf(sslPort:Int,sslKeyStorePass:String,sslKeyPass:String,sslKeyStore:String) 
-object SslConf extends Conf{
-  def create(xml:Elem)=SslConf(
-    takeInt(xml \ "ssl-port").getOrElse(defaultSsl.sslPort),
-    take(xml \ "ssl-key-store-password").getOrElse(defaultSsl.sslKeyStorePass),
-    take(xml \ "ssl-key-password").getOrElse(defaultSsl.sslKeyPass),
-    take(xml \ "ssl-key-store").getOrElse(defaultSsl.sslKeyStore))
 }
 
 case class StorageConf(driver:String,url:String,

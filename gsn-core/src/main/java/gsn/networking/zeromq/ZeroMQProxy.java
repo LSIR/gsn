@@ -7,7 +7,7 @@ import gsn.DataDistributer;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.beans.DataField;
-import gsn.http.delivery.DefaultDistributionRequest;
+import gsn.delivery.DefaultDistributionRequest;
 
 import org.zeromq.ZMQ;
 import org.slf4j.Logger;

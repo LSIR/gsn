@@ -21,16 +21,9 @@ public class BeansInitializer {
 	  if (gsn.slidingConf().isDefined())
 		  sliding.setStorage(storage(gsn.slidingConf().get()));
 	  else sliding=null;
-	  int sslPort=gsn.sslConf().sslPort();
 	 ContainerConfig con=new ContainerConfig(			 
-			 gsn.name(),gsn.author(),gsn.description(),gsn.email(),
-			 gsn.port(),gsn.timeFormat(),			 
+			 gsn.monitorPort(),gsn.timeFormat(),			 
 			 gsn.zmqConf().enabled(),gsn.zmqConf().proxyPort(),gsn.zmqConf().metaPort(),
-			 true,
-			 sslPort,
-			 gsn.sslConf().sslKeyStorePass(),
-			 gsn.sslConf().sslKeyPass(),
-			 gsn.sslConf().sslKeyStore(),
 			 storage(gsn.storageConf()),sliding);
 	
 	 return con;

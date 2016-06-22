@@ -29,7 +29,6 @@
 
 package gsn.beans;
 
-import gsn.Main;
 import gsn.config.GsnConf;
 import gsn.utils.KeyValueImp;
 
@@ -53,48 +52,25 @@ public class ContainerConfig {
 
 	public static final String            NOT_PROVIDED                     = "Not Provided";
 	
-	public static final int               DEFAULT_GSN_PORT                 = 22001;
-    public static final int               DEFAULT_SSL_PORT                 = 8443;
+	public static final int               DEFAULT_MONITOR_PORT             = 22001;
 	public static final int               DEFAULT_ZMQ_PROXY_PORT           = 22022;
 	public static final int               DEFAULT_ZMQ_META_PORT            = 22023;
 	public static final boolean           DEFAULT_ZMQ_ENABLED               = false;
-	public static final String            DEFAULT_WEB_NAME                 = "NoName.";
-	public static final String            DEFAULT_WEB_AUTHOR               = "Author not specified.";
-	public static final String            DEFAULT_WEB_EMAIL                = "Email not specified.";
-    private static final String           DEFAULT_SSL_KEYSTORE_PWD         = "changeit";
-    private static final String           DEFAULT_SSL_KEY_PWD              = "changeit";
-    private static final String           DEFAULT_SSL_KEYSTORE             = Main.gsnConfFolder + "/servertestkeystore";
     
-	public static final String            FIELD_NAME_gsnPortNo             = "containerPort";
+	public static final String            FIELD_NAME_monitorPortNo         = "monitorPort";
 	public static final String            FIELD_NAME_zmqEnabled            = "zmqEnabled";
 	public static final String            FIELD_NAME_zmqProxyPort          = "zmqProxyPort";
 	public static final String            FIELD_NAME_zmqMetaPort           = "zmqMetaPort";
-	public static final String            FIELD_NAME_webName               = "webName";
-	public static final String            FIELD_NAME_webAuthor             = "webAuthor";
-	public static final String            FIELD_NAME_webDescription        = "webDescription";
-	public static final String            FIELD_NAME_webEmail              = "webEmail";
 	public static final String            FIELD_NAME_databaseSystem        = "databaseSystem";
 
 	
-	protected String                      webName                          = DEFAULT_WEB_NAME;
-    protected String                      webAuthor                        = DEFAULT_WEB_AUTHOR;
-    protected String                      webDescription;
-	protected String                      webEmail                         = DEFAULT_WEB_EMAIL;
-	protected String                      mailServer;
-	protected String                      smsServer;
-	protected String                      smsPassword;
-	protected int                         containerPort                    = DEFAULT_GSN_PORT;
+	protected int                         monitorPort                      = DEFAULT_MONITOR_PORT;
 	protected boolean                     zmqEnabled                       = DEFAULT_ZMQ_ENABLED;
 	protected int                         zmqProxyPort                     = DEFAULT_ZMQ_PROXY_PORT;
 	protected int                         zmqMetaPort                      = DEFAULT_ZMQ_META_PORT;
 	protected String                      containerFileName;
 	protected int                         storagePoolSize                  = -1;
 
-	private int                           sslPort                          = -1;
-    private boolean                       acEnabled                        = false;
-	private String                        sslKeyStorePassword;
-	private String                        sslKeyPassword;
-	private String						  sslKeyStore                      = DEFAULT_SSL_KEYSTORE;
     private StorageConfig                 storage ;
     private SlidingConfig                 sliding;
 	private String                        gsnConfigurationFileName;
@@ -106,33 +82,17 @@ public class ContainerConfig {
 		
 	}
 	
-	public ContainerConfig(String name,String author,String description,String email,
-			int port, String timeFormat, boolean zmqEnabled,int zmqProxyPort,int zmqMetaPort,
-			boolean acEnabled,int sslPort, String sslKSPass,String sslKPass,String sslKS, 
-			StorageConfig storage,SlidingConfig slide){
-		this.webName=name;
-		this.webAuthor=author;
-		this.webEmail=email;
-		this.webDescription=description;
-		this.containerPort=port;
+	public ContainerConfig(int port, String timeFormat, boolean zmqEnabled,int zmqProxyPort,int zmqMetaPort,StorageConfig storage,SlidingConfig slide){
+		this.monitorPort=port;
 		this.timeFormat=timeFormat;
 		this.zmqEnabled=zmqEnabled;
 		this.zmqProxyPort=zmqProxyPort;
 		this.zmqMetaPort=zmqMetaPort;
-		this.acEnabled=acEnabled;
-		this.sslPort=sslPort;
-		this.sslKeyStorePassword=sslKSPass;
-		this.sslKeyPassword=sslKPass;
-		this.sslKeyStore=sslKS;
 		this.storage=storage;
 		this.sliding=slide;				
 				
 				
 	}
-
-    public boolean isAcEnabled() {
-        return acEnabled;
-    }
 
     public StorageConfig getStorage() {
         return storage;
@@ -150,26 +110,13 @@ public class ContainerConfig {
 		this.containerFileName = containerFileName;
 	}
 
-	/**
-	 * @return Returns the author.
-	 */
-	public String getWebAuthor ( ) {
-		if ( this.webAuthor == null || this.webAuthor.trim( ).equals( "" ) )
-			this.webAuthor = NOT_PROVIDED;
-		else
-			this.webAuthor = this.webAuthor.trim( );
-		return this.webAuthor;
-	}
 
-	/**
-	 * @return Returns the containerPort.
-	 */
-	public int getContainerPort ( ) {
-		return this.containerPort;
+	public int getMonitorPort ( ) {
+		return this.monitorPort;
 	}
 	
-	public void setContainerPort ( int newValue ) {
-		this.containerPort = newValue;
+	public void setMonitorPort ( int newValue ) {
+		this.monitorPort = newValue;
 	}
 	
 	/**
@@ -194,65 +141,18 @@ public class ContainerConfig {
 	}
 
 	/**
-	 * @return Returns the webDescription.
-	 */
-	public String getWebDescription ( ) {
-		if ( this.webDescription == null || this.webDescription.trim( ).equals( "" ) ) this.webDescription = NOT_PROVIDED;
-		return this.webDescription.trim( );
-	}
-
-	/**
-	 * @return Returns the webEmail.
-	 */
-	public String getWebEmail ( ) {
-		if ( this.webEmail == null ) this.webEmail = NOT_PROVIDED;
-		return this.webEmail;
-	}
-
-	/**
-	 * @return Returns the name.
-	 */
-	public String getWebName ( ) {
-		if ( this.webName == null || this.webName.trim( ).equals( "" ) ) this.webName = NOT_PROVIDED;
-		this.webName = this.webName.trim( );
-		return this.webName;
-	}
-
-	public void setWebEmail ( String newValue ) {
-		this.webEmail = newValue;
-	}
-
-	public void setWebAuthor ( String newValue ) {
-		this.webAuthor = newValue;
-	}
-
-	public void setWebName ( String newValue ) {
-		this.webName = newValue;
-	}
-
-	/**
 	 * @return Returns the storagePoolSize.
 	 */
 	public int getStoragePoolSize ( ) {
 		return this.storagePoolSize;
 	}
 
-	public String toString ( ) {
-		return this.getClass().getName() + " class [name=" + this.webName + "]";
-	}
-
 	public static ContainerConfig getConfigurationFromFile (String containerConfigurationFileName) throws FileNotFoundException {
-/*		IBindingFactory bfact = BindingDirectory.getFactory( ContainerConfig.class );
-		IUnmarshallingContext uctx = bfact.createUnmarshallingContext( );
-		ContainerConfig toReturn = ( ContainerConfig ) uctx.unmarshalDocument( new FileInputStream( containerConfigurationFileName ) , null );
-*/
 		GsnConf gsn=GsnConf.load(containerConfigurationFileName);
 		ContainerConfig toReturn = BeansInitializer.container(gsn);
 		toReturn.setSourceFiles(containerConfigurationFileName);
 		return toReturn;
 	}
-
-	
 
 	private void setSourceFiles ( String gsnConfigurationFileName) {
 		this.gsnConfigurationFileName = gsnConfigurationFileName;
@@ -300,15 +200,10 @@ public class ContainerConfig {
 	public void writeConfigurations ( ) throws FileNotFoundException , IOException {
 		StringTemplateGroup templateGroup = new StringTemplateGroup( "gsn" );
 		StringTemplate st = templateGroup.getInstanceOf( "gsn/gui/templates/templateConf" );
-		st.setAttribute( "name" , getWebName( ) );
-		st.setAttribute( "author" , getWebAuthor( ) );
-		st.setAttribute( "description" , getWebDescription( ) );
-		st.setAttribute( "email" , getWebEmail( ) );
 		st.setAttribute( "db_user" , storage.getJdbcUsername( ) );
 		st.setAttribute( "db_password" , storage.getJdbcPassword( ) );
 		st.setAttribute( "db_driver" , storage.getJdbcDriver( ) );
 		st.setAttribute( "db_url" , storage.getJdbcURL( ) );
-		st.setAttribute( "gsn_port" , getContainerPort( ) );
 
 		FileWriter writer = new FileWriter( gsnConfigurationFileName );
 		writer.write( st.toString( ) );
@@ -326,18 +221,6 @@ public class ContainerConfig {
 		return bean;
 	}
 
-	public int getSSLPort(){
-		return sslPort;
-	}
-	public String getSSLKeyStorePassword(){
-		return sslKeyStorePassword == null ? DEFAULT_SSL_KEYSTORE_PWD : sslKeyStorePassword;
-	}
-	public String getSSLKeyPassword(){
-		return sslKeyPassword == null ? DEFAULT_SSL_KEY_PWD : sslKeyPassword;
-	}
-	public String getSSLKeystore(){
-		return sslKeyStore;
-	}
 	
 	/**
 	 * MSR MAP PART.

@@ -31,8 +31,7 @@ package gsn.beans;
 import gsn.Main;
 import gsn.Mappings;
 import gsn.config.VsConf;
-import gsn.http.delivery.LocalDeliveryWrapper;
-import gsn.http.delivery.PushRemoteWrapper;
+import gsn.delivery.LocalDeliveryWrapper;
 import gsn.storage.SQLUtils;
 import gsn.utils.ValidityTools;
 import gsn.utils.graph.Graph;
@@ -248,11 +247,8 @@ public final class Modifications {
 							continue;
 						}
 
-						boolean isLocalRemote = wrapperClass.isAssignableFrom(PushRemoteWrapper.class) && isInTheSameGSNInstance(addressing[addressingIndex]);
 
-						if((wrapperClass.isAssignableFrom(PushRemoteWrapper.class)) && !isLocalRemote){
-							hasValidAddressing = true;
-						}else if(( wrapperClass.isAssignableFrom(LocalDeliveryWrapper.class)) || isLocalRemote ){
+						if(( wrapperClass.isAssignableFrom(LocalDeliveryWrapper.class)) ){
 							String vsName = vsensorName.toLowerCase().trim();
 							VSensorConfig sensorConfig = vsNameTOVSConfig.get(vsName);
 							if(sensorConfig == null)
@@ -305,6 +301,7 @@ public final class Modifications {
 		}
 	}
 
+	/* let's keep it if we want to play with zmq dependency one day
 	private static boolean isInTheSameGSNInstance(AddressBean addressBean) {
 		String urlStr = addressBean.getPredicateValue ( "remote-contact-point" );
 		String host;
@@ -334,7 +331,7 @@ public final class Modifications {
 		boolean toReturn = (ValidityTools.isLocalhost(host) && Main.getContainerConfig().getContainerPort() == port);
 		return toReturn;
 	}
-
+*/
 	public static Graph<VSensorConfig> buildDependencyGraphFromIterator(Iterator<VSensorConfig> vsensorIterator){
 		Graph<VSensorConfig> graph = new Graph<VSensorConfig>();
 		fillGraph(graph, vsensorIterator);

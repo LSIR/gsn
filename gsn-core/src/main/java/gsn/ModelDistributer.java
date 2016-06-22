@@ -27,8 +27,8 @@ package gsn;
 
 import gsn.beans.StreamElement;
 import gsn.beans.VSensorConfig;
-import gsn.http.delivery.DeliverySystem;
-import gsn.http.delivery.DistributionRequest;
+import gsn.delivery.DeliverySystem;
+import gsn.delivery.DistributionRequest;
 import gsn.storage.DataEnumeratorIF;
 import gsn.storage.ModelEnumerator;
 

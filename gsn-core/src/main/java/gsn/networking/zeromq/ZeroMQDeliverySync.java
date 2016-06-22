@@ -15,7 +15,7 @@ import com.esotericsoftware.kryo.io.Output;
 import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.http.delivery.DeliverySystem;
+import gsn.delivery.DeliverySystem;
 
 public class ZeroMQDeliverySync implements DeliverySystem{
 	

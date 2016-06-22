@@ -169,7 +169,7 @@ public class eKoWrapper extends AbstractWrapper {
 			return false;
 		}
 
-		port = addressBean.getPredicateValueAsInt("port" ,ContainerConfig.DEFAULT_GSN_PORT);
+		port = addressBean.getPredicateValueAsIntWithException("port");
 		if ( port > 65000 || port <= 0 ) {
 			logger.error("Remote wrapper initialization failed, bad port number:"+port);
 			return false;

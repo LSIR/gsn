@@ -16,8 +16,8 @@ import gsn.Main;
 import gsn.beans.AddressBean;
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
+import gsn.delivery.StreamElement4Rest;
 import gsn.wrappers.AbstractWrapper;
-import gsn.http.delivery.StreamElement4Rest;
 
 public class ZeroMQWrapperAsync extends AbstractWrapper {
 	

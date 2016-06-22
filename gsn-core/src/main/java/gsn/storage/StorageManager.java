@@ -37,7 +37,7 @@ import gsn.Main;
 import gsn.beans.DataField;
 import gsn.beans.DataTypes;
 import gsn.beans.StreamElement;
-import gsn.http.datarequest.AbstractQuery;
+import gsn.delivery.datarequest.AbstractQuery;
 import gsn.storage.hibernate.DBConnectionInfo;
 import gsn.utils.GSNRuntimeException;
 import gsn.utils.ValidityTools;
