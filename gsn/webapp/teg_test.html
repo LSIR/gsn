@@ -36,17 +36,24 @@ $(document).ready(function() {
       { title:"TEG Test ETZ, Left",
         signals: [{
           vsensor:".*_temperature__tttn",
-          field:["tttn_t1","tttn_t1"],
+          field:["tttn_t1","tttn_t2"],
           position: [2082],
         }]
       },
       { title:"TEG Test ETZ, Right",
         signals: [{
           vsensor:".*_temperature__tttn",
-          field:["tttn_t1","tttn_t1"],
+          field:["tttn_t1","tttn_t2","tttn_t3"],
           position: [2112],
         }]
       },
+      { title:"TEG Test Voltages",
+          signals: [{
+            vsensor:".*_dozer_adccomdiff__mapped",
+            field:["payload_a3"],
+            position: [2082,2112],
+          }]
+        },
     ]);
     
     $.ajax({
