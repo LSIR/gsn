@@ -1,6 +1,5 @@
 name := "gsn-services"
 
-javacOptions ++= Seq("-source", "1.7", "-target", "1.7")
 
 val buildSettings = Defaults.defaultSettings ++ Seq(
    javaOptions += "-Xmx128m",

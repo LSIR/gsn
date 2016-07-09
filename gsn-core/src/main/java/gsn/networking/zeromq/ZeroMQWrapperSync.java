@@ -27,6 +27,7 @@ public class ZeroMQWrapperSync extends AbstractWrapper {
 	private String vsensor;
 	private Kryo kryo = new Kryo();
 	private boolean isLocal = false;
+	private ZContext ctx;
 	private ZMQ.Socket requester = null;
 	private ZMQ.Socket receiver = null;
 	private int lport = 0;
@@ -35,6 +36,11 @@ public class ZeroMQWrapperSync extends AbstractWrapper {
 	@Override
 	public DataField[] getOutputFormat() {
 		if (structure == null){
+			requester = ctx.createSocket(ZMQ.REQ);
+			requester.setReceiveTimeOut(1000);
+			requester.setSendTimeOut(1000);
+			requester.setLinger(0);
+			requester.connect(remoteContactPoint_META);
 			if (requester.send(vsensor + "?tcp://" + laddress + ":" + lport)){
 			    byte[] rec = requester.recv();
 			    if (rec != null){
@@ -44,6 +50,7 @@ public class ZeroMQWrapperSync extends AbstractWrapper {
 			        return structure;
 			    }
 			}
+			requester.close();
 		}
     	return structure;
 	}
@@ -83,7 +90,8 @@ public class ZeroMQWrapperSync extends AbstractWrapper {
 			}
 			remoteContactPoint_META = "tcp://127.0.0.1:" + Main.getContainerConfig().getZMQMetaPort();
 		}
-		ZContext ctx = Main.getZmqContext();
+	    remoteContactPoint_META = remoteContactPoint_META.trim();
+		ctx = Main.getZmqContext();
 		receiver = ctx.createSocket(ZMQ.REP);
 		if (lport == 0){
 		lport = receiver.bindToRandomPort("tcp://*", 50000, 60000);
@@ -93,16 +101,15 @@ public class ZeroMQWrapperSync extends AbstractWrapper {
 		requester = ctx.createSocket(ZMQ.REQ);
 		requester.setReceiveTimeOut(1000);
 		requester.setSendTimeOut(1000);
-		requester.connect((remoteContactPoint_META).trim());
-		
+		requester.setLinger(0);
+		requester.connect(remoteContactPoint_META);
 		if (requester.send(vsensor + "?tcp://" + laddress + ":" + lport)){
 		    byte[] rec = requester.recv();
 		    if (rec != null){
-		        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);
-		        if (structure != null)
-		            requester.close();
+		        structure =  kryo.readObjectOrNull(new Input(new ByteArrayInputStream(rec)),DataField[].class);  
 		    }
 		}
+		requester.close();
         return true;
 	}
 

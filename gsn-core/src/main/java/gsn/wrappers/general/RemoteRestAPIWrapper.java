@@ -36,7 +36,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Base64;
+import org.apache.commons.codec.binary.Base64;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -128,7 +128,7 @@ public class RemoteRestAPIWrapper extends AbstractWrapper {
 			int code = response.getStatusLine().getStatusCode();
 			if (code == 401) {
 			    // Add Basic Authorization header
-				post.addHeader("Authorization",Base64.getEncoder().encodeToString((clientId+":"+clientSecret).getBytes()));
+				post.addHeader("Authorization",Base64.encodeBase64String((clientId+":"+clientSecret).getBytes()));
 				post.releaseConnection();
 				response = client.execute(post);
 				code = response.getStatusLine().getStatusCode();

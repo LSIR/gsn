@@ -52,7 +52,7 @@ public class DataSources {
 		//ds.setDefaultTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
                 //ds.setAccessToUnderlyingConnectionAllowed(true); 
                 GSNContext.getMainContext().bind(Integer.toString(dci.hashCode()), ds);
-                logger.warn("Created a DataSource to: " + ds.getUrl());
+                logger.info("Created a DataSource to: " + ds.getUrl());
             }
         } catch (NamingException e) {
             logger.error(e.getMessage(), e);

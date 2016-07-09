@@ -62,7 +62,10 @@ public class User extends AppModel implements Subject {
 	public List<UserPermission> permissions;
 	
 	@ManyToMany
-	public List<DataSource> dataSources;
+	public List<DataSource> w_dataSources;
+	
+	@ManyToMany
+	public List<DataSource> r_dataSources;
 	
 	@ManyToMany
 	public List<Group> groups;
@@ -90,10 +93,17 @@ public class User extends AppModel implements Subject {
 		return this.permissions;
 	}
 	
-	public boolean hasAccessTo(DataSource ds){
-		if (dataSources.contains(ds)) return true;
-		for (Group g : groups){
-			if (g.dataSources.contains(ds)) return true;
+	public boolean hasAccessTo(DataSource ds, Boolean toWrite){
+		if (toWrite) {
+			if (w_dataSources.contains(ds)) return true;
+			for (Group g : groups){
+				if (g.w_dataSources.contains(ds)) return true;
+			}
+		}else{
+			if (r_dataSources.contains(ds)) return true;
+			for (Group g : groups){
+				if (g.r_dataSources.contains(ds)) return true;
+			}
 		}
 		return false;
 	}

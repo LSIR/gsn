@@ -1,7 +1,9 @@
+
 lazy val commonSettings = Seq(
   organization := "gsn",
   version := "2.0.0-SNAPSHOT",
   scalaVersion := "2.11.2",
+  javacOptions ++= Seq("-source", "1.7", "-target", "1.7", "-bootclasspath", "/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar"),
   resolvers ++= Seq(
     DefaultMavenRepository,
     "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
@@ -30,7 +32,7 @@ lazy val root = (project in file(".")).
 lazy val core = (project in file("gsn-core")).
   dependsOn(tools).
   settings(commonSettings: _*).
-  enablePlugins(JavaServerAppPackaging)
+  enablePlugins(JavaServerAppPackaging, DebianPlugin)
 
 lazy val extra = (project in file("gsn-extra")).
   dependsOn(core).

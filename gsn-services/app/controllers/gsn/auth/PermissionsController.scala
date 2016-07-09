@@ -183,13 +183,21 @@ object PermissionsController extends Controller with DeadboltActions {
       val v = request.queryString.get("vs_id").map { x => DataSource.find.byId(x.head.toLong) }
       v.fold(BadRequest(access.vslist.render(DataSource.find.setFirstRow((page - 1) * Global.pageLength).setMaxRows(Global.pageLength).findList().asScala, Group.find.findList().asScala, User.find.findList().asScala, count, page, Global.pageLength)))(vs => {
           request.queryString.get("id").map {x => x.head match {
-              case s if s.startsWith("u") => {
-                  vs.users.add(User.find.byId(s.stripPrefix("u").toLong))
-                  vs.saveManyToManyAssociations("users")
+              case s if s.startsWith("ur") => {
+                  vs.r_users.add(User.find.byId(s.stripPrefix("ur").toLong))
+                  vs.saveManyToManyAssociations("r_users")
                   }
-              case s if s.startsWith("g") => {
-                  vs.groups.add(Group.find.byId(s.stripPrefix("g").toLong))
-                  vs.saveManyToManyAssociations("groups")
+              case s if s.startsWith("gr") => {
+                  vs.r_groups.add(Group.find.byId(s.stripPrefix("gr").toLong))
+                  vs.saveManyToManyAssociations("r_groups")
+                  }
+              case s if s.startsWith("uw") => {
+                  vs.w_users.add(User.find.byId(s.stripPrefix("uw").toLong))
+                  vs.saveManyToManyAssociations("w_users")
+                  }
+              case s if s.startsWith("gw") => {
+                  vs.w_groups.add(Group.find.byId(s.stripPrefix("gw").toLong))
+                  vs.saveManyToManyAssociations("w_groups")
                   }
               case s if s.startsWith("a") => {
                   vs.setIs_public(true)
@@ -209,13 +217,21 @@ object PermissionsController extends Controller with DeadboltActions {
       val v = request.queryString.get("vs_id").map { x => DataSource.find.byId(x.head.toLong) }
       v.fold(BadRequest(access.vslist.render(DataSource.find.setFirstRow((page - 1) * Global.pageLength).setMaxRows(Global.pageLength).findList().asScala, Group.find.findList().asScala, User.find.findList().asScala, count, page, Global.pageLength)))(vs => {
           request.queryString.get("id").map {x => x.head match {
-              case s if s.startsWith("u") => {
-                  vs.users.remove(User.find.byId(s.stripPrefix("u").toLong))
-                  vs.saveManyToManyAssociations("users")
+              case s if s.startsWith("ur") => {
+                  vs.r_users.remove(User.find.byId(s.stripPrefix("ur").toLong))
+                  vs.saveManyToManyAssociations("r_users")
                   }
-              case s if s.startsWith("g") => {
-                  vs.groups.remove(Group.find.byId(s.stripPrefix("g").toLong))
-                  vs.saveManyToManyAssociations("groups")
+              case s if s.startsWith("gr") => {
+                  vs.r_groups.remove(Group.find.byId(s.stripPrefix("gr").toLong))
+                  vs.saveManyToManyAssociations("r_groups")
+                  }
+              case s if s.startsWith("uw") => {
+                  vs.w_users.remove(User.find.byId(s.stripPrefix("uw").toLong))
+                  vs.saveManyToManyAssociations("w_users")
+                  }
+              case s if s.startsWith("gw") => {
+                  vs.w_groups.remove(Group.find.byId(s.stripPrefix("gw").toLong))
+                  vs.saveManyToManyAssociations("w_groups")
                   }
               case s if s.startsWith("a") => {
                   vs.setIs_public(false)

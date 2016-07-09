@@ -25,7 +25,10 @@ public class Group extends AppModel{
 	public String description;
 	
 	@ManyToMany
-	public List<DataSource> dataSources;
+	public List<DataSource> r_dataSources;
+	
+	@ManyToMany
+	public List<DataSource> w_dataSources;
 	
 	@ManyToMany(mappedBy = "groups")
 	public List<User> users;

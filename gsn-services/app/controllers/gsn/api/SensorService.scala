@@ -90,7 +90,7 @@ object SensorService extends Controller with GsnService {
     }.get  
   })
    
-  def userInfo() = headings((APIPermissionAction() compose Action).async {implicit request =>
+  def userInfo() = headings((APIPermissionAction(false) compose Action).async {implicit request =>
 
      request match{
          case AuthInfoRequest(auth:AuthInfo[User],req) => Future(
@@ -100,7 +100,7 @@ object SensorService extends Controller with GsnService {
      }
   })
   
-  def uploadSensorData(sensorid:String) = headings((APIPermissionAction(sensorid) compose Action).async {implicit request =>
+  def uploadSensorData(sensorid:String) = headings((APIPermissionAction(true, sensorid) compose Action).async {implicit request =>
     Try{
       val vsname = sensorid.toLowerCase
       val data = queryparam("data")
@@ -140,7 +140,7 @@ object SensorService extends Controller with GsnService {
   })
 
   
-  def sensorData(sensorid:String) = headings((APIPermissionAction(sensorid) compose Action).async {implicit request =>
+  def sensorData(sensorid:String) = headings((APIPermissionAction(false, sensorid) compose Action).async {implicit request =>
     Try{
       val vsname=sensorid.toLowerCase
       val size:Option[Int]=queryparam("size").map(_.toInt)
@@ -322,7 +322,7 @@ object SensorService extends Controller with GsnService {
     }.get
   }
 
-  def download= (APIPermissionAction() compose Action).async {implicit request=>
+  def download= (APIPermissionAction(false) compose Action).async {implicit request=>
     //request.body.
     Future(Ok(""))
     

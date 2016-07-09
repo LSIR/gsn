@@ -27,11 +27,17 @@ public class DataSource extends AppModel implements Permission {
 	
 	public boolean is_public;
 
-	@ManyToMany(mappedBy = "dataSources")
-	public List<Group> groups;
+	@ManyToMany(mappedBy = "w_dataSources")
+	public List<Group> w_groups;
 	
-	@ManyToMany(mappedBy = "dataSources")
-	public List<User> users;
+	@ManyToMany(mappedBy = "w_dataSources")
+	public List<User> w_users;
+	
+	@ManyToMany(mappedBy = "r_dataSources")
+	public List<Group> r_groups;
+	
+	@ManyToMany(mappedBy = "r_dataSources")
+	public List<User> r_users;
 	
 	public static play.db.ebean.Model.Finder<Long, DataSource> find = new play.db.ebean.Model.Finder<Long, DataSource>(
 			Long.class, DataSource.class);

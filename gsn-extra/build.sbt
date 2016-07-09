@@ -2,10 +2,6 @@ import com.typesafe.sbt.SbtNativePackager._
 
 name := "gsn-extra"
 
-packageArchetype.java_application
-
-packAutoSettings
-
 libraryDependencies ++= Seq(
   "com.typesafe" % "config" % "1.2.1",
   "org.scala-lang.modules" % "scala-xml_2.11" % "1.0.2",

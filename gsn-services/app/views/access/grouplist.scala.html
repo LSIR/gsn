@@ -29,8 +29,10 @@
 					<td>@g.description</td>
 					<td>
 						<ul class="list-unstyled">
-							@for(u <- g.dataSources) {
-							<li>@u.value</li> }
+							@for(u <- g.r_dataSources) {
+							<li>@u.value (@Messages("gsn.access.vs.allowed.read"))</li> }
+							@for(u <- g.w_dataSources) {
+							<li>@u.value (@Messages("gsn.access.vs.allowed.write"))</li> }
 						</ul>
 					</td>
 					<td>
