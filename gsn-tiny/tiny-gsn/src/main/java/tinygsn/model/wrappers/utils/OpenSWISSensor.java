@@ -78,8 +78,10 @@ public class OpenSWISSensor extends AbstractSerialProtocol{
             case STATE_WAITING_MEASUREMENT:
                 Log.d(TAG, "Measurement: " + s);
                 s = s.trim();
-                getOut().publish(new StreamElement(SerialBLEWrapper.FIELD_NAMES,SerialBLEWrapper.FIELD_TYPES, new Serializable[]{Double.parseDouble(s), new Double(device_offset)}));
-                getOut().done();
+                if (Double.parseDouble(s) < 100) {
+                    getOut().publish(new StreamElement(SerialBLEWrapper.FIELD_NAMES, SerialBLEWrapper.FIELD_TYPES, new Serializable[]{Double.parseDouble(s), new Double(device_offset)}));
+                    getOut().done();
+                }
         }
     }
 
