@@ -27,6 +27,4 @@ trait GsnService {
   def param[T](name:String,fun: String=>T,default:T)(implicit req:Request[AnyContent])=
     queryparam(name).map(fun(_)).getOrElse(default)
 
-  protected def globalKeyOk(key:String)=
-    key.equals(Global.globalKey )
 }

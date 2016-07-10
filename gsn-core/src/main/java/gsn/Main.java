@@ -91,7 +91,6 @@ public final class Main {
 	 */
 	private static  Properties                            wrappers ;
 	private static Main                                   singleton ;
-	private static int                                    gsnControllerPort      = 22232;
 	public static String                                  gsnConfFolder          = DEFAULT_GSN_CONF_FOLDER;
 	public static String                                  virtualSensorDirectory = DEFAULT_VIRTUAL_SENSOR_FOLDER;
 	private static ZeroMQProxy                            zmqproxy;
@@ -101,9 +100,9 @@ public final class Main {
     private static ZContext                               zmqContext              = new ZContext();
     private static HashMap<Integer, StorageManager>       storages                = new HashMap<Integer, StorageManager>();
     private static HashMap<VSensorConfig, StorageManager> storagesConfigs         = new HashMap<VSensorConfig, StorageManager>();
-    private GSNController                                 controlSocket;
     private ContainerConfig                               containerConfig;
     private MonitoringServer                              monitoringServer;
+    private static VSensorLoader vsLoader; 
     private static GsnConf gsnConf;
     private static Map <String,VsConf> vsConf = new HashMap<String,VsConf>();
     private static ArrayList<Monitorable> toMonitor = new ArrayList<Monitorable>();
@@ -120,17 +119,10 @@ public final class Main {
 
 		ValidityTools.checkAccessibilityOfFiles ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , gsnConfFolder + "/gsn.xml");
 		ValidityTools.checkAccessibilityOfDirs ( virtualSensorDirectory );
-		try {
-			controlSocket = new GSNController(null, gsnControllerPort);
-			containerConfig = loadContainerConfiguration();
-			updateSplashIfNeeded(new String[] {"GSN is starting...", "All GSN logs are available at: logs/gsn.log"});
-			System.out.println("Global Sensor Networks (GSN) is starting...");
-            System.out.println("The logs of GSN server are available in logs/gsn.log file.");
-			System.out.println("To Stop GSN execute the gsn-stop script.");
-		} catch ( FileNotFoundException e ) {
-			logger.error ( "The the configuration file : conf/gsn.xml doesn't exist.");
-			throw new Exception(e);
-		}
+		containerConfig = loadContainerConfiguration();
+		updateSplashIfNeeded(new String[] {"GSN is starting...", "All GSN logs are available at: logs/gsn.log"});
+		System.out.println("Global Sensor Networks (GSN) is starting...");
+	
         int maxDBConnections = System.getProperty("maxDBConnections") == null ? DEFAULT_MAX_DB_CONNECTIONS : Integer.parseInt(System.getProperty("maxDBConnections"));
         int maxSlidingDBConnections = System.getProperty("maxSlidingDBConnections") == null ? DEFAULT_MAX_DB_CONNECTIONS : Integer.parseInt(System.getProperty("maxSlidingDBConnections"));
 
@@ -163,7 +155,7 @@ public final class Main {
 				vsConf.put(vs.name(), vs);
 			}
 		}
-		controlSocket.setLoader(vsloader);
+		Main.vsLoader = vsloader;
 
 		vsloader.addVSensorStateChangeListener(new SQLValidatorIntegration(SQLValidator.getInstance()));
 		vsloader.addVSensorStateChangeListener(DataDistributer.getInstance(LocalDeliveryWrapper.class));
@@ -234,15 +226,46 @@ public final class Main {
 
 	public static void main(String[] args)  {
 		if (args.length > 0) {
-		    Main.gsnControllerPort = Integer.parseInt(args[0]);
+			Main.gsnConfFolder = args[0];
 		}
 		if (args.length > 1) {
-			Main.gsnConfFolder = args[1];
-		}
-		if (args.length > 2) {
-			Main.virtualSensorDirectory = args[2];
+			Main.virtualSensorDirectory = args[1];
 		}
 		updateSplashIfNeeded(new String[] {"GSN is trying to start.","All GSN logs are available at: logs/gsn.log"});
+		Runtime.getRuntime().addShutdownHook(new Thread()
+	        {
+	            @Override
+	            public void run()
+	            {
+	                System.out.println("GSN is stopping...");
+	                new Thread(new Runnable() {
+	    				public void run() {
+	    					try {
+	    						Thread.sleep(10000);
+	    					} catch (InterruptedException e) {
+	    					}finally {
+	    						logger.warn("Forced exit...");
+	    						System.out.println("GSN is stopped (forced).");
+	    						Runtime.getRuntime().halt(1);
+	    					}
+	    				}}).start();
+
+	    			try {
+	    				logger.info("Shutting down GSN...");
+	    				if (vsLoader != null) {
+	    					vsLoader.stopLoading();
+	    					logger.info("All virtual sensors have been stopped, shutting down virtual machine.");
+	    				} else {
+	    					logger.warn("Could not shut down virtual sensors properly. We are probably exiting GSN before it has been completely initialized.");
+	    				}
+	    			} catch (Exception e) {
+	    				logger.warn("Error while reading from or writing to control connection: " + e.getMessage(), e);
+	    			}finally {
+	    				System.out.println("GSN is stopped.");
+	    			}
+	            }
+	        });
+		
 		try {
 			Main.getInstance();
 		}catch (Exception e) {

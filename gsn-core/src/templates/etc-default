@@ -3,8 +3,6 @@ JAVA_OPTS="-Xms64m -Xmx1024m $JAVA_OPTS"
 CONFDIR="./conf"
 export CONFDIR
 
-VSDIR="./conf/gsn.d"
+VSDIR="./conf/virtual-sensors"
 export VSDIR
 
-CONTROL_PORT="22232"
-export CONTROL_PORT

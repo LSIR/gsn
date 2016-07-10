@@ -1,3 +1,5 @@
+import com.typesafe.sbt.packager.archetypes.ServerLoader
+
 name := "gsn-services"
 
 
@@ -5,6 +7,10 @@ val buildSettings = Defaults.defaultSettings ++ Seq(
    javaOptions += "-Xmx128m",
    javaOptions += "-Xms64m"
 )
+
+sources in (Compile,doc) := Seq.empty
+
+publishArtifact in (Compile, packageDoc) := false
 
 libraryDependencies ++= Seq(
   jdbc,
@@ -26,7 +32,24 @@ libraryDependencies ++= Seq(
   "org.zeromq" % "jeromq" % "0.3.5",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
   "org.scalatestplus" %% "play" % "1.1.0" % "test",
-  "gsn" % "gsn-tools" % "2.0.0-SNAPSHOT",
+  "gsn" % "gsn-core" % "2.0.0-SNAPSHOT" exclude("org.apache.logging.log4j", "log4j-slf4j-impl"),
   "com.typesafe.play" %% "play-json" % "2.3.10",
   "com.typesafe.akka" %% "akka-actor" % "2.3.14"
   )
+
+//libraryDependencies := libraryDependencies.value.map(_.exclude("ch.qos.logback", "logback-classic").exclude("ch.qos.logback", "logback-core"))
+
+
+NativePackagerKeys.packageSummary in com.typesafe.sbt.SbtNativePackager.Linux := "GSN Services"
+
+NativePackagerKeys.packageDescription := "Global Sensor Networks Services"
+
+NativePackagerKeys.maintainer in com.typesafe.sbt.SbtNativePackager.Linux := "LSIR EPFL <gsn@epfl.ch>"
+
+debianPackageDependencies in Debian += "java7-runtime"
+
+debianPackageRecommends in Debian ++= Seq("postgresql", "munin-node", "gsn-core")
+
+serverLoading in Debian := ServerLoader.Systemd
+
+daemonUser in Linux := "gsn"

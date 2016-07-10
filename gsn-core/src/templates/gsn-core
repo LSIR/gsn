@@ -1,5 +1,3 @@
 #!/bin/bash
 
-trap "java -classpath ./lib/* gsn.GSNStop $CONTROL_PORT" SIGHUP SIGINT SIGTERM
-
-java -classpath $CONFDIR/:./lib/* gsn.Main $CONTROL_PORT $CONFDIR $VSDIR
+java -classpath $CONFDIR/:./lib/* gsn.Main $CONFDIR $VSDIR

@@ -41,7 +41,7 @@ lazy val extra = (project in file("gsn-extra")).
 lazy val services = (project in file("gsn-services")).
   dependsOn(tools).
   settings(commonSettings: _*).
-  enablePlugins(PlayScala)
+  enablePlugins(PlayScala, DebianPlugin)
 
 lazy val tools = (project in file("gsn-tools")).
   settings(commonSettings: _*)

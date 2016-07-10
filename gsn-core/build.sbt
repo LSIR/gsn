@@ -59,38 +59,41 @@ NativePackagerKeys.maintainer in com.typesafe.sbt.SbtNativePackager.Linux := "LS
 
 debianPackageDependencies in Debian += "java7-runtime"
 
-debianPackageRecommends in Debian ++= Seq("postgresql", "munin-node")
+debianPackageRecommends in Debian ++= Seq("postgresql", "munin-node", "gsn-services")
 
 serverLoading in Debian := ServerLoader.Systemd
 
-mappings in Universal <+= (packageBin in Compile, sourceDirectory ) map { (_, src) =>
-    (src / "templates" / "gsn-core") -> "bin/gsn-core"
+daemonUser in Linux := "gsn"
+
+mappings in Universal <+= sourceDirectory map { src => (src / "templates" / "gsn-core") -> "bin/gsn-core" }
+
+mappings in Universal <+= sourceDirectory map { src => (src / "main" / "resources" / "log4j2.xml") -> "conf/log4j2.xml" }
+
+mappings in Universal <+= baseDirectory map { base => (base / ".." / "conf" / "gsn.xml") -> "conf/gsn.xml" }
+
+mappings in Universal <+= sourceDirectory map { src => (src / "main" / "resources" / "wrappers.properties") -> "conf/wrappers.properties" }
+
+linuxPackageMappings in Debian <+= baseDirectory map { base => packageMapping(
+    (base / ".." / "virtual-sensors" / "packaged") -> "/usr/share/gsn-core/conf/virtual-sensors"
+  ) withUser "gsn" withGroup "root" withPerms "0775" withContents()
 }
 
-mappings in Universal <+= (packageBin in Compile, sourceDirectory ) map { (_, src) =>
-    (src / "main" / "resources" / "log4j2.xml") -> "conf/log4j2.xml"
+mappings in Universal <++= baseDirectory map { base => 
+    ((base / ".." / "virtual-sensors" / "samples").***) pair {file => Some("virtual-sensors-samples/" + file.name)}
 }
 
-linuxPackageMappings in Debian <+= (name in Universal, sourceDirectory) map { (name, src) =>
-  (packageMapping(
-    (src / "main" / "resources" / "wrappers.properties") -> "/usr/share/gsn-core/conf/wrappers.properties"
-  ) withUser "gsn-core" withGroup "root" withPerms "0664")
-}
-
-linuxPackageMappings in Debian <+= (name in Universal, baseDirectory) map { (name, base) =>
-  (packageMapping(
-    (base / ".." / "conf" / "gsn.xml") -> "/usr/share/gsn-core/conf/gsn.xml"
-  ) withUser "gsn-core" withGroup "root" withPerms "0664")
-}
-
-mappings in Universal <+= (packageBin in Compile, baseDirectory ) map { (_, base) =>
-    val conf = base / ".." / "virtual-sensors" / "memoryDataVS.xml"
-    conf -> "conf/gsn.d/memoryDataVirtualSensor.xml"
-}
-
-mappings in Universal <++= (packageBin in Compile, baseDirectory ) map { (_, base) =>
-    val dir = base / ".." / "virtual-sensors" / "samples"
-    (dir.***) pair {file => Some("virtual-sensors/" + file.name)}
+linuxPackageMappings := {
+    val mappings = linuxPackageMappings.value
+    mappings map { 
+        case linuxPackage if linuxPackage.fileData.config equals "true" =>
+            val newFileData = linuxPackage.fileData.copy(
+                user = "gsn"
+            )
+            linuxPackage.copy(
+                fileData = newFileData
+            )
+        case linuxPackage => linuxPackage
+    }
 }
 
 scalacOptions += "-deprecation"

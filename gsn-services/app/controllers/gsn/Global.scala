@@ -23,7 +23,6 @@ object Global extends GlobalSettings {
   val gsnConf = GsnConf.load(conf.getString("gsn.config"))
   val ds = new DataStore(gsnConf)
   val pageLength = conf.getInt("gsn.ui.pagination.length")
-  val globalKey = conf.getString("gsn.security.globalKey")
   
   override def onStart(app: Application) {
     Logger.info("Application has started")
