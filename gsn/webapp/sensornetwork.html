@@ -135,7 +135,7 @@ $(document).ready(function() {
         signals: [{
           vsensor:".*_dozer_nodehealth__conv",
           field:["sysvoltage"],
-          select:"sensornode[nodetype=1][position]"
+          select:"sensornode[nodetype=1][position],sensornode[nodetype=3][position]"
         }]
       },
       { title:"Dozer SDI Voltage",
