@@ -46,7 +46,8 @@ lazy val services = (project in file("gsn-services")).
 lazy val tools = (project in file("gsn-tools")).
   settings(commonSettings: _*)
 
-lazy val webui = (project in file("gsn-webui"))
+lazy val webui = (project in file("gsn-webui")).
+  enablePlugins(JavaServerAppPackaging, DebianPlugin)
 
 
 lazy val startAll = taskKey[Unit]("Start all the GSN modules")

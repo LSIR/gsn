@@ -48,7 +48,7 @@ NativePackagerKeys.maintainer in com.typesafe.sbt.SbtNativePackager.Linux := "LS
 
 debianPackageDependencies in Debian += "java7-runtime"
 
-debianPackageRecommends in Debian ++= Seq("postgresql", "munin-node", "gsn-core")
+debianPackageRecommends in Debian ++= Seq("postgresql", "gsn-core", "nginx")
 
 serverLoading in Debian := ServerLoader.Systemd
 
