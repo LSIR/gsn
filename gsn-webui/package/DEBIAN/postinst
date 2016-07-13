@@ -87,12 +87,17 @@ chown gsn:gsn /var/log/gsn-webui
 [ -d /usr/share/gsn-webui/bin/env3 ] || virtualenv -p python3 /usr/share/gsn-webui/bin/env3
 . /usr/share/gsn-webui/bin/env3/bin/activate
 pip install -r /usr/share/gsn-webui/requirements.txt
-python /usr/share/gsn-webui/manage.py migrate
+runuser -u gsn python /usr/share/gsn-webui/manage.py migrate
 deactivate
 echo "Virtual Environment ready for GSN..."
 
+ln -fs /etc/gsn-webui/gsn-nginx.conf /etc/nginx/sites-enabled/gsn-nginx.conf
+rm /etc/nginx/sites-enabled/default
+systemctl reload "nginx.service"
+echo "Nginx proxy configured..."
+
 # ------------------------------------------------------------------------------------
-#   ____                                _             _          _
+#  ____                                _             _          _
 # / ___|  ___ _ ____   _____ _ __     / \   _ __ ___| |__   ___| |_ _   _ _ __   ___
 # \___ \ / _ \ '__\ \ / / _ \ '__|   / _ \ | '__/ __| '_ \ / _ \ __| | | | '_ \ / _ \
 #  ___) |  __/ |   \ V /  __/ |     / ___ \| | | (__| | | |  __/ |_| |_| | |_) |  __/

@@ -2,7 +2,7 @@
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'db.sqlite3', }
+        'NAME': '/tmp/gsn-webui.sqlite3', }
 }
 
 GSN = {

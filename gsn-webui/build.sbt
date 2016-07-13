@@ -20,6 +20,8 @@ packageDjango := {
 
   "mkdir -p ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/app" !
 
+  "mkdir -p ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/static/static" !
+
   "mkdir -p ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/gsn/migrations" !
 
   "mkdir -p ./gsn-webui/target/gsn-webui/usr/lib/systemd/system" !
@@ -28,9 +30,9 @@ packageDjango := {
 
   Seq("/bin/sh", "-c", "cp ./gsn-webui/app/*.py ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/app/") !
 
-  "cp -r ./gsn-webui/components ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/" !
+  Seq("/bin/sh", "-c", "cp -r ./gsn-webui/components/bower_components/* ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/static/static/") !
 
-  "cp -r ./gsn-webui/static-files ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/" !
+  Seq("/bin/sh", "-c", "cp -r ./gsn-webui/static-files/* ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/static/static/") !
 
   Seq("/bin/sh", "-c", "cp ./gsn-webui/gsn/*.py ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/gsn/") !
 
@@ -47,6 +49,10 @@ packageDjango := {
   "cp ./gsn-webui/package/templates/gsn-webui ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/bin/" !
 
   "cp ./gsn-webui/package/templates/settingsLocal.py ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/app/" !
+
+  "cp ./gsn-webui/package/templates/gsn-nginx.conf ./gsn-webui/target/gsn-webui/etc/gsn-webui/gsn-nginx.conf" !
+
+  "cp ./gsn-webui/package/templates/etc-default ./gsn-webui/target/gsn-webui/etc/default/gsn-webui" !
 
   "ln -fs /usr/share/gsn-webui/app/settingsLocal.py ./gsn-webui/target/gsn-webui/etc/gsn-webui/settingsLocal.py" !
 
