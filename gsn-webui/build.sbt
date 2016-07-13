@@ -6,18 +6,54 @@ startDjango := {
   "./gsn-webui/start-dev.sh" !
 }
 
-NativePackagerKeys.packageSummary in com.typesafe.sbt.SbtNativePackager.Linux := "GSN Server"
+lazy val packageDjango = taskKey[Unit]("Package the django app")
 
-NativePackagerKeys.packageDescription := "Global Sensor Networks web UI"
+packageDjango := {
 
-NativePackagerKeys.maintainer in com.typesafe.sbt.SbtNativePackager.Linux := "LSIR EPFL <gsn@epfl.ch>"
+  "mkdir -p ./gsn-webui/target/gsn-webui/etc/gsn-webui" !
 
-debianPackageDependencies in Debian ++= Seq("python3", "python3-pip", "python3-virtualenv")
+  "mkdir -p ./gsn-webui/target/gsn-webui/etc/default" !
 
-debianPackageRecommends in Debian ++= Seq("postgresql", "gsn-core", "gsn-services")
+  "mkdir -p ./gsn-webui/target/gsn-webui/var/log/gsn-webui" !
 
-serverLoading in Debian := ServerLoader.Systemd
+  "mkdir -p ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/bin" !
 
-daemonUser in Linux := "gsn"
+  "mkdir -p ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/app" !
 
-mappings in Universal <+= sourceDirectory map { src => (src / "templates" / "gsn-core") -> "bin/gsn-core" }
+  "mkdir -p ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/gsn/migrations" !
+
+  "mkdir -p ./gsn-webui/target/gsn-webui/usr/lib/systemd/system" !
+
+  "mkdir -p ./gsn-webui/target/gsn-webui/usr/bin" !
+
+  Seq("/bin/sh", "-c", "cp ./gsn-webui/app/*.py ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/app/") !
+
+  "cp -r ./gsn-webui/components ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/" !
+
+  "cp -r ./gsn-webui/static-files ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/" !
+
+  Seq("/bin/sh", "-c", "cp ./gsn-webui/gsn/*.py ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/gsn/") !
+
+  Seq("/bin/sh", "-c", "cp ./gsn-webui/gsn/migrations/*.py ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/gsn/migrations") !
+
+  "cp -r ./gsn-webui/gsn/templates ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/gsn/" !
+
+  "cp ./gsn-webui/manage.py ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/" !
+
+  "cp -r ./gsn-webui/requirements.txt ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/" !
+
+  "cp ./gsn-webui/package/templates/gsn-webui.service ./gsn-webui/target/gsn-webui/usr/lib/systemd/system/" !
+
+  "cp ./gsn-webui/package/templates/gsn-webui ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/bin/" !
+
+  "cp ./gsn-webui/package/templates/settingsLocal.py ./gsn-webui/target/gsn-webui/usr/share/gsn-webui/app/" !
+
+  "ln -fs /usr/share/gsn-webui/app/settingsLocal.py ./gsn-webui/target/gsn-webui/etc/gsn-webui/settingsLocal.py" !
+
+  "ln -fs /usr/share/gsn-webui/bin/gsn-webui ./gsn-webui/target/gsn-webui/usr/bin/gsn-webui" !
+
+  "tar -czf ./gsn-webui/target/gsn-webui.tar.gz -C ./gsn-webui/target/gsn-webui ./" !
+
+  "fpm -s tar -t deb -a all -v 2.0.0 --deb-default ./gsn-webui/package/templates/etc-default  --after-install ./gsn-webui/package/DEBIAN/postinst --after-remove ./gsn-webui/package/DEBIAN/postrm --before-remove ./gsn-webui/package/DEBIAN/prerm --deb-custom-control ./gsn-webui/package/DEBIAN/control ./gsn-webui/target/gsn-webui.tar.gz" !
+
+}
