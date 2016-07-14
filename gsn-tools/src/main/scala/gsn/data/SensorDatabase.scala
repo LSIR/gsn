@@ -18,17 +18,21 @@ import java.io.ObjectInputStream
 import java.sql.ResultSet
 import com.hp.hpl.jena.datatypes.RDFDatatype
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
+import com.typesafe.config.ConfigFactory
 
 object SensorDatabase { 
   val log=LoggerFactory.getLogger(SensorDatabase.getClass)
   def latestValues(sensor:Sensor, timeFormat:Option[String]=None)
     (implicit ds:Option[String]) ={
+    val timeframe=ConfigFactory.load.getInt("gsn.data.timeframe")
     val vsName=sensor.name.toLowerCase 
     val fields=sensor.fields
     val fieldNames=fields.map (f=>f.fieldName ) 
               .filterNot (_.equals("grid")) ++ Seq("timed") 
-	val query = s"""select ${fieldNames.mkString(",")} from $vsName where  
-	  timed = (select max(timed) from $vsName limit 1) limit 1"""	  	  	  	  
+    val query = sensor.properties.get("partitionField") match {
+      case Some(partitionField) => s"""SELECT ${fieldNames.mkString(",")} from $vsName where pk IN (SELECT max(pk) from $vsName where timed > (select max(timed) from $vsName) - $timeframe group by $partitionField)"""
+      case _ => s"""SELECT ${fieldNames.mkString(",")} from $vsName where pk = (SELECT max(pk) from $vsName)"""
+    }	  	  	  	  
 	Try{
 	  vsDB(ds).withSession {implicit session=>
 	 
@@ -285,8 +289,7 @@ object SensorDatabase {
           times+= t2-t1
         t1=t2
       }          
-	  if (times.size>0)
-	    rate=Some(times.sum/times.size)
+	  rate = if (times.size == 0) Some(0)  else Some(times.sum/times.size)
 	  log debug s"Computed rate for $vsName"
 	  stmt2.close
 	  conn2.close

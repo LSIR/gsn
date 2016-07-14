@@ -35,7 +35,7 @@ object VsConf extends Conf{
 }
 
 case class ProcessingConf(className:String,uniqueTimestamp:Boolean,initParams:Map[String,String],
-    rate:Option[Int],output:Seq[FieldConf],webInput:Option[WebInputConf])
+    rate:Option[Int],output:Seq[FieldConf],webInput:Option[WebInputConf], partitionField:Option[String])
 object ProcessingConf extends Conf{
   def create(xml:Node)=ProcessingConf(
       (xml \ "class-name").text,
@@ -44,7 +44,8 @@ object ProcessingConf extends Conf{
       (xml \ "init-params" \ "param").map(p=>(p \@ "name",p.text)).toMap,
       (xml \ "output-specification").headOption.map(o=>attInt(o,"rate",VsConf.defaultOutputRate )),
       (xml \ "output-structure" \ "field").map(f=>FieldConf.create(f)),
-      (xml \ "web-input").headOption.map(wi=>WebInputConf.create(wi))
+      (xml \ "web-input").headOption.map(wi=>WebInputConf.create(wi)),
+      (xml \ "output-structure").head.attribute("partition-field").map(_.toString)
   )
 }
 

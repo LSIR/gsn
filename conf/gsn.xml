@@ -1,30 +1,14 @@
 <sensor-server>
-   <name>GSN Server</name>
-   <author>GSN Development Team.</author>
-   <email>my email address</email>
-   <description>Not Provided</description>
-   <port>22001</port>
-   <zmq-enable>false</zmq-enable>
+   <monitor-port>22001</monitor-port>
+   <zmq-enable>true</zmq-enable>
    <zmqproxy>22022</zmqproxy>
    <zmqmeta>22023</zmqmeta>
 
 
-<!-- SSL Support, Optional -->
-<!--
-   <ssl-port>8443</ssl-port>
-   <ssl-key-store-password>changeit</ssl-key-store-password>
-   <ssl-key-password>changeit</ssl-key-password>
--->
-<!--
-   <ssl-port>8443</ssl-port>
-   <ssl-key-store-password>/home/ivo/.keystore</ssl-key-store-password>
-   <ssl-key-password>password</ssl-key-password>
--->
-<access-control>false</access-control>
 <!-- Main Storage Database, Mandatory -->
- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:gsn_mem_db" />  
-<!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:file:./GsnMemDb" />-->
-<!--  <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:~/GsnMemDb;AUTO_SERVER=TRUE" />-->
+<!--<storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:mem:gsn_mem_db" />-->  
+<!-- <storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:file:./GsnMemDb" /> -->
+<storage user="sa" password="" driver="org.h2.Driver" url="jdbc:h2:/tmp/GsnMemDb;AUTO_SERVER=TRUE" />
 <!--  <storage user="root" password="root" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/gsn" />   -->
 <!-- <storage user="gsn" password="gsn" driver="net.sourceforge.jtds.jdbc.Driver" url="jdbc:jtds:sqlserver://192.168.51.14:12345/gsn;cachemetadata=true;prepareSQL=3" />-->
 <!--  <storage user="admin" password="" driver="org.postgresql.Driver" url="jdbc:postgresql://localhost/gsn" /> -->

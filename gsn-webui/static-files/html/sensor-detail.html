@@ -1,0 +1,327 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header" ng-bind-template="Sensors Detail: {{ sensorName }}">Sensor Detail: {{ sensorName }}</h1>
+    </div>
+
+    <script>
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+        });
+    </script>
+
+    <div ng-show="loading">.</div>
+    <div ng-if="loading" us-spinner style="position: relative"></div>
+
+    <p class="col-lg-12 lead" ng-if="details==undefined && !loading">This sensor does not exist or you do not have
+                                                                     access to this it.</p>
+
+    <div ng-if="details">
+        <!--<div class="row" >-->
+
+        <div class="col-lg-6" ng-if="!loading">
+            <div class="panel panel-info">
+                <div class="panel-heading">Properties</div>
+                <div class="panel-body">
+                    <div ng-repeat="(key, value) in details.properties">
+                        <p
+                                ng-if="key != 'fields' && key != 'geographical' && key != 'values' && key != 'latitude'
+                            && key != 'longitude'">
+                            <b
+                            >{{ key }}:
+                            </b>
+                            {{ value }}
+                        </p>
+                    </div>
+                    <div ng-if="details.user.logged">
+                        <button ng-if="details.user.favorite" ng-click="removeFavorite(sensorName)">Remove from
+                                                                                                    favorites
+                        </button>
+                        <button ng-if="!details.user.favorite" ng-click="addFavorite(sensorName)
+                        ">Add to favorites
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6" ng-if="!loading">
+
+            <div class="panel panel-info">
+                <div class="panel-heading">Geographical data</div>
+                <div class="panel-body">
+                    <p ng-if="details.properties.geographical">
+                        <b>Location:</b>
+                        {{ details.properties.geographical }}
+                    </p>
+
+                    <div ng-repeat="(key, value) in details.geometry">
+                        <p ng-if="key != 'coordinates'">
+                            <b>{{ key }}:</b>
+                            {{ value }}
+                        </p>
+                    </div>
+                    <ul>
+                        <li ng-if="details.geometry.coordinates[0]">
+                            <b>Latitude:</b>
+                            {{ details.geometry.coordinates[0]}}
+                        </li>
+                        <li ng-if="details.geometry.coordinates[1]">
+                            <b>Longitude:</b>
+                            {{ details.geometry.coordinates[1]}}
+                        </li>
+                        <li ng-if="sensor.geometry.coordinates[2]">
+                            <b>Altitude:</b>
+                            {{ details.geometry.coordinates[2]}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel panel-info"
+                 ng-if="details.properties.stats && (details.properties.stats.start-datetime || details.properties.stats.end-datetime)">
+                <div class="panel-heading">Geographical data</div>
+                <div class="panel-body">
+
+                    <div ng-repeat="(key, value) in details.properties.stats">
+                        <p ng-if="key != 'coordinates'">
+                            <b>{{ key }}:</b>
+                            {{ value }}
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!--</div>-->
+
+        <p class="col-lg-12 lead" ng-if="details.user.logged && !details.user.has_access && !loading ">
+            You do not have access to this sensor's data . If you think you should have access to it, please contact
+            your organization or make sure you have linked this account to your server's account.
+        </p>
+
+        <p class="col-lg-12 lead" ng-if="!details.user.logged && !loading ">
+            As a non-registered user, you do not have access to this sensor's data, only its metadata. Please log in
+            or create an account.
+        </p>
+
+        <div class="col-lg-12" ng-if="!loading && details.user.has_access">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Data</div>
+                <div class="panel-body">
+
+                    <form novalidate class="form" ng-submit="submit()">
+
+                        <div class="row">
+
+                            <div class="col-lg-6">
+                                <b>From:</b>
+                                <br>
+
+                                <div class="dropdown">
+                                    <a class="dropdown-toggle" id="fromDate" role="button" data-toggle="dropdown"
+                                       data-target="#" href="">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control"
+                                                   data-ng-model="date.from.date"  data-date-time-input="YYYY-MM-DDTHH:mm:ss"><span
+                                                class="input-group-addon"><i
+                                                class="glyphicon glyphicon-calendar"></i></span>
+                                        </div>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                        <datetimepicker data-ng-model="date.from.date"
+                                                        data-on-set-time="date.from.onTimeSet()"
+                                                        data-datetimepicker-config="{ dropdownSelector: '#fromDate' }"></datetimepicker>
+                                    </ul>
+                                </div>
+
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label>To:</label>
+                                <br>
+
+                                <div class="dropdown">
+                                    <a class="dropdown-toggle" id="toDate" role="button" data-toggle="dropdown"
+                                       data-target="#" href="">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control"
+                                                   data-ng-model="date.to.date"  data-date-time-input="YYYY-MM-DDTHH:mm:ss"><span
+                                                class="input-group-addon"><i
+                                                class="glyphicon glyphicon-calendar"></i></span>
+                                        </div>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                        <datetimepicker data-ng-model="date.to.date"
+                                                        data-on-set-time="date.to.onTimeSet()"
+                                                        data-datetimepicker-config="{ dropdownSelector: '#toDate' }"></datetimepicker>
+                                    </ul>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin: 1em">Refresh data</button>
+
+                    </form>
+
+                    <div class="col-lg-12">
+
+                        <div class="row">
+
+                            <p style="float: left; display:inline-block" ng-if="details.properties.values">
+                                <br>
+                                {{ details.properties.values.length }} results found
+                                for
+                                the specified timeframe.
+                            </p>
+
+                            <p style="float:left; display:inline-block" ng-if="!details.properties.values">
+                                <br>
+                                <b>No data found for the
+                                   specified timeframe.
+                                </b>
+                            </p>
+
+                            <h4 style="float: right; display:inline-block">Page size:
+                                <b class="form-inline">
+                                    <input type="number" min="1" max="100" class="form-control" placeholder="25"
+                                           ng-model="pageSize">
+                                </b>
+                                <button type="button" class="btn btn-primary form-inline"
+                                        ng-click="updateRowCount(pageSize)">
+                                    Apply
+                                </button>
+
+                            </h4>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-inline" ng-repeat="field in details.properties.fields">
+                                <input type="checkbox" ng-model="columns[$index]">
+                                {{ field.name }}
+                            </label>
+                        </div>
+
+                        <!--
+                                                <button class="btn btn-info btn-block" ng-disabled="!details.properties.values"
+                                                        ng-click="downloadCsv()">
+                                                    <i class="fa fa-download"></i>
+                                                    Download
+                                                </button>
+                        -->
+
+                        <table id="sensor_data_table_id" class="table table-bordered table-hover table-striped"
+                               ng-if="details.properties.fields">
+
+                            <thead>
+                            <tr>
+                                <th ng-repeat="field in details.properties.fields" ng-if="columns[$index]">
+                                    {{ field.name }}
+                                    ({{ field.type }}<span
+                                        ng-show="field.unit">, {{ field.unit }}</span>
+                                    )
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody ng-if="details.properties.values">
+                            <tr dir-paginate="values in details.properties.values  |itemsPerPage: truePageSize ">
+                                <td ng-repeat="value in values track by $index"
+                                    ng-show="columns[$index]">{{ value }}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <dir-pagination-controls max-size="10" direction-links="true" boundary-links="true">
+                        </dir-pagination-controls>
+
+                        <!--
+                                                <button class="btn btn-success btn-block" ng-disabled="!details.properties.values"
+                                                        ng-click="download()">
+                                                    <i class="fa fa-download"></i>
+                                                    Download
+                                                </button>
+
+                                                <br>
+
+                                                <button class="btn btn-primary btn-block" ng-click="compare()" ng-disabled="!details.properties
+                                                .values">
+                                                    Compare this dataset
+                                                </button>
+                        -->
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <button class="btn btn-success btn-block" ng-disabled="!details.properties.values"
+                                        ng-click="download()">
+                                    <i class="fa fa-download"></i>
+                                    Download
+                                </button>
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <br>
+
+                        <highchart ng-if="details.properties.values" id="chart1" config="chartConfig"></highchart>
+                        <br>
+
+                        <button class="btn btn-primary" ng-click="compare()" ng-disabled="!details.properties
+                        .values">
+                            Compare this graph
+                        </button>
+                        <br>
+                        <br>
+
+                        <button class="btn btn-info" ng-click="addFilter(1, '>', 1,filterFunctionList.length)">Add a
+                                                                                                               filter
+                        </button>
+
+                        <br>
+                        <br>
+
+                        <div class="form-group" ng-repeat="fil in filterFunctionList">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <select class=" form-control" ng-options="field as field.name for field in
+                            details
+                            .properties
+                            .fields"
+                                            ng-model="filterValuesList[$index][0]">
+                                        <option value="">-- choose a column --</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3">
+
+                                    <select class=" form-control" ng-options="op as op for op in filterOperators"
+                                            ng-model="filterValuesList[$index][1]">
+                                        <option value="">-- choose an operator --</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3">
+
+                                    <input type="number" class="form-control" value="12"
+                                           ng-model="filterValuesList[$index][2]">
+                                </div>
+
+                                <button class="btn btn-danger" ng-click="removeFilter($index)">Remove filter</button>
+                            </div>
+
+                        </div>
+                        <button class="btn btn-info" ng-click="applyFilterChanges();filter()"
+                                ng-disabled="!filterFunctionList.length">Apply
+                                                                         filters
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>

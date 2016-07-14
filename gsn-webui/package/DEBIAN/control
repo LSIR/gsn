@@ -1,0 +1,12 @@
+Source: gsn-webui
+Package: gsn-webui
+Version: 2.0.0-SNAPSHOT
+Section: python
+Priority: optional
+Architecture: all
+Installed-Size: 11044
+Depends: python3, python3-pip, python3-virtualenv, virtualenv, nginx
+Recommends: postgresql, gsn-core, gsn-services
+Maintainer: LSIR EPFL <gsn@epfl.ch>
+Description: GSN Server
+ Global Sensor Networks web UI

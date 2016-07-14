@@ -1,0 +1,131 @@
+@(title: String, nav: String = "")(content: Html)
+
+@import be.objectify.deadbolt.java.views.html._
+@import be.objectify.deadbolt.core.utils.TemplateUtils._
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>GSN::Access Control</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="GSN Access Control">
+        <meta name="author" content="The GSN Team">
+
+        <script type="text/javascript" src="@routes.Assets.at("lib/jquery/jquery.js")"></script>
+        <script type="text/javascript" src="@routes.Assets.at("lib/bootstrap/js/bootstrap.js")"></script>
+        <script type="text/javascript" src="@controllers.gsn.auth.routes.LocalAuthController.jsRoutes" defer="defer"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script>
+        <link rel="stylesheet" href="@routes.Assets.at("lib/bootstrap/css/bootstrap.css")">
+        <link href="@routes.Assets.at("css/main.css")" rel="stylesheet">
+        <style type="text/css">
+            .table-striped > tbody > tr.success:nth-child(odd) > td,
+            .table-striped > tbody > tr.success:nth-child(odd) > th {
+                background-color: #C3D5BC;
+            }
+            tr.success > td > ul.hideable {
+               display:none;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-default navbar-fixed-top navbar-inverse" role="navigation">
+            <div class="container-fluid">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="@controllers.gsn.auth.routes.LocalAuthController.index()">Global Sensor Networks</a>
+                </div>
+
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="@("active".when(nav == ""))"><a href="@controllers.gsn.auth.routes.LocalAuthController.index()">@Messages("playauthenticate.navigation.home")</a></li>
+
+                        @subjectNotPresent() {
+                            <li class="@("active".when(nav == "signup"))"><a href="@controllers.gsn.auth.routes.LocalAuthController.signup()">@Messages("playauthenticate.navigation.signup")</a></li>
+                        </ul>
+                        }
+                        
+                        @subjectPresentOr() {
+                        	@restrict(la(as("admin"))) {
+                        		<li class="@("active".when(nav == "userlist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.users(1)">@Messages("gsn.access.users")</a></li>
+                        		<li class="@("active".when(nav == "grouplist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.groups(1)">@Messages("gsn.access.groups")</a></li>
+                        	 	<li class="@("active".when(nav == "vslist"))"><a href="@controllers.gsn.auth.routes.PermissionsController.vs(1)">@Messages("gsn.access.vs.title")</a></li>
+                        	 	<li class="@("active".when(nav == "clientlist"))"><a href="@controllers.gsn.routes.OAuth2Controller.listClients()">@Messages("gsn.oauth2.clients")</a></li>
+                            }
+                    </ul>
+
+                    
+                        <ul class="nav navbar-nav navbar-right">
+                        @defining(controllers.gsn.auth.LocalAuthController.getLocalUser(play.mvc.Controller.session())) { user =>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> @user.firstName @user.lastName <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li class="@("active".when(nav == "profile"))"><a href="@controllers.gsn.auth.routes.LocalAuthController.profile()">@Messages("playauthenticate.navigation.profile")</a></li>
+                                    <li><a href="@controllers.gsn.auth.routes.Account.link()">@Messages("playauthenticate.navigation.link_more")</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()"><i class="icon-off"></i> @Messages("playauthenticate.navigation.logout")</a></li>
+                                </ul>
+                            </li>
+                        }
+                        </ul>
+                    } {
+                        <a href="@controllers.gsn.auth.routes.LocalAuthController.login()" class=" navbar-right btn btn-default navbar-btn @("disabled".when(nav == "login"))">@Messages("playauthenticate.navigation.login")</a>
+                    }
+
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+
+
+        <div class="container">
+            @if(play.mvc.Controller.flash.containsKey(controllers.gsn.auth.LocalAuthController.FLASH_ERROR_KEY)) {
+                <div class="alert alert-danger" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
+                        Close</span></button>
+                    @play.mvc.Controller.flash().get(controllers.gsn.auth.LocalAuthController.FLASH_ERROR_KEY)
+                </div>
+            }
+            @if(play.mvc.Controller.flash.containsKey(controllers.gsn.auth.LocalAuthController.FLASH_MESSAGE_KEY)) {
+                <div class="alert alert-success" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
+                        Close</span></button>
+                    @play.mvc.Controller.flash().get(controllers.gsn.auth.LocalAuthController.FLASH_MESSAGE_KEY)
+                </div>
+            }
+            @for( v <- play.mvc.Controller.flash.values){
+            	 <div class="alert alert-info" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">
+                        Close</span></button>
+                    @v
+                </div>
+            	}
+            @content
+
+            <hr>
+
+            <footer>
+                <p>&copy;
+                    2004-2015 Global Sensor Networks. Licensed under <a href="https://github.com/LSIR/gsn/blob/master/LICENSE">GPL v3+</a>.
+                </p>
+                <p>
+                    <small>Back-end by <a href="https://github.com/joscha/play-authenticate">Play! Authenticate</a> &middot; 
+                        Styles by <a href="http://getbootstrap.com" target="_blank">
+                        Twitter Bootstrap</a> &middot;
+                        Provider icons by <a href="https://github.com/paulrobertlloyd/socialmediaicons/" target="_blank">
+                            Paul Robert Lloyd</a></small></p>
+            </footer>
+        </div> <!-- /container -->
+
+    </body>
+</html>

@@ -1,0 +1,49 @@
+@(page:Int, pageLength:Int, collectionLength:Int, route:Int => Call, bound:Int = 2)
+@pageNbr() = @{
+    (collectionLength.toDouble / pageLength).ceil.toInt
+}
+@lowbound() = @{
+    (page - bound).max(2)
+}
+@highbound() = @{
+    (page + bound).min(pageNbr-1)
+}
+<nav>
+    <ul class="pagination">
+            @if(page == 1){
+                <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+            } else {
+                <li><a href="@route(page-1)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+
+            }
+            @if(page > 1) {
+	            <li><a href="@route(1)">1</a></li>
+	            
+	            @if(lowbound > 2) {
+	                <li class="disabled"><a href="#">...</a></li>
+	            }
+	            
+	            @for(i <- lowbound until page) {
+	                <li><a href="@route(i)">@i</a></li>
+	            }
+	        }
+
+            <li class="active"><a href="#">@page</a></li>
+
+            @for(i <- page+1 to highbound()) {
+                <li><a href="@route(i)">@i</a></li>
+            }
+
+            @if(highbound < pageNbr-1) {
+                <li class="disabled"><a href="#">...</a></li>
+            }
+
+            @if(page < pageNbr) {
+            	<li><a href="@route(pageNbr)">@pageNbr</a></li>
+                <li><a href="@route(page+1)" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+            } else {
+                <li class="disabled"><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+
+            }
+    </ul>
+</nav>

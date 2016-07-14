@@ -12,18 +12,18 @@ case class Sensor(name:String,
 } 
 
 object Sensor{
-  def fromConf(vsConf:VsConf):Sensor=fromConf(vsConf,false,None)
-  def fromConf(vsConf:VsConf,accessProtected:Boolean,stats:Option[SensorStats])={
+  def fromConf(vsConf:VsConf):Sensor=fromConf(vsConf,None)
+  def fromConf(vsConf:VsConf,stats:Option[SensorStats])={
     val output=
       vsConf.processing.output map{out=>
         Sensing(out.name,Output(out.name.toLowerCase,vsConf.name,
             DataUnit(out.unit.getOrElse(null)),DataType(out.dataType) ))
       }
-    val props=vsConf.address.map{kv=>
+    val _props=vsConf.address.map{kv=>
         (kv._1.toLowerCase.trim,kv._2.trim )
       } ++ 
-      Map("description"->vsConf.description,
-          "accessProtected"->accessProtected.toString  )
+      Map("description"->vsConf.description )
+    val props = if(vsConf.processing.partitionField.isEmpty) _props else _props ++ Map("partitionField"->vsConf.processing.partitionField.get )
     def coord(p:Map[String,String],n:String)=
       try p.get(n).map(_.toDouble)
       catch {case e:Exception=> None}

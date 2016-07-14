@@ -6,58 +6,24 @@ GSN is a software middleware designed to facilitate the deployment and programmi
 
 You can find the latest GSN documentation, including a deployment, installation, and programming
 guide, on the project [wiki](https://github.com/LSIR/gsn/wiki).
-This README file only contains basic setup instructions.
+This README file only contains basic setup instructions depending on your goal:
 
-## Building from the sources
+### Running and deploying GSN
 
-First download the code from the git repository (using ``--depth 1`` makes it a lot smaller if you don't need the 10 years history):
+#### Debian package
 
-	git clone --depth 1 git@github.com:LSIR/gsn.git
+To make it even easier to test on Linux or deploy at large scale, we provide debian packages (see releases). It includes a systemd script to start the GSN server modules automatically at boot and manage it like any other service. Configuration files are in `/etc/gsn-core/`, `/etc/gsn-services/` and `/etc/gsn-webui/`, the virtual sensors in `/etc/gsn-core/virtual-sensors/` and the logs can be found at `/var/log/gsn-core/`, `/var/log/gsn-services/` and `/var/log/gsn-webui/`. Starting and stopping GSN is performed with `service gsn-core start/stop`, `service gsn-services start/stop` and `service gsn-webui start/stop`. By default, the GSN web interface is then accessible at <http://localhost> and the API at <http://localhost:9000>, but you can change the ports in the configuration files.
 
-GSN requires the following software for building:
+#### Universal package
 
-* Jakarta apache ant version 1.7.x or higher.
-* Java JDK 1.7.x .
-* [Apache Maven](http://maven.apache.org/download.cgi)
+We provide a universal package for each release of the code. This package is the best way to easily try GSN features on non-Linux platforms. 
 
-To build GSN follow these steps:
-* Add ANT_HOME/bin folder to your PATH
-* Execute ant with the build task:
-	``ant build``
-
-To run GSN from the source code, you can run the following ant task:
-	``ant gsn``
-
-To stop GSN:
-	``ant stop``
-
-Starting from version 1.1.7 GSN is using apache maven for managing the dependencies and libraries.
-If you use a IDE such as eclipse or NetBeans you may need to install additional plugins and change the settings of the project:
-
-* For eclipse: 
-  * You can install [M2Eclipse](http://eclipse.org/m2e/) 
-  * Right-click on your GSN project -> configure -> Convert to Maven project... 
-  * Right-click on your GSN project -> Build Path -> Configure build path...
-  * On the libraries tab, remove all references to the libraries that are marked in red.
-  * Press alt+F5 and update the maven libraries (it may take a while the first time) 
-  * If it still complains about missing libraries, check if they are in the lib folder and if needed add them to the build path
-
-## Multiplatform installer
-
-We provide a multiplatform GSN Installer for each release of the code. This installer is the best way to easily try GSN features. 
-
-The installer binaries for the latest realease can be found at:
+The installer binaries for the latest release can be found at:
 <https://github.com/LSIR/gsn/releases>
 
 Once GSN is installed, you can start it, executing the batch file `gsn-start.bat` (Windows) or shell script `gsn-start.sh` (Linux). 
 
-The GSN web interface is accessible at <http://localhost:22001>
-
-## *NEW*  Debian package
-
-To make it even easier to test on Linux or deploy at large scale, we provide with the latest version (1.1.8) a debian package (https://github.com/LSIR/gsn/releases/download/gsn-release-1.1.8/gsn_1.1.8_all.deb). It includes an init script to start the GSN server automatically at boot and manage it like any other service. For this first packaged version, we put all configuration files in `/opt/gsn/1.1.8/conf/`, the virtual sensors in `/opt/gsn/1.1.8/virtual-sensors/` and the logs can be found at `/var/log/gsn/`. Starting and stopping GSN is performed with `service gsn start/stop`. By default, the GSN web interface is then accessible at <http://localhost:22001>, but you can change the port at installation time or later on, in the configuration file `gsn.xml`.
-
-## Loading your first virtual sensor
+#### Loading your first virtual sensor
 
 To load a virtual sensor into GSN, you need to move its description file (.xml) into the `virtual-sensors` directory.
 This directory contains a set of samples that can be used.
@@ -65,6 +31,68 @@ This directory contains a set of samples that can be used.
 You can start by loading the MultiFormatTemperatureHandler virtual sensor (`virtual-sensors/samples/multiFormatSample.xml`).
 This virtual sensor generates random values without the need of an actual physical sensor.
 
-Virtual sensors are visible in the GSN web interface: <http://localhost:22001>
+### Developing new wrappers or Virtual Sensors 
 
+If you only need to write your own wrapper for a specific sensor communication protocol or processing class, you don't need to have the full building chain as in the next section. Just start an empty Java or Scala project and include a dependency to gsn-core (for example with maven):
+
+```xml
+<dependency>
+    <groupId>gsn</groupId>
+    <artifactId>gsn-core</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
+</dependency>
+```
+and the repository:
+```xml
+<distributionManagement>
+    <repository>
+        <id>osper</id>
+        <name>osper-releases</name>
+        <url>http://osper.epfl.ch:8081/artifactory/gsn-release</url>
+    </repository>
+    <snapshotRepository>
+        <id>osper</id>
+        <name>osper-snapshots</name>
+        <url>http://osper.epfl.ch:8081/artifactory/gsn-release</url>
+    </snapshotRepository>
+</distributionManagement>
+```
+
+Then you can package your code as a jar and put it in the lib folder of the installer (after you followed the steps of the previous section) and you are ready to load you own wrapper or virtual sensor. In the case of a new wrapper you will also need to register it on the ``wrapper.properties`` file on your GSN installation.
+
+### Building from sources
+
+First download the code from the git repository (using ``--depth 1`` makes it a lot smaller if you don't need the 10 years history):
+
+	git clone --depth 1 git@github.com:LSIR/gsn.git
+
+The GSN modules have the following requirements for building from the sources:
+
+* gsn-core and gsn-extra
+  * sbt 0.13+
+  * Java JDK 1.7
+* gsn-tools and gsn-services
+  * sbt 0.13+
+  * Java JDK 1.7
+  * Scala 2.11
+* gsn-webui
+  * python 3 
+  * [bower](http://bower.io/)
+  * [virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/)
+
+
+Then you can run the following tasks in sbt:
+
+* clean: remove generated files
+* compile: compiles the modules
+* package: build jar packages
+* project [core|extra|tools|services|webui]: select a specific projet
+
+In the project core you can use ``re-start`` to launch gsn-core for development and ``debian:packageBin`` to build the debian package.
+
+In the project services you can use ``run`` to start the web api in development mode  and ``debian:packageBin`` to build the debian package.
+
+In the project webui you can use ``startDjango`` to start the web interface in development mode  and ``packageDjango`` to build the debian package.
+
+Never use the development mode commands to run a production server !!
 

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+    <property name="extra-src.dir" value="${basedir}/gsn-extra/src/main/java"/>
+    <property name="extra-build.dir" value="${basedir}/gsn-extra/target/classes"/>
+    <property name="extra-reports.dir" value="${basedir}/gsn-extra/target/reports"/>
+    <property name="extra-resources.dir" value="${basedir}/gsn-extra/src/main/resources"/>
+    <property name="extra-jar.file" value="gsn-extra.jar"/>
+
+    <path id="extra-classpath">
+        <pathelement location="${conf.dir}/"/>
+        <pathelement location="${extra-build.dir}/"/>
+        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
+        <pathelement location="${core-build.dir}/"/>
+        <fileset dir="${basedir}/gsn-extra/lib/">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset refid="gsnextradeps"/>
+    </path>
+
+    <target name="build-gsn-extra" depends="setup, build-gsn-core" description="Compile the cource code of gsn-extra.">
+        <javac debug="true" srcdir="${extra-src.dir}" optimize="off"
+               destdir="${extra-build.dir}" failonerror="true" classpathref="extra-classpath">
+        </javac>
+    	<!--<copy todir="${extra-build.dir}">
+    	    <fileset dir="${extra-resources.dir}" includes="**/*.conf,**/*.properties" />
+    	</copy>-->
+    </target>
+
+    <!-- Dev -->
+
+    <target name="clean-gsn-extra" depends="init" description="Erase built files and target in gsn-extra.">
+        <delete includeEmptyDirs="yes" failonerror="no">
+            <fileset dir="${extra-build.dir}" includes="**/*.class,**/*.xml"/>
+            <fileset dir="${extra-build.dir}" includes="**/*.xml"/>
+        </delete>
+    </target>
+
+
+    <!-- Tools -->
+    <!-- Starts a sensorscope server, which listens on a port for data and publishes to CSV files -->
+    <!-- configuration is set in conf/sensorscope_server.properties -->
+    <target name="sensorscope-server" depends="build" description="Tests sensorscope server">
+            <java classname="gsn.utils.SensorScopeListener" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
+        <!--<java classname="gsn.wrappers.tinyos.SensorScopeServerListener" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">-->
+            <classpath refid="classpath"/>
+            <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
+        </java>
+    </target>
+
+    <target name="sensorscope-server-test" depends="build" description="Tests sensorscope server">
+        <java classname="gsn.utils.SensorScopeListenerTest" maxmemory="${maxMemoryUsage}" fork="true" dir="${basedir}">
+            <classpath refid="classpath"/>
+            <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
+        </java>
+    </target>
+
+    <!-- Tests -->
+
+    <target name="test-report-gsn-extra" depends="tests-gsn-extra" description="Runs JUnit tests, generates jcoverage,junit,todo reports on gsn-extra">
+        <junitreport todir="${extra-reports.dir}/junit">
+            <fileset dir="${extra-reports.dir}/junit">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${extra-reports.dir}/junit"/>
+        </junitreport>
+    </target>
+
+
+    <target name="tests-gsn-extra" depends="build-gsn-extra" description="Runs JUnit tests on gsn-extra">
+        <junit printsummary="on" haltonerror="off" haltonfailure="off" showoutput="on">
+            <formatter type="xml" usefile="true"/>
+            <classpath refid="extra-classpath"/>
+            <batchtest todir="${extra-reports.dir}/junit">
+                <fileset dir="${extra-build.dir}">
+                    <include name="**/*Test*.class"/>
+                    <exclude name="**/TestStreamExporterVirtualSensor.class"/>
+                    <exclude name="**/TestContainerImpl.class"/>
+                    <exclude name="**/RFIDTest.class"/>
+                    <exclude name="**/TestDataPropogation.class"/>
+                    <exclude name="**/TestVSensorLoader.class"/>
+                    <exclude name="**/TestStreamSource.class"/>
+                    <exclude name="**/TestWindowing1.class"/>
+                    <exclude name="**/TestWindowing2.class"/>
+                    <exclude name="**/TestPublicToMSR.class"/>
+                    <exclude name="**/TestService.class"/>
+                    <exclude name="**/TestDataPacket.class"/>
+                    <exclude name="**/TestSQLUtils.class"/>
+                    <exclude name="**/TestStreamElement.class"/>
+                    <exclude name="**/TestValidityTools.class"/>
+                    <exclude name="**/TestGraph.class"/>
+                    <exclude name="**/TestContainerImpl.class"/>
+                    <exclude name="**/TestStreamExporterVirtualSensor.class"/>
+                    <exclude name="**/TestStorageManager.class"/>
+                    <exclude name="**/TestAbstractWrapper.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <!-- Distribution -->
+
+    <target name="docs-gsn-extra" depends="setup">
+        <javadoc classpathref="extra-classpath" destdir="${extra-reports.dir}/javadoc" author="false" version="true" use="true"
+                 windowtitle="Global Sensor Network extra packages">
+            <fileset dir="${extra-src.dir}" defaultexcludes="yes">
+                <include name="**/*.java"/>
+                <exclude name="**/*Test.java"/>
+            </fileset>
+            <doctitle>Global Sensor Network</doctitle>
+            <bottom>GSN Development Team.</bottom>
+            <tag name="todo" scope="all" description="To do:"/>
+        </javadoc>
+        <!--
+        <documentdoclet destdir="${reports}/todos">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+            <info/>
+        </documentdoclet>
+        -->
+    </target>
+        
+    <target name="jar-gsn-extra" depends="clean-gsn-extra,build-gsn-extra" description="Create a jar file containing the GSN extra classes.">
+        <jar destfile="${jars.dir}/${extra-jar.file}" basedir="${extra-build.dir}">
+            <manifest>
+                <attribute name="Built-By" value="GSN Development Team."/>
+                <attribute name="Main-Class" value="gsn.Main"/>
+            </manifest>
+        </jar>
+    </target>
+
+	<artifact:pom id="gsnextrapom" file="${basedir}/gsn-extra/pom.xml"></artifact:pom>
+	<artifact:dependencies filesetId="gsnextradeps" pomRefId="gsnextrapom" />
+</project>

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+. /usr/share/gsn-webui/bin/env3/bin/activate
+cd /usr/share/gsn-webui
+gunicorn app.wsgi > /var/log/gsn-webui/gunicorn.log

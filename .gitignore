@@ -14,3 +14,6 @@ virtual-sensors/*.xml
 *.db
 ./data/
 csv-check-points/
+*.sqlite3
+*.sqlite
+*.pyc

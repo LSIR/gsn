@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+    <property name="core-src.dir" value="${basedir}/gsn-core/src/main/java"/>
+    <property name="core-build.dir" value="${basedir}/gsn-core/target/classes"/>
+    <property name="core-reports.dir" value="${basedir}/gsn-core/target/reports"/>
+    <property name="core-resources.dir" value="${basedir}/gsn-core/src/main/resources"/>
+    <property name="core-jar.file" value="gsn-core.jar"/>
+
+    <path id="core-classpath">
+        <pathelement location="${conf.dir}/"/>
+        <pathelement location="${core-build.dir}/"/>
+        <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
+        <fileset refid="gsncoredeps" />
+    </path>
+
+    <target name="build-gsn-core" depends="setup" description="Compile the cource code of gsn-core.">
+        <javac debug="true" srcdir="${core-src.dir}" optimize="off"
+               destdir="${core-build.dir}" failonerror="true" classpathref="core-classpath">
+        </javac>
+    	<copy todir="${core-build.dir}">
+    	    <fileset dir="${core-resources.dir}" includes="**/*.conf,**/*.properties" />
+    	</copy>
+    </target>
+
+    <!-- Dev -->
+
+    <target name="clean-gsn-core" depends="init" description="Erase built files and target in gsn-core.">
+        <delete includeEmptyDirs="yes" failonerror="no">
+            <fileset dir="${core-build.dir}" includes="**/*.class,**/*.xml"/>
+            <fileset dir="${core-build.dir}" includes="**/*.xml"/>
+        </delete>
+    </target>
+
+
+    <!-- Tests -->
+
+    <target name="test-report-gsn-core" depends="tests-gsn-core" description="Runs JUnit tests, generates jcoverage,junit,todo reports on gsn-core">
+        <junitreport todir="${core-reports.dir}/junit">
+            <fileset dir="${core-reports.dir}/junit">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${core-reports.dir}/junit"/>
+        </junitreport>
+    </target>
+
+    <target name="tests-gsn-core" depends="build-gsn-core" description="Runs JUnit tests on gsn-core">
+        <junit printsummary="on" haltonerror="off" haltonfailure="off" showoutput="on">
+            <formatter type="xml" usefile="true"/>
+            <classpath refid="core-classpath"/>
+            <batchtest todir="${core-reports.dir}/junit">
+                <fileset dir="${core-build.dir}">
+                    <include name="**/*Test*.class"/>
+                    <exclude name="**/TestStreamExporterVirtualSensor.class"/>
+                    <exclude name="**/TestContainerImpl.class"/>
+                    <exclude name="**/RFIDTest.class"/>
+                    <exclude name="**/TestDataPropogation.class"/>
+                    <exclude name="**/TestVSensorLoader.class"/>
+                    <exclude name="**/TestStreamSource.class"/>
+                    <exclude name="**/TestWindowing1.class"/>
+                    <exclude name="**/TestWindowing2.class"/>
+                    <exclude name="**/TestPublicToMSR.class"/>
+                    <exclude name="**/TestService.class"/>
+                    <exclude name="**/TestDataPacket.class"/>
+                    <exclude name="**/TestSQLUtils.class"/>
+                    <exclude name="**/TestStreamElement.class"/>
+                    <exclude name="**/TestValidityTools.class"/>
+                    <exclude name="**/TestGraph.class"/>
+                    <exclude name="**/TestContainerImpl.class"/>
+                    <exclude name="**/TestStreamExporterVirtualSensor.class"/>
+                    <exclude name="**/TestStorageManager.class"/>
+                    <exclude name="**/TestAbstractWrapper.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <!-- Distribution -->
+
+    <target name="docs-gsn-core" depends="setup">
+        <javadoc classpathref="core-classpath" destdir="${core-reports.dir}/javadoc" author="false" version="true" use="true"
+                 windowtitle="Global Sensor Network Core Infrastructure">
+            <fileset dir="${core-src.dir}" defaultexcludes="yes">
+                <include name="**/*.java"/>
+                <exclude name="**/*Test.java"/>
+            </fileset>
+            <doctitle>Global Sensor Network</doctitle>
+            <bottom>GSN Development Team.</bottom>
+            <tag name="todo" scope="all" description="To do:"/>
+        </javadoc>
+        <!--
+        <documentdoclet destdir="${reports}/todos">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+            <info/>
+        </documentdoclet>
+        -->
+    </target>
+        
+    <target name="jar-gsn-core" depends="clean-gsn-core,build-gsn-core" description="Create a jar file containing the GSN core classes.">
+        <jar destfile="${jars.dir}/${core-jar.file}" basedir="${core-build.dir}">
+            <manifest>
+                <attribute name="Built-By" value="GSN Development Team."/>
+                <attribute name="Main-Class" value="gsn.Main"/>
+            </manifest>
+        </jar>
+    </target>
+
+	<artifact:pom id="gsncorepom" file="gsn-core/pom.xml"></artifact:pom>
+	<artifact:dependencies filesetId="gsncoredeps" pomRefId="gsncorepom" />
+</project>

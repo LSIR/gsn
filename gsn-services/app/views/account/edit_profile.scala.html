@@ -1,0 +1,24 @@
+@(changeForm: play.data.Form[controllers.gsn.auth.Account.EditProfile])
+
+@import helper._
+@import play.core.j.PlayMagicForJava._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+@main(Messages("playauthenticate.profile.edit")) {
+
+	<h1>@Messages("playauthenticate.profile.edit")</h1>
+	<p>
+	@form(controllers.gsn.auth.routes.Account.doEditProfile, 'class -> "form-vertical", 'role -> "form") {
+
+       @if(changeForm.hasGlobalErrors) {
+        <p class="alert alert-danger">
+          @changeForm.globalError.message
+     	</p>
+       }
+
+	   @_profilePartial(changeForm)
+
+    <button type="submit" class="btn btn-default">@Messages("playauthenticate.profile.edit.btn")</button>
+	}
+	</p>
+}

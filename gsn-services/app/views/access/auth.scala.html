@@ -1,0 +1,26 @@
+@(client: String, secret: String, redirect: String, user: models.gsn.auth.User)
+
+@import helper._
+
+@main(Messages("gsn.oauth2.auth.title"),"auth") {
+<div id="groups" class="row">
+<div class="col-md-12">
+<h1>@Messages("gsn.oauth2.auth.title")</h1>
+</div>
+</div>
+     <div id="groups" class="row">
+		<div class="col-xs-12 col-md-6 col-md-offset-3">
+		<div class="highlight">
+		<h3>@Messages("gsn.oauth2.auth.access")</h3>
+		@Messages("gsn.oauth2.auth.access2", client)
+		<div align="center"><p><b>@Messages("gsn.oauth2.auth.access3", client)</b></p></div>
+		@helper.form(controllers.gsn.routes.OAuth2Controller.doAuth, 'class -> "form-horizontal", 'role -> "form") {
+		<input type="hidden" name="response_type" value="code" />
+		<input type="hidden" name="client_id" value="@client" />
+		<input type="hidden" name="client_secret" value="@secret" />
+		<div align="center"><button type="button" class="btn btn-danger" onclick="document.location='@redirect';">@Messages("gsn.oauth2.auth.deny")</button>&nbsp;&nbsp;&nbsp;<button type="submit" class="btn btn-success">@Messages("gsn.oauth2.auth.allow")</button></div>
+		}
+		</div>
+		</div>
+    </div>
+}

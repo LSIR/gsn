@@ -1,0 +1,237 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en" ng-app="gsnApp">
+
+<head>
+
+    <meta charset="utf-8">
+    <!--<meta http-equiv="X-UA-Compatible" content="IE=edge">-->
+
+    <title>Global Sensor Network Web App</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="{% static 'metisMenu/dist/metisMenu.min.css' %}" rel="stylesheet">
+
+    <!-- Timeline CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/sb-admin-2.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/timeline.css' %}"/>
+
+    <!-- Angular Chart CSS -->
+    <link rel="stylesheet" href="{% static 'angular-chart.js/dist/angular-chart.min.css' %}">
+
+    <!-- DateTimePicker CSS-->
+    <link rel="stylesheet" href="{% static 'angular-bootstrap-datetimepicker/src/css/datetimepicker.css' %}">
+
+    <!-- Custom Fonts -->
+    <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+
+    <script type="text/javascript">
+        var WEBSOCKET_URL = "{{ws_url}}";
+    </script>
+
+    <!-- jQuery -->
+    <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
+
+    <!-- AngularJS -->
+    <script src="{% static 'angular/angular.min.js' %}"></script>
+    <script src="{% static 'js/django-angular.js' %}"></script>
+    <script src="{% static 'angular-route/angular-route.min.js' %}"></script>
+    <script src="{% static 'js/controllers.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+
+    <!-- Moments -->
+    <script src="{% static 'moment/min/moment.min.js' %}"></script>
+
+    <!-- DateTimePicker  -->
+    <script src="{% static 'angular-bootstrap-datetimepicker/src/js/datetimepicker.js' %}"></script>
+    <script src="{% static 'angular-bootstrap-datetimepicker/src/js/datetimepicker.templates.js' %}"></script>
+
+   <script src="{% static 'angular-date-time-input/src/dateTimeInput.js' %}"></script>
+
+    <!-- ui-bootstrap -->
+    <script src="{% static 'angular-bootstrap/ui-bootstrap-tpls.min.js' %}"></script> 
+
+    <!-- angular tables -->
+    <script src="{% static 'tabs/tabs.js' %}"></script>
+    <!-- DirPaginate-->
+    <script src="{% static 'dirPagination/dirPagination.js' %}"></script>
+
+    <!-- Angular Local Storage -->
+    <script src="{% static 'angular-local-storage/dist/angular-local-storage.min.js' %}"></script>
+
+    <!-- Google Maps -->
+    <script src="//maps.google.com/maps/api/js?libraries=places,geometry"></script>
+    <script src="{% static 'ngmap/build/scripts/ng-map.min.js' %}"></script>
+    <script src="{% static 'markerclustererplus/dist/markerclusterer.min.js' %}"></script>
+
+    <!-- Charts and Angular Chart -->
+    <script src="{% static 'js/Chart.js' %}"></script>
+    <script src="{% static 'angular-chart.js/dist/angular-chart.min.js' %}"></script>
+
+    <!-- HighPlots -->
+    <script src="{% static 'highcharts/highstock.js' %}"></script>
+    <script src="{% static 'highcharts-ng/dist/highcharts-ng.min.js' %}"></script>
+
+    <!-- ng-Autocomplete -->
+    <script src="{% static 'ngAutocomplete/src/ngAutocomplete.js' %}"></script>
+
+    <!-- spin -->
+    <script src="{% static 'spin.js/spin.min.js' %}"></script>
+    <script src="{% static 'angular-spinner/angular-spinner.min.js' %}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="{% static 'metisMenu/dist/metisMenu.min.js' %}"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="{% static 'js/sb-admin-2.js' %}"></script>
+
+    <!--websockets-->
+    <script src="{% static 'angular-websocket/dist/angular-websocket.min.js' %}"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+<div ng-controller="SensorListCtrl">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="">Global Sensor Network</a>
+            </div>
+            <!-- /.navbar-header -->
+
+            <ul class="nav navbar-top-links navbar-right" style="height: 50px; display: table ">
+
+                {% if logged_out %}
+                    <li style="display: table-cell;vertical-align: middle;">
+                        <a href="{% url 'oauth_logging_redirect' %}" class="btn btn-default">Log in</a>
+                    </li>
+                {% endif %}
+
+                {% if logged_in %}
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="">
+                            <strong>{{ user }}</strong>
+                            <i class="fa fa-user fa-fw"></i>
+                            <i class="fa fa-caret-down"></i>
+
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li>
+                                <a href="{% url 'logout' %}">
+                                    <i class="fa fa-sign-out fa-fw"></i>
+                                    Log Out
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- /.dropdown-user -->
+                    </li>
+                {% endif %}
+                <!-- /.dropdown -->
+            </ul>
+            <!-- /.navbar-top-links -->
+
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+                        <li class="sidebar-search">
+                            <div class="input-group custom-search-form">
+                                <input type="text" class="form-control" placeholder="Filter Sensors..."
+                                       ng-model="query">
+                                <!--<span class="input-group-btn">-->
+                                <!--<button class="btn btn-default" type="button">-->
+                                <!--<i class="fa fa-search"></i>-->
+                                <!--</button>-->
+                                <!--</span>-->
+                            </div>
+                            <!-- /input-group -->
+                        </li>
+                        <li>
+                            <a href="#/sensors" target="_self">
+                                <i class="fa  fa-list-ul fa-fw"></i>
+                                Sensors
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#/dashboard" target="_self">
+                                <i class="fa  fa-list-ul fa-fw"></i>
+                                Dashboard
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#/compare" target="_self">
+                                <i class="fa  fa-list-ul fa-fw"></i>
+                                Compare
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#/map">
+                                <i class="fa fa-fw fa-globe"></i>
+                                Around Me
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#/download">
+                                <i class="fa fa-save fa-fw"></i>
+                                Data Export
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+        <div id="wrapper">
+
+            <div id="page-wrapper">
+                <div ng-view></div>
+            </div>
+
+        </div>
+
+        <!-- /#page-wrapper -->
+
+</div>
+<!-- /#wrapper -->
+
+</body>
+
+<footer style="margin: auto; margin-bottom: 2em; margin-top: 2em">
+    <div style="text-align: center">
+        LSIR, EPFL
+    </div>
+</footer>
+
+<script type="text/javascript">
+    
+    gsnApp.config(function(paginationTemplateProvider) {
+        paginationTemplateProvider.setPath("{% static 'dirPagination/dirPagination.tpl.html' %}");
+    });
+    
+</script>
+</html>

@@ -1,0 +1,19 @@
+<configuration>
+	<appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>logs/gsn-services.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>gsn-services-%d{yyyy-MM}.%i.log</fileNamePattern> 
+       <maxHistory>60</maxHistory>
+       <totalSizeCap>20GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+    </encoder>
+  </appender>
+	
+	<logger name="gsn.data" level="DEBUG" />
+	<logger name="application" level="DEBUG" />
+	<root level="WARN">
+		<appender-ref ref="ROLLING" />
+	</root>
+</configuration>

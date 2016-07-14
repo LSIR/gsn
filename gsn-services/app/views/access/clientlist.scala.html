@@ -1,0 +1,84 @@
+@import scala.collection.mutable.Buffer
+@import controllers.gsn.auth.GSNEditClient 
+@(clients: Buffer[models.gsn.auth.Client], editForm: Form[GSNEditClient])
+@import helper._ 
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+@main(Messages("gsn.oauth2.clients.title"),"clientlist") {
+<div id="groups" class="row">
+	<div class="col-md-12">
+		<h1>@Messages("gsn.oauth2.clients.title")</h1>
+	</div>
+</div>
+<div id="groups" class="row">
+	<div class="col-xs-12 col-md-8">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>@Messages("gsn.oauth2.clients.name")</th>
+					<th>@Messages("gsn.oauth2.clients.user")</th>
+					<th>@Messages("gsn.oauth2.clients.id")</th>
+					<th>@Messages("gsn.oauth2.clients.redirect")</th>
+					<th>@Messages("gsn.access.actions")</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for(c <- clients) {
+				<tr>
+					<td>@c.name</td>
+					<td>@if(c.linked) {  @c.user.firstName @c.user.lastName } else { - }</td>
+					<td>@c.clientId</td>
+					<td>@c.redirect</td>
+					<td data-id="@c.id" data-name="@c.name" data-client="@c.clientId"
+						data-redirect="@c.redirect" data-secret="@c.secret" data-linked="@c.linked">
+						<button class="btn btn-default btn-xs" onclick="edit(this);">@Messages("gsn.oauth2.clients.edit")</button>
+						<button class="btn btn-danger btn-xs" onclick="del(this);">@Messages("gsn.oauth2.clients.delete")</button>
+					</td>
+				</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+	<div class="col-xs-12 col-md-4">
+		<div class="highlight">
+			<div id="info-box"></div>
+			@helper.form(controllers.gsn.routes.OAuth2Controller.editClient,'class -> "form-horizontal", 'role -> "form") {
+
+			@if(editForm.hasGlobalErrors) {
+			<p class="alert alert-danger">@editForm.globalError.get.message</p>
+			} 
+			<input type="hidden" id="idd" name="id" value="0" />
+			<input type="hidden" id="actiond" name="action" value="add" /> 
+				
+			@inputText(editForm("name"), '_label -> Messages("gsn.oauth2.clients.name") )
+			@inputText( editForm("client_id"), '_label -> Messages("gsn.oauth2.clients.id") ) 
+			@inputPassword(	editForm("client_secret"), '_label -> Messages("gsn.oauth2.clients.secret") )
+			@inputText( editForm("redirect"), '_label -> Messages("gsn.oauth2.clients.redirect") )
+			@checkbox( editForm("linked"), '_label -> Messages("gsn.oauth2.clients.user") )
+			<button type="submit" class="btn btn-primary">@Messages("gsn.oauth2.clients.add")</button>
+			}
+		</div>
+	</div>
+</div>
+<script language="javascript">
+    function edit(t){
+    	$('#info-box').html("@Messages("gsn.oauth2.clients.editing") " + $(t).parent().attr('data-name'));
+    	$('#idd').val($(t).parent().attr('data-id'));
+    	$('#actiond').val('edit');
+    	$('#name').val($(t).parent().attr('data-name'));
+    	$('#client_id').val($(t).parent().attr('data-client'));
+    	$('#client_secret').val($(t).parent().attr('data-secret'));
+    	$('#redirect').val($(t).parent().attr('data-redirect'));
+    	$('#linked')[0].checked = $(t).parent().attr('data-linked')==="true";
+    }
+    function del(t){
+    	$('#idd').val($(t).parent().attr('data-id'));
+    	$('#actiond').val('del');
+    	$('#name').val('name');
+    	$('#client_id').val('client');
+    	$('#client_secret').val('secret');
+    	$('#redirect').val('redirect');
+    	$('form').submit();
+    }
+    </script>
+}

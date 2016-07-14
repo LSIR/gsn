@@ -1,8 +1,11 @@
-language: java
-script: "ant build"
+language: scala
+scala:
+   - 2.11.2
 sudo: false
 jdk:
   - openjdk7
+script:
+  - sbt compile
 branches:
   only:
     - master

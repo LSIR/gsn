@@ -1,0 +1,131 @@
+@import scala.collection.mutable.Buffer 
+@import controllers.gsn.auth.GSNGroup 
+@(vs: Buffer[models.gsn.auth.DataSource], groups: Buffer[models.gsn.auth.Group], users: Buffer[models.gsn.auth.User], count:Int, page:Int, pageLength:Int) 
+@import helper._ 
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+@main(Messages("gsn.access.vs.title"),"vslist") {
+<div id="groups" class="row">
+	<div class="col-md-12">
+		<h1>@Messages("gsn.access.vs.title")</h1>
+	</div>
+</div>
+<div id="groups" class="row">
+	<div class="col-xs-12 col-md-12">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>@Messages("gsn.access.vs.title")</th>
+					<th>@Messages("gsn.access.vs.allowed.read.users")</th>
+					<th>@Messages("gsn.access.vs.allowed.read.groups")</th>
+					<th>@Messages("gsn.access.vs.allowed.write.users")</th>
+					<th>@Messages("gsn.access.vs.allowed.write.groups")</th>
+					<th>@Messages("gsn.access.vs.allowed.all")</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for(v <- vs) {
+				<tr id="row_@v.id" @if(v.is_public){ class="success" }>
+					<td>@v.value</td>
+					<td>
+						<ul class="list-unstyled hideable">
+							@for(u <- v.r_users) {
+							<li>@u.firstName @u.lastName (@u.email)
+								<button type="button" class="btn btn-danger btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=ur' + @u.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.users.remove")</button>
+							</li> } @if(v.r_users.size < users.size){
+							<li><select id="ur_@v.id"> @for(u <- users) {
+									@if(!v.r_users.contains(u)){
+									<option value="ur@u.id">@u.firstName @u.lastName
+										(@u.email)</option> } }
+							</select>
+								<button type="button" class="btn btn-primary btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#ur_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.groups.add")</button>
+							</li> }
+						</ul>
+					</td>
+					<td>
+						<ul class="list-unstyled  hideable">
+							@for(g <- v.r_groups) {
+							<li>[ @g.name ]
+								<button type="button" class="btn btn-danger btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=gr' + @g.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.users.remove")</button>
+							</li>
+							<span class="text-muted">
+								<ul class="list-inline">
+									@for(u <- g.users){
+									<li>@u.firstName @u.lastName (@u.email)</li> }
+								</ul>
+							</span>
+							</li> } @if(v.r_groups.size < groups.size){
+							<li><select id="gr_@v.id"> @for(u <- groups) {
+									@if(!v.r_groups.contains(u)){
+									<option value="gr@u.id">[ @u.name ]</option> } }
+							</select>
+								<button type="button" class="btn btn-primary btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#gr_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.groups.add")</button>
+							</li> }
+						</ul>
+					</td>
+					<td>
+						<ul class="list-unstyled hideable">
+							@for(u <- v.w_users) {
+							<li>@u.firstName @u.lastName (@u.email)
+								<button type="button" class="btn btn-danger btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=uw' + @u.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.users.remove")</button>
+							</li> } @if(v.w_users.size < users.size){
+							<li><select id="uw_@v.id"> @for(u <- users) {
+									@if(!v.w_users.contains(u)){
+									<option value="uw@u.id">@u.firstName @u.lastName
+										(@u.email)</option> } }
+							</select>
+								<button type="button" class="btn btn-primary btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#uw_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.groups.add")</button>
+							</li> }
+						</ul>
+					</td>
+					<td>
+						<ul class="list-unstyled  hideable">
+							@for(g <- v.w_groups) {
+							<li>[ @g.name ]
+								<button type="button" class="btn btn-danger btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=gw' + @g.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.users.remove")</button>
+							</li>
+							<span class="text-muted">
+								<ul class="list-inline">
+									@for(u <- g.users){
+									<li>@u.firstName @u.lastName (@u.email)</li> }
+								</ul>
+							</span>
+							</li> } @if(v.w_groups.size < groups.size){
+							<li><select id="gw_@v.id"> @for(u <- groups) {
+									@if(!v.w_groups.contains(u)){
+									<option value="gw@u.id">[ @u.name ]</option> } }
+							</select>
+								<button type="button" class="btn btn-primary btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#gw_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.groups.add")</button>
+							</li> }
+						</ul>
+					</td>
+					<td>
+					<input type="checkbox" @if(v.is_public) { checked="checked" } data-id="@v.id" onchange="check(this);"/>
+					</td>
+				</tr>
+				}
+			</tbody>
+		</table>
+		@paginate(page, pageLength, count, controllers.gsn.auth.routes.PermissionsController.vs(_))
+	</div>
+</div>
+<script type="text/javascript">
+function check(item){
+	var i = $(item);
+	if (i[0].checked){
+		$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + i.data('id') + '&id=a').done($('#row_'+i.data('id')).toggleClass('success',true))
+	}else{
+		$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + i.data('id') + '&id=a').done($('#row_'+i.data('id')).toggleClass('success',false))
+	}
+}
+$('select').select2();
+</script>
+}

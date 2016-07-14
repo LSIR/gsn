@@ -1,0 +1,20 @@
+[Unit]
+Description=GSN Server Web UI
+Requires=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/usr/share/gsn-webui
+EnvironmentFile=/etc/default/gsn-webui
+ExecStart=/usr/share/gsn-webui/bin/gsn-webui
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=60
+User=gsn
+ExecStartPre=/bin/mkdir -p /run/gsn-webui
+ExecStartPre=/bin/chown gsn:gsn /run/gsn-webui
+ExecStartPre=/bin/chmod 755 /run/gsn-webui
+PermissionsStartOnly=true
+
+[Install]
+WantedBy=multi-user.target

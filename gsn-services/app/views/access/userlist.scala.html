@@ -1,0 +1,56 @@
+@import scala.collection.mutable.Buffer 
+@(users: Buffer[models.gsn.auth.User], roles: Buffer[models.gsn.auth.SecurityRole], count:Int, page:Int, pageLength:Int) 
+@import helper._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f)} 
+@main(Messages("gsn.access.users.title"),"userlist") {
+<div id="groups" class="row">
+	<div class="col-md-12">
+		<h1>@Messages("gsn.access.users.title")</h1>
+	</div>
+</div>
+<div id="users" class="row">
+	<div class="col-xs-12 col-md-12">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>@Messages("playauthenticate.profile.firstname")</th>
+					<th>@Messages("playauthenticate.profile.lastname")</th>
+					<th>E-mail</th>
+					<th>@Messages("gsn.access.roles")</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for(u <- users) {
+				<tr>
+					<td>@u.firstName</td>
+					<td>@u.lastName</td>
+					<td>@u.email</td>
+					<td>
+						<ul class="list-inline">
+							@for(r <- u.roles) {
+							<li>@r.roleName
+								<button type="button" class="btn btn-danger btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removerole(page)?user_id=' + @u.id + '&role_id=' + @r.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.users(page)');">@Messages("gsn.access.users.remove")</button>
+							</li> } @if(u.roles.size < roles.size){
+							<li><select id="u_@u.id"> @for(r <- roles) {
+									@if(!u.roles.contains(r)){
+									<option value="@r.id">@r.roleName</option> 
+									} 
+								}
+							</select>
+								<button type="button" class="btn btn-primary btn-xs"
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addrole(page)?user_id=' + @u.id + '&role_id=' + $('#u_@u.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.users(page)');">@Messages("gsn.access.users.add")</button></li>
+							}
+						</ul>
+					</td>
+				</tr>
+				}
+			</tbody>
+		</table>
+		@paginate(page, pageLength, count, controllers.gsn.auth.routes.PermissionsController.users(_))
+	</div>
+</div>
+<script type="text/javascript">
+$('select').select2();
+</script>
+}
