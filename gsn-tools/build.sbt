@@ -9,6 +9,7 @@ libraryDependencies ++= Seq(
   "org.geotools" % "gt-shapefile" % "13.2",
   "org.geotools" % "gt-geojson" % "13.2",
   "org.geotools" % "gt-epsg-hsql" % "13.2",
+  "javax.media" % "jai_core" % "1.1.3" from "http://download.osgeo.org/webdav/geotools/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar",
   "org.apache.jena" % "jena-core" % "2.11.0" exclude("log4j","log4j") exclude("org.slf4j","slf4j-log4j12"),
   "com.typesafe.slick" %% "slick" % "2.1.0",
   "com.mchange" % "c3p0" % "0.9.5-pre10",
