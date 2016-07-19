@@ -10,6 +10,12 @@ This README file only contains basic setup instructions depending on your goal:
 
 ### Running and deploying GSN
 
+#### Quick demo with Vagrant
+
+On any computer that can run [VirtualBox](https://www.virtualbox.org/) (or any other supported virtual machine provider), install [Vagrant](https://www.vagrantup.com/), get the GSN git repository or just the file `Vagrantfile` and type `vagrant up` in your terminal (being in the same folder).
+Once the provisioning is done, open your browser at http://localhost:8000/ to see the GSN UI. You can login with the username root@localhost and password changeme.
+
+
 #### Debian package
 
 To make it even easier to test on Linux or deploy at large scale, we provide debian packages (see releases). It includes a systemd script to start the GSN server modules automatically at boot and manage it like any other service. Configuration files are in `/etc/gsn-core/`, `/etc/gsn-services/` and `/etc/gsn-webui/`, the virtual sensors in `/etc/gsn-core/virtual-sensors/` and the logs can be found at `/var/log/gsn-core/`, `/var/log/gsn-services/` and `/var/log/gsn-webui/`. Starting and stopping GSN is performed with `service gsn-core start/stop`, `service gsn-services start/stop` and `service gsn-webui start/stop`. By default, the GSN web interface is then accessible at <http://localhost> and the API at <http://localhost:9000>, but you can change the ports in the configuration files.
