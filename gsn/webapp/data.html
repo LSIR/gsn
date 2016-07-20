@@ -81,7 +81,7 @@
                                         var d;
                                         if (isNaN(data[i])) {
                                         	if (data[i].slice(0, 10) == '/field?vs=')
-                                        		d='BINARY_DATA';
+                                        		d='<a href="'+data[i]+'">download <img src="style/download_arrow.gif" alt="" /></a>';
                                         	else
                                         		d=data[i];
                                         }
