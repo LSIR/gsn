@@ -116,6 +116,16 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
+                    <predicate key="query">select * from Matterhorn_GPS_Logger__data__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select GSN_TIMESTAMP, DEVICE_ID, GENERATION_TIME, TIMESTAMP, 0 as GPS_UNIXTIME, 0 as GPS_MISSING_SV, DEVICE_TYPE, GPS_RAW_DATA_VERSION, GPS_SATS, RAW_DATA as GPS_RAW_DATA from wrapper where data_type = 0</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
                     <predicate key="query">select * from Matterhorn_GPS_RAW__tobinary__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>

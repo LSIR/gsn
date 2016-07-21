@@ -1,0 +1,37 @@
+<virtual-sensor name="Matterhorn_GPS_Logger__parsing" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.GPSLoggerDataParser</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="stream_type">parsing-status</param>
+        </init-params>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            
+			<field name="FILE_TYPE" type="VARCHAR(16)" />
+			<field name="FILE_NAME" type="VARCHAR(64)" />
+			<field name="FILE_QUEUE_SIZE" type="INTEGER" />
+			<field name="START_PARSING" type="BIGINT" unit="unixtime" />
+			<field name="FINISHED_PARSING" type="BIGINT" unit="unixtime" />
+			<field name="GENERATED_STREAMS" type="INTEGER" />
+			<field name="UNPARSABLE_STREAMS" type="INTEGER" />
+            
+        </output-structure>
+    </processing-class>
+    <description>GPS Logger parsing status information from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from Matterhorn_GPS_Logger__files__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

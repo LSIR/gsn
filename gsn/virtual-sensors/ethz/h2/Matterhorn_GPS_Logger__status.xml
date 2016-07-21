@@ -1,0 +1,43 @@
+<virtual-sensor name="Matterhorn_GPS_Logger__status" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
+		    <field name="SAMPLE_COUNT" type="INTEGER"/>
+			<field name="V12DC_IN" type="INTEGER" unit="mV"/>
+			<field name="HUMIDITY" type="INTEGER" unit="%"/>
+			<field name="TEMPERATURE" type="SMALLINT" unit="°C"/>
+            <field name="INCLINOMETER_X" type="VARCHAR(30)" unit="°" />
+            <field name="INCLINOMETER_Y" type="VARCHAR(30)" unit="°" />
+            <field name="RAW_DATA" type="BINARY"/>
+            
+        </output-structure>
+    </processing-class>
+    <description>GPS Logger status information from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from Matterhorn_GPS_Logger__data__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, GSN_TIMESTAMP, DEVICE_TYPE, SAMPLE_COUNT,
+                STATUS_V12DC_IN as V12DC_IN, STATUS_HUMIDITY as HUMIDITY, STATUS_TEMPERATURE as TEMPERATURE,
+                cast(round(ASIN(STATUS_INCLINOMETER_X / 32000.0) * 180.0/PI(), 3) as CHAR(30)) as INCLINOMETER_X,
+                cast(round(ASIN(STATUS_INCLINOMETER_Y / 32000.0) * 180.0/PI(), 3) as CHAR(30)) as INCLINOMETER_Y,
+                RAW_DATA from wrapper where data_type = 1</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

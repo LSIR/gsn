@@ -1,0 +1,57 @@
+<virtual-sensor name="Matterhorn_GPS_Logger__files" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                    DEVICE_TYPE = "gps-logger";
+                ]]>
+            </param>
+        </init-params>
+       	<web-input password="test">
+         	<command name="files">
+				<field name="raw_status_file" type="*binary">file</field>
+				<field name="config_file" type="*binary">file</field>
+				<field name="event_file" type="*binary">file</field>
+        	</command>
+   		</web-input>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
+            <field name="RELATIVE_FILE1" type="VARCHAR(255)"/>
+            <field name="SIZE_FILE1" type="BIGINT" unit="bytes"/>
+            <field name="RAW_STATUS_DATA" type="binary" data-path-field="RELATIVE_FILE1" />
+            <field name="RELATIVE_FILE2" type="VARCHAR(255)"/>
+            <field name="SIZE_FILE2" type="BIGINT" unit="bytes"/>
+            <field name="EVENT_DATA" type="binary" data-path-field="RELATIVE_FILE2" />
+            <field name="RELATIVE_FILE3" type="VARCHAR(255)"/>
+            <field name="SIZE_FILE3" type="BIGINT" unit="bytes"/>
+            <field name="CONFIGURATION_DATA" type="binary" data-path-field="RELATIVE_FILE3" />
+            
+            <field name="DATA_IMPORT_SOURCE" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>GPS Logger files from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
+    <streams>
+      <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="file-getter">
+                    <predicate key="subdirectory-name">gps-logger</predicate>
+                    <predicate key="filename-regex1">^D_(\d{6})_\d+_\d+\.dat$</predicate>
+                    <predicate key="filename-regex2">^C_(\d{6})_\d+_\d+\.log$</predicate>
+                    <predicate key="filename-regex3">^E_(\d{6})_\d+_\d+\.log$</predicate>
+                    <predicate key="deviceid-from-filename">true</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

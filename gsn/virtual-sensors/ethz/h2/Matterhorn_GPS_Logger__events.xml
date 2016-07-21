@@ -1,0 +1,38 @@
+<virtual-sensor name="Matterhorn_GPS_Logger__events" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.GPSLoggerDataParser</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+            <param name="stream_type">events</param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true" />
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" />
+            
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
+		    <field name="EVENT_COUNT" type="INTEGER"/>
+		    <field name="EVENT" type="VARCHAR(256)"/>
+		    
+        </output-structure>
+    </processing-class>
+    <description>GPS Logger parsed event information from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from Matterhorn_GPS_Logger__files__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

@@ -1,0 +1,58 @@
+<virtual-sensor name="Matterhorn_GPS_Logger__config" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.GPSLoggerDataParser</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+            <param name="stream_type">configuration</param>
+        </init-params>
+        <output-structure>
+			<field name="POSITION" type="INTEGER" index="true" />
+			<field name="DEVICE_ID" type="INTEGER" />
+			<field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true" />
+			<field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" />
+			
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
+			<field name="START_DATE" type="BIGINT" unit="unixtime" />
+			<field name="END_DATE" type="BIGINT" unit="unixtime" />
+			<field name="UPLOADER" type="VARCHAR(64)" />
+			<field name="PROTOCOL" type="VARCHAR(8)" />
+			<field name="SOFTWARE_VERSION" type="INTEGER" />
+			<field name="FIRMWARE" type="SMALLINT" />
+			<field name="MANUAL_POSITION" type="INTEGER" />
+			<field name="LOW_POWER_CYCLE_TIME" type="SMALLINT" unit="min" />
+			<field name="LOW_POWER_ACTIVE_TIME" type="SMALLINT" unit="min" />
+			<field name="LOW_POWER_MEASUREMENT" type="SMALLINT" />
+			<field name="ENTRY_VOLTAGE" type="INTEGER" unit="mV" />
+			<field name="EXIT_VOLTAGE" type="INTEGER" unit="mV" />
+			<field name="LOGGING_RATE" type="INTEGER" unit="ms" />
+			<field name="CONFIG_USED" type="SMALLINT" />
+			<field name="CONFIG_TOTAL" type="SMALLINT" />
+			<field name="CONFIG_STRING" type="BINARY" />
+			<field name="MAST_ORIENTATION_START" type="SMALLINT" unit="°" />
+			<field name="MAST_ORIENTATION_END" type="SMALLINT" unit="°" />
+			<field name="DATA_PAGES" type="INTEGER" />
+			<field name="EVENT_PAGES" type="INTEGER" />
+			<field name="HIGH_POWER_MEASUREMENT" type="SMALLINT" />
+			<field name="ANTENNA_SERIAL" type="VARCHAR(32)" />
+			
+        </output-structure>
+    </processing-class>
+    <description>GPS Logger parsed configuration information from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from Matterhorn_GPS_Logger__files__mapped</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

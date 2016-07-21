@@ -1,0 +1,39 @@
+<virtual-sensor name="Matterhorn_GPS_Logger__files__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="RELATIVE_FILE1" type="VARCHAR(255)"/>
+            <field name="SIZE_FILE1" type="BIGINT" unit="bytes"/>
+            <field name="RAW_STATUS_DATA" type="binary" data-path-field="RELATIVE_FILE1" />
+            <field name="RELATIVE_FILE2" type="VARCHAR(255)"/>
+            <field name="SIZE_FILE2" type="BIGINT" unit="bytes"/>
+            <field name="EVENT_DATA" type="binary" data-path-field="RELATIVE_FILE2" />
+            <field name="RELATIVE_FILE3" type="VARCHAR(255)"/>
+            <field name="SIZE_FILE3" type="BIGINT" unit="bytes"/>
+            <field name="CONFIGURATION_DATA" type="binary" data-path-field="RELATIVE_FILE3" />
+            
+        </output-structure>
+    </processing-class>
+    <description>GPS Logger files from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from Matterhorn_GPS_Logger__files</predicate>
+                    <predicate key="remote-contact-point">http://pvt.permasense.ethz.ch/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

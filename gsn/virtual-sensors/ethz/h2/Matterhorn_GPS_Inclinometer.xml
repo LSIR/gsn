@@ -22,6 +22,16 @@
         <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
+                    <predicate key="query">select * from Matterhorn_GPS_Logger__status</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, DEVICE_TYPE as SENSORTYPE, INCLINOMETER_X, INCLINOMETER_Y from wrapper</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
                     <predicate key="query">select * from Matterhorn_Dozer_WgpsStatus__conv</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>

@@ -358,6 +358,12 @@ Matterhorn_GPS_Inclinometer.xml
 Matterhorn_GPS_L2__conv.xml
 Matterhorn_GPS_L2__files__mapped.xml
 Matterhorn_GPS_L2__parsed.xml
+Matterhorn_GPS_Logger__config.xml
+Matterhorn_GPS_Logger__data__mapped.xml
+Matterhorn_GPS_Logger__events.xml
+Matterhorn_GPS_Logger__files__mapped.xml
+Matterhorn_GPS_Logger__parsing.xml
+Matterhorn_GPS_Logger__status.xml
 Matterhorn_GPS_RAW__binary__mapped.xml
 Matterhorn_GPS_RAW__tobinary__mapped.xml
 Matterhorn_Mapping_Chart.xml
