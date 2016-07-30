@@ -65,7 +65,7 @@ public class ZeroMQWrapperPush extends AbstractWrapper {
 		structure = getActiveAddressBean().getOutputStructure();
 
 		String _lport = addressBean.getPredicateValue("local_port");
-		laddress = addressBean.getPredicateValue("local_adress");
+		laddress = addressBean.getPredicateValue("local_address");
 
 		if ( laddress == null || laddress.trim().length() == 0 ) 
 			throw new RuntimeException( "The >local_address< parameter is missing from the ZeroMQ wrapper." );

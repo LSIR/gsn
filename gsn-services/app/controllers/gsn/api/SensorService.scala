@@ -103,7 +103,7 @@ object SensorService extends Controller with GsnService {
   def uploadSensorData(sensorid:String) = headings((APIPermissionAction(true, sensorid) compose Action).async {implicit request =>
     Try{
       val vsname = sensorid.toLowerCase
-      val data = queryparam("data")
+      val data = request.body.asText
       val se = StreamElement.fromJSON(data.get)
     	val baos = new ByteArrayOutputStream()
       val o = new kOutput(baos)
