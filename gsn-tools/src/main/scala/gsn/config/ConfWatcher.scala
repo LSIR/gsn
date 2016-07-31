@@ -21,7 +21,7 @@ class ConfWatcher extends Actor {
     private def addVsConfig(f:File)={
       if (f.getName.endsWith(".xml")){
         val vs=VsConf load f.getPath
-	    vsMap+= ((vs.name.toLowerCase,vs ))	    
+           vsMap+= ((vs.name.toLowerCase,vs ))
 	    vsFileMap += ((f.getName,vs.name.toLowerCase))
 	    Some(vs)
       }	    
@@ -40,7 +40,7 @@ class ConfWatcher extends Actor {
     }
     
     override def preStart() {     
-      println("prestart actor conf watch")
+      println("prestart actor conf watch at " + this.self.path)
       watchServiceTask .watch(vsDir.toPath)
       vsDir.listFiles.foreach{f=>
         self ! Created(f)       

@@ -103,16 +103,11 @@ object SensorService extends Controller with GsnService {
   def uploadSensorData(sensorid:String) = headings((APIPermissionAction(true, sensorid) compose Action).async {implicit request =>
     Try{
       val vsname = sensorid.toLowerCase
-      val data = request.body.asText
-      val se = StreamElement.fromJSON(data.get)
-    	val baos = new ByteArrayOutputStream()
-      val o = new kOutput(baos)
-      kryo.writeObjectOrNull(o,se,classOf[StreamElement])
-      o.close()
+      val data = request.body.asJson.get.toString
+      val se = StreamElement.fromJSON(data)
       
       implicit val timeout = Timeout(1 seconds)
-      
-      val q = Akka.system.actorOf(Props[ConfWatcher])
+      val q=Akka.system.actorSelection("/user/gsnSensorStore/ConfWatcher")
       val p = q ? GetSensorConf(sensorid)
       p.map{c => c match{
         case conf:VsConf => {
@@ -123,12 +118,19 @@ object SensorService extends Controller with GsnService {
     		    val forwarder = context.socket(ZMQ.REQ)
     		    forwarder.connect("tcp://"+address+":"+port)
     		    forwarder.setReceiveTimeOut(3000)
-            forwarder.send(baos.toByteArray)
-            val rec = forwarder.recv()
-            if (rec != null && rec.head == 0.asInstanceOf[Byte]){
+    	      val result = se.map(s => {
+    	        val baos = new ByteArrayOutputStream()
+              val o = new kOutput(baos)
+              kryo.writeObjectOrNull(o,s,classOf[StreamElement])
+              o.close()
+              forwarder.send(baos.toByteArray)
+              val rec = forwarder.recv()
+              (rec != null && rec.head == 0.asInstanceOf[Byte])
+            })
+            if (result.forall(identity)){
               Ok("{\"status\": \"success\"}")       
             } else {
-              InternalServerError("{\"status\": \"error\", \"message\" : \"Packet forwarding to GSN core failled.\"}")
+              InternalServerError("{\"status\": \"error\", \"message\" : \"Packet forwarding to GSN core failed.\"}")
             }
           }
         case _ => InternalServerError("{\"status\": \"error\", \"message\" : \"Virtual Sensor config not found.\"}")

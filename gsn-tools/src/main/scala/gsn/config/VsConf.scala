@@ -97,6 +97,6 @@ object WrapperConf{
       xml \@ "wrapper", 
       xml.attribute("partial-order-key").map(_.toString),
       (xml \ "predicate").map(p=>(p \@ "key",p.text)).toMap,
-      (xml \ "field").map(f=>FieldConf.create(f)))
+      (xml \ "output-structure" \ "field").map(f=>FieldConf.create(f)))
 }    
       

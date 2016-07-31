@@ -387,35 +387,36 @@ public final class StreamElement implements Serializable {
 		for(JsonNode v : jn.get("values")){
 			Serializable[] data = new Serializable[df.length];
 			for(int j=1;j < v.size();j++){
-				switch(df[j].getDataTypeID()){
+				switch(df[j-1].getDataTypeID()){
 				case DataTypes.DOUBLE:
-					data[j] = v.get(j).asDouble();
+					data[j-1] = v.get(j).asDouble();
 					break;
 				case DataTypes.FLOAT:
-					data[j] = (float)v.get(j).asDouble();
+					data[j-1] = (float)v.get(j).asDouble();
 					break;
 				case DataTypes.BIGINT:
-					data[j] = v.get(j).asLong();
+					data[j-1] = v.get(j).asLong();
 					break;
 				case DataTypes.TINYINT:
-					data[j] = (byte)v.get(j).asInt();
+					data[j-1] = (byte)v.get(j).asInt();
 					break;
 				case DataTypes.SMALLINT:
 				case DataTypes.INTEGER:
-					data[j] = v.get(j).asInt();
+					data[j-1] = v.get(j).asInt();
 					break;
 				case DataTypes.CHAR:
 				case DataTypes.VARCHAR:
-					data[j] = v.get(j).asText();
+					data[j-1] = v.get(j).asText();
 					break;
 				case DataTypes.BINARY:
-					data[j] = (byte[])Base64.decodeBase64(v.get(j).asText());
+					data[j-1] = (byte[])Base64.decodeBase64(v.get(j).asText());
 					break;
 				default:
-					logger.error("The data type of the field cannot be parsed: " + df[j].toString());
+					logger.error("The data type of the field cannot be parsed: " + df[j-1].toString());
 				}
 			}
 			ret[k] = new StreamElement(df, data, v.get(0).asLong());
+			k++;
 		}
 		return ret;
 	}

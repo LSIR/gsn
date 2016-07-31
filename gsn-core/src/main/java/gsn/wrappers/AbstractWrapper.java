@@ -237,7 +237,7 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 	protected Boolean postStreamElement(StreamElement streamElement) {
 		if (streamElement == null) {
 			logger.info("postStreamElement is called with null ! Wrapper "
-					+ getWrapperName() + " might has a problem !");
+					+ getWrapperName() + " might have a problem !");
 			return false;
 		}
 		try {

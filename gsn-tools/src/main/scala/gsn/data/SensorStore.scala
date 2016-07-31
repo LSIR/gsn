@@ -21,7 +21,7 @@ object dsReg{
 
 class SensorStore(ds:DataStore) extends Actor{
   val log = Logging(context.system, this)
-  val confWatch=context.actorOf(Props[ConfWatcher])
+  val confWatch=context.actorOf(Props[ConfWatcher], "ConfWatcher")
     
   val driver = new MongoDriver(context.system)
   val connection:MongoConnection = null//driver.connection(List("localhost"))
