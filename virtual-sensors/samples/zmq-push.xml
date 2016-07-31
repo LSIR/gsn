@@ -1,0 +1,32 @@
+<virtual-sensor name="push" priority="11">
+	<processing-class>
+		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		<output-structure>
+			<field name="temp" type="double" unit="degree Celsius"/>
+		</output-structure>
+	</processing-class>
+	<description>Not Specified, please edit the file</description>
+	<life-cycle pool-size="10" />
+	<addressing>
+		<predicate key="geographical">Geographical data</predicate>
+		<predicate key="LATITUDE">37.5419</predicate>
+		<predicate key="LONGITUDE">-122.1419</predicate>		
+	</addressing>
+	<storage history-size="10000" />
+	<streams>
+		<stream name="input1">
+			<source alias="source1" sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq-push">
+                    <predicate key="local_address">127.0.0.1</predicate>
+                    <predicate key="local_port">23456</predicate>
+					<output-structure>
+						<field name="temp" type="double" unit="degree Celsius"/>
+					</output-structure>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from source1</query>
+		</stream>
+	</streams>
+</virtual-sensor>
+
