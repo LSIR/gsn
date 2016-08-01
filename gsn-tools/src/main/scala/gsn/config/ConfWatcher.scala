@@ -72,7 +72,7 @@ class ConfWatcher extends Actor {
         if (vs.isDefined)
           context .parent ! ModifiedVsConf(vs.get)        
       case GetSensorConf(sensorid) =>
-        sender ! vsMap(sensorid)   
+        sender ! vsMap(sensorid.toLowerCase)
       //case GetSensorsConf =>
 //        sender ! VsConfs(vsMap.map(_._2).toSeq)
     }
