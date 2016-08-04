@@ -48,12 +48,19 @@ $(document).ready(function() {
         }]
       },
       { title:"TEG Test Voltages",
-          signals: [{
-            vsensor:".*_dozer_adccomdiff__mapped",
-            field:["payload_a3"],
-            position: [2082,2112],
-          }]
+	      signals: [{
+	        vsensor:".*_dozer_adccomdiff__mapped",
+	        field:["payload_a3"],
+	        position: [2082,2112],
+	      }]
         },
+      { title:"TEG",
+          signals: [{
+            vsensor:".*_dozer_teg__conv",
+            field:["temp_air_side","temp_mtn_side","rectified_teg_voltage","bat_charge_current"],
+            position: [2054],
+          }]
+      },
     ]);
     
     $.ajax({
