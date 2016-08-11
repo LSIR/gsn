@@ -25,7 +25,7 @@
                     		RF_DC = (double)RF_DC / 10.0;
                     	
                     	if (GENERATION_TIME != null && TIMESTAMP != null)
-                    		NETWORK_DWELL_TIME = TIMESTAMP - GENERATION_TIME;
+                    		NETWORK_DWELL_TIME = (int)(TIMESTAMP - GENERATION_TIME);
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
