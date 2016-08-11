@@ -40,6 +40,13 @@ $(document).ready(function() {
           position: [20001,20031,20032,20034,20035,20039,20040,20042,20046,20048,20049,20050],
         }]
       },
+      { title:"DPP Packet network dwell time",
+        signals: [{
+          vsensor:".*_dpp_status__conv",
+          field:["network_dwell_time"],
+          position: [20001,20031,20032,20034,20035,20039,20040,20042,20046,20048,20049,20050],
+        }]
+      },
       { title:"DPP Temperature",
         signals: [{
           vsensor:".*_dpp_status__conv",

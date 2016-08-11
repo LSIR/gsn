@@ -7,7 +7,7 @@
             <param name="scriptlet">
                 <![CDATA[
                 	try {
-                		N_RX = N_HOPS1 = N_HOPS2 = N_HOPS3 = null;
+                		N_RX = N_HOPS1 = N_HOPS2 = N_HOPS3 = NETWORK_DWELL_TIME = null;
 
                     	if (N_RX_HOPS != null) {
                     		N_RX = (short)(N_RX_HOPS & 0x0f);
@@ -23,6 +23,9 @@
                     		CPU_DC = (double)CPU_DC / 10.0;
                     	if (RF_DC != null)
                     		RF_DC = (double)RF_DC / 10.0;
+                    	
+                    	if (GENERATION_TIME != null && TIMESTAMP != null)
+                    		NETWORK_DWELL_TIME = TIMESTAMP - GENERATION_TIME;
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
@@ -35,6 +38,7 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="GENERATION_TIME_MICROSEC" type="BIGINT"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="NETWORK_DWELL_TIME" type="INTEGER" unit="ms" />
             <field name="MESSAGE_TYPE" type="INTEGER" />
             <field name="SEQNR" type="INTEGER" />
             <field name="PAYLOAD_LENGTH" type="INTEGER" />
@@ -49,7 +53,7 @@
             <field name="N_HOPS2" type="SMALLINT" />
             <field name="N_HOPS3" type="SMALLINT" />
             <field name="PER" type="SMALLINT" unit="%" />
-            <field name="SNR" type="SMALLINT" unit="dBm" />
+            <field name="SNR" type="SMALLINT" unit="dB" />
             <field name="RSSI1" type="SMALLINT" unit="dBm" />
             <field name="RSSI2" type="SMALLINT" unit="dBm" />
             <field name="RSSI3" type="SMALLINT" unit="dBm" />
