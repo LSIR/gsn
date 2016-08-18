@@ -1,22 +1,24 @@
 package opensense.data
 
 import com.mchange.v2.c3p0.C3P0Registry
-import scala.slick.jdbc.JdbcBackend.Database
 import org.slf4j.LoggerFactory
-import gsn.data.DataStore
 import com.typesafe.config.ConfigFactory
 import gsn.config.GsnConf
 import gsn.config.StorageConf
+import gsn.data.DataStore
 import scala.slick.jdbc.JdbcBackend
+import scala.slick.jdbc.JdbcBackend.Database
 import scala.collection.mutable.ArrayBuffer
+import org.postgis._
 
 object DataCuration {
   val data=new ArrayBuffer[Array[Any]]()
   
   val log=LoggerFactory.getLogger(DataCuration.getClass)
 
-  val geo=StorageConf("org.postgresql.Driver","jdbc:postgresql://localhost:5433/pg_test",
-        "postgres","password",Some("geo"))
+  val geo=StorageConf("org.postgresql.Driver",
+      "jdbc:postgresql://localhost:5433/pg_test",
+      "postgres","password",Some("geo"))
             lazy val conf=ConfigFactory.load
   val gsnConf=GsnConf.load(conf.getString("gsn.config"))
   val ds=new DataStore(gsnConf)
@@ -38,45 +40,53 @@ object DataCuration {
   }
   
   def insertClean()(implicit session:JdbcBackend.Session)={
-    val sql=s"""INSERT INTO geo_osanm (timed,station,co,no2,co2,geom,seg) 
+    val sql=s"""INSERT INTO geo_osanm (timed,station,co,no2,co2,geom,seg,longitude,latitude) 
                 VALUES ${data.map(d=>"("+d.mkString(",")+")").mkString(",")}"""
     val stmt=session.conn.createStatement
     val rs=stmt executeUpdate(sql)        
   }
   def closePoint(gid:Int,x:Double,y:Double)(implicit session:JdbcBackend.Session)={
+    val s:MultiLineString=null
+    
     val q=s"SELECT ST_AsText(ST_ClosestPoint(geom,${point(x,y)})) AS point FROM tl where gid=$gid"
     val stmt=session.conn.createStatement
     val rs=stmt executeQuery q
-        println("execute close "+System.currentTimeMillis)
+        //println("execute close "+System.currentTimeMillis)
     rs.next
     rs getObject "point"
   }
-  
+  def makePoint(obj:Object)={
+    val coords=obj.toString.replace("POINT(","").replace(")","").split(" ")
+    point(coords(0).toDouble, coords(1).toDouble)
+  }
+  var total=0
   def distance(time:Long,station:Int,co:Int,no2:Int,co2:Int,
       x:Double,y:Double)={
     val q=s"""SELECT (geom::geography <-> ${point(x,y)}::geography) as dist,
                      gid,id,line,geom
               FROM tl 
-              ORDER BY dist LIMIT 10;"""
+              ORDER BY dist LIMIT 3;"""
     var pip=0d
-    println("before distance "+System.currentTimeMillis)
+    val bef=System.currentTimeMillis()
     vsDB(Some(geo.url)).withSession {implicit session=>
       val stmt=session.conn.createStatement
       val rs=stmt executeQuery q
-      println("after distance "+System.currentTimeMillis)
+      //println("after distance "+(System.currentTimeMillis-bef))
 	    rs.next
       pip=rs getDouble "dist"
       if (pip<20){
         val gid =rs getInt "gid"
         val segId=rs getInt "id"
-        val coords=closePoint(gid,x,y).toString.replace("POINT(","").replace(")","").split(" ")
-        println("after close point "+System.currentTimeMillis)
-        data+=Array(time, station, co, no2, co2, point(coords(0).toDouble, coords(1).toDouble),segId)
+        //println("after close point "+System.currentTimeMillis)
+        data+=Array(time, station, co, no2, co2, 
+            makePoint(closePoint(gid,x,y)),segId,x,y)
       }
       //else println(s"$x,$y")
      
-      if (data.size>100){
+      if (data.size>1000){
+        total+=data.size
         //insertClean
+        println(System.currentTimeMillis+" insert now "+total)
         data.clear
       }
     }
@@ -85,12 +95,16 @@ object DataCuration {
   }
   
   def query(offset:Long)={
-    val open=StorageConf("org.postgresql.Driver","jdbc:postgresql://opensense.epfl.ch:5433/opensense",
+    val open=StorageConf("org.postgresql.Driver",
+        "jdbc:postgresql://opensense.epfl.ch:5433/opensense",
         "gsn","opensense",Some("opensense"))
     val op_d=ds.datasource(open.url, open)    
     
-    val q=s"select * from geo_osanm where latitude is not null and station<100 order by timed offset $offset limit 100000"
-    vsDB(Some(open.url)).withSession {implicit session=>
+    val q=s"""SELECT * FROM geo_osanm 
+              WHERE latitude is not null and station<100 
+              ORDER BY timed 
+              OFFSET $offset LIMIT 1000000"""
+    vsDB(Some(geo.url)).withSession {implicit session=>
       val stmt=session.conn.createStatement
       val rs=stmt executeQuery q
 	    log debug "Query: "+q
@@ -110,6 +124,6 @@ object DataCuration {
   }
   
   def main(args:Array[String]):Unit={
-    query(1600000)
+    query(1000000*0)
   }
 }

@@ -32,6 +32,7 @@ libraryDependencies ++= Seq(
   "com.mchange" % "c3p0" % "0.9.5-pre10",
   "org.reactivemongo" %% "reactivemongo" % "0.10.5.0.akka23",
   "postgresql" % "postgresql" % "9.1-901.jdbc4",
+  "net.postgis" % "postgis-jdbc" % "2.2.0",
   "ch.qos.logback" % "logback-classic" % "1.1.1" % "test",
   "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test",
   "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test",
