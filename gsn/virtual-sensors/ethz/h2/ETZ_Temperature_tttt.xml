@@ -1,0 +1,42 @@
+<virtual-sensor name="ETZ_Temperature__tttt" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="sensorvalue_conversion" />
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="SENSORTYPE" type="VARCHAR(100)" />
+            <field name="SENSORTYPE_SERIALID" type="BIGINT" />
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s" />
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            <field name="TTTT_T1" type="VARCHAR(30)" unit="°C" />
+            <field name="TTTT_T2" type="VARCHAR(30)" unit="°C" />
+            <field name="TTTT_T3" type="VARCHAR(30)" unit="°C" />
+            <field name="TTTT_T4" type="VARCHAR(30)" unit="°C" />
+        </output-structure>
+    </processing-class>
+    <description>Temperature/TTTT data from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_Dozer_AdcComDiff__mapped </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper where SENSORTYPE is not null and locate(' tttt:', SENSORTYPE) != 0 </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
