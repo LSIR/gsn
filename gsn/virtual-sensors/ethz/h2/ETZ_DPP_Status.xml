@@ -11,17 +11,24 @@
             <field name="SEQNR" type="INTEGER" />
             <field name="PAYLOAD_LENGTH" type="INTEGER" />
             
+            <field name="UPTIME" type="INTEGER" />
             <field name="TEMP" type="INTEGER" />
             <field name="VCC" type="INTEGER" />
             <field name="CPU_DC" type="INTEGER" />
             <field name="RF_DC" type="INTEGER" />
-            <field name="RX_CNT" type="INTEGER" />
-            <field name="N_RX_HOPS" type="INTEGER" />
-            <field name="PER" type="SMALLINT" />
-            <field name="SNR" type="SMALLINT" />
-            <field name="RSSI1" type="SMALLINT" />
-            <field name="RSSI2" type="SMALLINT" />
-            <field name="RSSI3" type="SMALLINT" />
+            <field name="LWB_RX_CNT" type="INTEGER" />
+            <field name="LWB_N_RX_HOPS" type="INTEGER" />
+            <field name="RF_PER" type="INTEGER" />
+            <field name="RF_SNR" type="SMALLINT" />
+            <field name="LWB_RSSI1" type="SMALLINT" />
+            <field name="LWB_RSSI2" type="SMALLINT" />
+            <field name="LWB_RSSI3" type="SMALLINT" />
+            <field name="LWB_FSR" type="INTEGER" />
+            <field name="LWB_TX_BUF" type="SMALLINT" />
+            <field name="LWB_RX_BUF" type="SMALLINT" />
+            <field name="LWB_TX_DROP" type="SMALLINT" />
+            <field name="LWB_RX_DROP" type="SMALLINT" />
+            <field name="LFXT_TICKS" type="INTEGER" />
         </output-structure>
     </processing-class>
     <description>DPP Status messages from the ETZ deployment</description>

@@ -46,7 +46,7 @@ class DPPPluginClass(AbstractPluginClass):
     
     
     def msgReceived(self, data):
-        self.sendDPPmsg(dict(device_id=data[0], type=data[1], payload_len=data[2], seqnr=data[3], generation_time=data[4], payload=data[5]))
+        self.sendDPPmsg(dict(device_id=data[0], type=data[1], payload_len=data[2], seqnr=data[3], payload=data[4]))
     
     
     def isBusy(self):
@@ -55,8 +55,4 @@ class DPPPluginClass(AbstractPluginClass):
     
     def needsWLAN(self):
         return False
-    
-    
-    def _backlog2dpp(self, message):
-        return array.array('B', message[1:]).tolist()
     

@@ -7,13 +7,13 @@
             <param name="scriptlet">
                 <![CDATA[
                 	try {
-                		N_RX = N_HOPS1 = N_HOPS2 = N_HOPS3 = NETWORK_DWELL_TIME = null;
+                		LWB_N_RX = LWB_N_HOPS1 = LWB_N_HOPS2 = LWB_N_HOPS3 = NETWORK_DWELL_TIME = null;
 
-                    	if (N_RX_HOPS != null) {
-                    		N_RX = (short)(N_RX_HOPS & 0x0f);
-                    		N_HOPS1 = (short)((N_RX_HOPS>>4) & 0x0f);
-                    		N_HOPS2 = (short)((N_RX_HOPS>>8) & 0x0f);
-                    		N_HOPS3 = (short)((N_RX_HOPS>>12) & 0x0f);
+                    	if (LWB_N_RX_HOPS != null) {
+                    		LWB_N_RX = (short)(LWB_N_RX_HOPS & 0x0f);
+                    		LWB_N_HOPS1 = (short)((LWB_N_RX_HOPS>>4) & 0x0f);
+                    		LWB_N_HOPS2 = (short)((LWB_N_RX_HOPS>>8) & 0x0f);
+                    		LWB_N_HOPS3 = (short)((LWB_N_RX_HOPS>>12) & 0x0f);
                     	}
                     	if (TEMP != null)
                     		TEMP = (double)TEMP / 100.0;
@@ -23,6 +23,10 @@
                     		CPU_DC = (double)CPU_DC / 10.0;
                     	if (RF_DC != null)
                     		RF_DC = (double)RF_DC / 10.0;
+                    	if (RF_PER != null)
+                    		RF_PER = (double)RF_PER / 100.0;
+                    	if (LWB_FSR != null)
+                    		LWB_FSR = (double)LWB_FSR / 100.0;
                     	
                     	if (GENERATION_TIME != null && TIMESTAMP != null)
                     		NETWORK_DWELL_TIME = (int)(TIMESTAMP - GENERATION_TIME);
@@ -43,20 +47,27 @@
             <field name="SEQNR" type="INTEGER" />
             <field name="PAYLOAD_LENGTH" type="INTEGER" />
             
+            <field name="UPTIME" type="INTEGER" unit="s" />
             <field name="TEMP" type="DOUBLE" unit="°C" />
             <field name="VCC" type="DOUBLE" unit="V" />
             <field name="CPU_DC" type="DOUBLE" unit="%" />
             <field name="RF_DC" type="DOUBLE" unit="%" />
-            <field name="RX_CNT" type="INTEGER" />
-            <field name="N_RX" type="SMALLINT" />
-            <field name="N_HOPS1" type="SMALLINT" />
-            <field name="N_HOPS2" type="SMALLINT" />
-            <field name="N_HOPS3" type="SMALLINT" />
-            <field name="PER" type="SMALLINT" unit="%" />
-            <field name="SNR" type="SMALLINT" unit="dB" />
-            <field name="RSSI1" type="SMALLINT" unit="dBm" />
-            <field name="RSSI2" type="SMALLINT" unit="dBm" />
-            <field name="RSSI3" type="SMALLINT" unit="dBm" />
+            <field name="LWB_RX_CNT" type="INTEGER" />
+            <field name="LWB_N_RX" type="SMALLINT" />
+            <field name="LWB_N_HOPS1" type="SMALLINT" />
+            <field name="LWB_N_HOPS2" type="SMALLINT" />
+            <field name="LWB_N_HOPS3" type="SMALLINT" />
+            <field name="RF_PER" type="DOUBLE" unit="%" />
+            <field name="RF_SNR" type="SMALLINT" unit="dB" />
+            <field name="LWB_RSSI1" type="SMALLINT" unit="dBm" />
+            <field name="LWB_RSSI2" type="SMALLINT" unit="dBm" />
+            <field name="LWB_RSSI3" type="SMALLINT" unit="dBm" />
+            <field name="LWB_FSR" type="DOUBLE" unit="%" />
+            <field name="LWB_TX_BUF" type="SMALLINT" />
+            <field name="LWB_RX_BUF" type="SMALLINT" />
+            <field name="LWB_TX_DROP" type="SMALLINT" />
+            <field name="LWB_RX_DROP" type="SMALLINT" />
+            <field name="LFXT_TICKS" type="INTEGER" unit="32kHz ticks" />
         </output-structure>
     </processing-class>
     <description>Converted DPP Status messages from the ETZ deployment</description>
