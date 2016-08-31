@@ -8,7 +8,7 @@
             <param name="scriptlet">
                 <![CDATA[
                     // send email on dozer event error
-                    def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
+                    def mailrecipients = ["permasense-test@tik.ee.ethz.ch"];
 		    
                     if ( ! isdef('idToMessageMap')) {idToMessageMap = [
                     	5:'Node started after watchdog reset.',

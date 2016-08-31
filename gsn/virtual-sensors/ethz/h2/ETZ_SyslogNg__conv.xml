@@ -24,7 +24,7 @@
 						
 						// send email on backlog error
 						if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) {
-							def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
+							def mailrecipients = ["permasense-test@tik.ee.ethz.ch"];
 			    		
 							if ( PROGRAM.toLowerCase() == "backlog" && PRIORITY%8 <= 3 ) {
 								// Notify by email

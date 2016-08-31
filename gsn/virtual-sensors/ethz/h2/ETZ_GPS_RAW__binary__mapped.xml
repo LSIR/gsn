@@ -18,7 +18,7 @@
                 		
                 		// send email if number of satellites is zero LIMIT time in a row
                 		def LIMIT = 10;
-                    	def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
+                    	def mailrecipients = ["permasense-test@tik.ee.ethz.ch"];
                 		if ( ! isdef('zeroCountMap')) { zeroCountMap = [:]; }
                 		if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) {
                 			if (zeroCountMap.containsKey(POSITION)) {
@@ -53,7 +53,7 @@
                 		// a list of alarm time per position
                     	def timeDifferenceOffsetPositionMap = [:];
                     	// the mail recipients
-                    	def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
+                    	def mailrecipients = ["permasense-test@tik.ee.ethz.ch"];
                     	
                     	if ( isdef('positionMap')) {
                     		def rmlist = [];
