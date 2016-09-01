@@ -28,7 +28,9 @@
             <field name="LWB_RX_BUF" type="SMALLINT" />
             <field name="LWB_TX_DROP" type="SMALLINT" />
             <field name="LWB_RX_DROP" type="SMALLINT" />
-            <field name="LFXT_TICKS" type="INTEGER" />
+            <field name="LWB_BOOTSTRAP_CNT" type="SMALLINT" />
+            <field name="LWB_SLEEP_CNT" type="SMALLINT" />
+            <field name="LFXT_TICKS" type="BIGINT" />
         </output-structure>
     </processing-class>
     <description>DPP Status messages from the ETZ deployment</description>

@@ -42,7 +42,9 @@ public class DPPMessagePlugin extends AbstractPlugin {
 			new DataField("LWB_RX_BUF", "SMALLINT"),
 			new DataField("LWB_TX_DROP", "SMALLINT"),
 			new DataField("LWB_RX_DROP", "SMALLINT"),
-			new DataField("LFXT_TICKS", "INTEGER")};
+			new DataField("LWB_BOOTSTRAP_CNT", "SMALLINT"),
+			new DataField("LWB_SLEEP_CNT", "SMALLINT"),
+			new DataField("LFXT_TICKS", "BIGINT")};
 
 	private final transient Logger logger = Logger.getLogger( DPPMessagePlugin.class );
 
@@ -79,11 +81,13 @@ public class DPPMessagePlugin extends AbstractPlugin {
     		short lwb_rx_buf = payload.get(); 					// uint8_t: number of packets in the receive buffer
     		short lwb_tx_drop = payload.get(); 					// uint8_t: dropped tx packets since last health message
     		short lwb_rx_drop = payload.get(); 					// uint8_t: dropped rx packets since last health message
-    		int lfxt_ticks = payload.getInt(); 					// uint32_t: in 32kHz ticks, rollover of ~36h
+    		short lwb_bootstrap_cnt = payload.get();
+    		short lwb_sleep_cnt = payload.get();
+    		long lfxt_ticks = payload.getInt() & 0xffffffffL;	// uint32_t: in 32kHz ticks, rollover of ~36h
             
 			if( dataProcessed(System.currentTimeMillis(), new Serializable[]{timestamp, (long)(generation_time/1000.0), generation_time, device_id, 
 					type, seq_no, payload_len, uptime, temp, vcc, cpu_dc, rf_dc, lwb_rx_cnt, lwb_n_rx_hops, rf_per, rf_snr, lwb_rssi1, lwb_rssi2, 
-					lwb_rssi3, lwb_fsr, lwb_tx_buf, lwb_rx_buf, lwb_tx_drop, lwb_rx_drop, lfxt_ticks}) ) {
+					lwb_rssi3, lwb_fsr, lwb_tx_buf, lwb_rx_buf, lwb_tx_drop, lwb_rx_drop, lwb_bootstrap_cnt, lwb_sleep_cnt, lfxt_ticks}) ) {
 				ackMessage(timestamp, super.priority);
 				return true;
 			} else {
