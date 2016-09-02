@@ -42,7 +42,10 @@ class DPPPluginClass(AbstractPluginClass):
     
     
     def dppMsgReceived(self, timestamp, dppMsg):
-        return self.processMsg(timestamp, [dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['seqnr'], dppMsg['generation_time'], dppMsg['payload']], self._priority, self._backlog)
+        if dppMsg['ext_msg']:
+            return self.processMsg(timestamp, [dppMsg['device_id'], dppMsg['ext_msg'], dppMsg['type'], dppMsg['payload_len'], dppMsg['payload']], self._priority, self._backlog)
+        else:
+            return self.processMsg(timestamp, [dppMsg['device_id'], dppMsg['ext_msg'], dppMsg['type'], dppMsg['payload_len'], dppMsg['seqnr'], dppMsg['generation_time'], dppMsg['payload']], self._priority, self._backlog)
     
     
     def msgReceived(self, data):
