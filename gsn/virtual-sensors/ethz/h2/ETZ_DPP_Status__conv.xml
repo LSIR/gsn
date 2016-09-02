@@ -47,7 +47,7 @@
             <field name="SEQNR" type="INTEGER" />
             <field name="PAYLOAD_LENGTH" type="INTEGER" />
             
-            <field name="UPTIME" type="INTEGER" unit="s" />
+            <field name="UPTIME" type="BIGINT" unit="s" />
             <field name="TEMP" type="DOUBLE" unit="°C" />
             <field name="VCC" type="DOUBLE" unit="V" />
             <field name="CPU_DC" type="DOUBLE" unit="%" />

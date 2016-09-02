@@ -11,7 +11,7 @@
             <field name="SEQNR" type="INTEGER" />
             <field name="PAYLOAD_LENGTH" type="INTEGER" />
             
-            <field name="UPTIME" type="INTEGER" />
+            <field name="UPTIME" type="BIGINT" />
             <field name="TEMP" type="INTEGER" />
             <field name="VCC" type="INTEGER" />
             <field name="CPU_DC" type="INTEGER" />

@@ -187,6 +187,20 @@ $(document).ready(function() {
           position: [20001,20031,20032,20034,20035,20039,20040,20042,20046,20048,20049,20050],
         }]
       },
+      { title:"Entering Bootstrap mode counter",
+        signals: [{
+          vsensor:".*_dpp_status__conv",
+          field:["lwb_bootstrap_cnt"],
+          position: [20001,20031,20032,20034,20035,20039,20040,20042,20046,20048,20049,20050],
+        }]
+      },
+      { title:"Entering Sleep mode counter",
+        signals: [{
+          vsensor:".*_dpp_status__conv",
+          field:["lwb_sleep_cnt"],
+          position: [20001,20031,20032,20034,20035,20039,20040,20042,20046,20048,20049,20050],
+        }]
+      },
       { title:"CC430 32kHz ticks",
         signals: [{
           vsensor:".*_dpp_status__conv",
