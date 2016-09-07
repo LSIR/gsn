@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
@@ -25,9 +26,11 @@ public class Group extends AppModel{
 	public String description;
 	
 	@ManyToMany
+	@JoinTable(name="group_r_data_sources")
 	public List<DataSource> r_dataSources;
 	
 	@ManyToMany
+	@JoinTable(name="group_w_data_sources")
 	public List<DataSource> w_dataSources;
 	
 	@ManyToMany(mappedBy = "groups")

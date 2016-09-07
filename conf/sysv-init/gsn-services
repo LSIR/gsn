@@ -1,0 +1,181 @@
+#!/bin/sh
+#############################################
+# AUTHOR:   Julien Eberle (julien.eberle@epfl.ch)
+# NAME:     gsn-services
+# VERSION:  2.0
+# DATE:     23/08/2016 (dd/mm/yy)
+# LICENCE:  GPLv3+
+#############################################
+#
+# gsn-core:  Global Sensor Networks services
+#
+# chkconfig: 2345 99 01
+# description: The GSN server services.
+#
+# processname: $PROCESS_NAME
+# pidfile: /var/run/$PROCESS_NAME.pid
+#
+
+### BEGIN INIT INFO
+# Provides: $PROCESS_NAME
+# Required-Start: $network
+# Required-Stop: $network
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Starts the $PROCESS_NAME daemon
+# Description: The GSN server services.
+### END INIT INFO
+
+#
+### These variables need setting
+#
+PROCESS_NAME="gsn-services";
+PROCESS_USER="gsn";
+PROCESS_PID_PATH="/var/run";
+PROCESS_LOG_PATH="/var/log/"$PROCESS_NAME"";
+
+# These are generated using the values above
+PROCESS_PID=""$PROCESS_PID_PATH"/"$PROCESS_NAME".pid";
+PROCESS_LOG=""$PROCESS_LOG_PATH"/"$PROCESS_NAME".log";
+
+# Do not change this
+RETVAL="0";
+CLR_RED=$(tput setaf 1);
+CLR_GREEN=$(tput setaf 2);
+CLR_RESET=$(tput sgr0);
+
+#############################################
+#
+### Sanity checks
+#
+
+# Ensure the $PROCESS_USER exists on the system
+id -u "$PROCESS_USER" >/dev/null 2>&1;
+RETVAL=$?;
+if [ ! "$RETVAL" -eq 0 ]; then
+    echo -e "ERROR: "$PROCESS_USER" user does not exist on the system. Try running:
+ sudo useradd -m -s "$(echo $SHELL)" "$PROCESS_USER"";
+    exit 1;
+fi
+
+# Ensure the log folder $PROCESS_LOG_PATH exists 
+# and is owned by the $PROCESS_USER user.
+if [ ! -d "$PROCESS_LOG_PATH" ]; then
+    mkdir -p "$PROCESS_LOG_PATH";
+fi
+chown -R "$PROCESS_USER":root "$PROCESS_LOG_PATH";
+
+#############################################
+
+
+status() {
+    if [ -f "$PROCESS_PID" ]; then
+        RUNNING_PID=$(cat $PROCESS_PID);
+        IS_RUNNING=$(ps -ef|grep "$RUNNING_PID"|grep "$PROCESS_NAME"|wc -l);
+        if [ "$IS_RUNNING" -gt 0 ]; then
+            echo ""$PROCESS_NAME" (pid "$RUNNING_PID") is running...";
+        else
+            echo "ERROR: "$PROCESS_NAME" has died but pid "$RUNNING_PID" exists. Try running:";
+            echo " sudo rm -f "$PROCESS_PID"";
+            RETVAL=1;
+            exit 1;
+        fi
+    else
+        IS_RUNNING=$(ps -ef|grep "$PROCESS_NAME"|grep -v grep|grep -v "init.d"|wc -l);
+        if [ "$IS_RUNNING" -gt 0 ]; then
+            echo "ERROR: "$PROCESS_NAME" is running without a pid file";
+            RETVAL=1;
+            exit 1;
+        else
+            if [ "$1" = "start" ]; then
+                echo "ERROR: "$PROCESS_NAME" has failed to "$1"";
+                RETVAL=1;
+                exit 1;
+            fi
+            if [ "$1" = "restart" ]; then
+                echo "ERROR: "$PROCESS_NAME" has failed to "$1"";
+                RETVAL=1;
+                exit 1;
+            fi
+            if [ "$1" = "stop" ]; then
+                echo ""$PROCESS_NAME" is stopped";
+                RETVAL=999;
+            else
+                echo ""$PROCESS_NAME" is stopped";
+                RETVAL=999;
+            fi
+        fi
+    fi
+}
+
+start() {
+    # Only start the service if it is stopped.
+    # RETVAL is set to '999' if the service is stopped.
+    status >/dev/null 2>/dev/null;
+    if [ "$RETVAL" -eq 1 ]; then
+        echo "WARN: Something went wrong...";
+        exit 1;
+    fi
+    if [ ! "$RETVAL" -eq 999 ]; then
+        echo "Starting "$PROCESS_NAME": ";
+        exit 0;
+    fi
+
+    echo -n $"Starting "$PROCESS_NAME": "
+    MYCMD=""$PROCESS_NAME" > "$PROCESS_LOG" 2>&1 & echo \$!";
+    #echo "$MYCMD";
+    su -m -l "$PROCESS_USER" -c "$MYCMD" > "$PROCESS_PID";
+    RETVAL=$?;
+    if [ "$RETVAL" -eq 0 ]; then
+        echo -e "\t\t\t\t [$CLR_GREEN OK $CLR_RESET]";
+    fi
+}
+
+stop() {
+    echo -n $"Stopping "$PROCESS_NAME": "
+    if [ -f "$PROCESS_PID" ]; then
+        RUNNING_PID=$(cat $PROCESS_PID);
+        IS_RUNNING=$(ps -ef|grep "$RUNNING_PID"|grep "$PROCESS_NAME"|wc -l);
+        if [ "$IS_RUNNING" -gt 0 ]; then
+            # Kill by program group id rather than PID
+            # to be sure all child processes are killed.
+            PGID=$(ps -o pgid= "$RUNNING_PID"|tr -d ' ');
+            kill -- -"$PGID";
+            RETVAL=$?;
+        fi
+        rm -f "$PROCESS_PID";
+        if [ "$RETVAL" -eq 0 ]; then
+            echo -e "\t\t\t\t [$CLR_GREEN OK $CLR_RESET]";
+        fi
+    else
+        IS_RUNNING=$(ps -ef|grep "$PROCESS_NAME"|grep -v grep|grep -v "init.d"|wc -l);
+        if [ "$IS_RUNNING" -gt 0 ]; then
+            echo -e "\t\t\t\t [$CLR_RED FAILED $CLR_RESET]";
+            echo "No pid file and "$PROCESS_NAME" is running. Try running:";
+            echo " sudo ps -ef|grep "$PROCESS_NAME"";
+        else
+            echo -e "\t\t\t\t [$CLR_RED FAILED $CLR_RESET]";
+        fi
+    fi
+}
+
+# See how we were called.
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status
+        ;;
+    restart)
+        stop
+        start
+        status
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart}"
+        exit 1;
+esac

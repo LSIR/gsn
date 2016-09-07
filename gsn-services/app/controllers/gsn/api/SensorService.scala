@@ -114,8 +114,7 @@ object SensorService extends Controller with GsnService {
             val wconfig = conf.streams.flatMap( s => s.sources.flatMap( so => so.wrappers ) ).filter( w => w.wrapper.equals("zeromq-push")).head
             val address = wconfig.params.get("local_address").getOrElse("localhost")
             val port = wconfig.params.get("local_port").orNull
-            val context = ZMQ.context(1)
-    		    val forwarder = context.socket(ZMQ.REQ)
+    		    val forwarder = Global.context.socket(ZMQ.REQ)
     		    forwarder.connect("tcp://"+address+":"+port)
     		    forwarder.setReceiveTimeOut(3000)
     	      val result = se.map(s => {
@@ -127,6 +126,7 @@ object SensorService extends Controller with GsnService {
               val rec = forwarder.recv()
               (rec != null && rec.head == 0.asInstanceOf[Byte])
             })
+            forwarder.close()
             if (result.forall(identity)){
               Ok("{\"status\": \"success\"}")       
             } else {

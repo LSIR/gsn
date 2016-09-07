@@ -5,6 +5,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc._
 import scala.util.Try
 import org.zeromq.ZMQ
+import controllers.gsn.Global
 import java.io.ByteArrayInputStream
 import java.util.Date
 import com.esotericsoftware.kryo.Kryo
@@ -20,8 +21,7 @@ object WebSocketForwarder extends Controller{
 
     def socket(sensorid:String) = WebSocket.using[String] { request =>
         
-        val context = ZMQ.context(1)
-		    val subscriber = context.socket(ZMQ.SUB)
+		    val subscriber = Global.context.socket(ZMQ.SUB)
 		    subscriber.connect("tcp://localhost:22022")
 		    subscriber.setReceiveTimeOut(3000)
 		    subscriber.subscribe((sensorid+":").getBytes)

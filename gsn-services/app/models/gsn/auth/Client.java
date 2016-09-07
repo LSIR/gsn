@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -26,6 +27,8 @@ public class Client extends AppModel{
 	public List<OAuthCode> codes;
 	@ManyToOne
 	public User user;
+	@ManyToMany
+	public List<User> trusted_users;
 	public Boolean linked = false;
 
 	public static final play.db.ebean.Model.Finder<Long, Client> find = new play.db.ebean.Model.Finder<Long, Client>(

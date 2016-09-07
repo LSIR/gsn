@@ -94,10 +94,16 @@ create table user_permission (
 ;
 
 
-create table groups_data_source (
+create table group_r_data_sources (
   groups_id                      bigint not null,
   data_source_id                 bigint not null,
-  constraint pk_groups_data_source primary key (groups_id, data_source_id))
+  constraint pk_group_r_data_sources primary key (groups_id, data_source_id))
+;
+
+create table group_w_data_sources (
+  groups_id                      bigint not null,
+  data_source_id                 bigint not null,
+  constraint pk_group_w_data_sources primary key (groups_id, data_source_id))
 ;
 
 create table users_security_role (
@@ -112,10 +118,22 @@ create table users_user_permission (
   constraint pk_users_user_permission primary key (users_id, user_permission_id))
 ;
 
-create table users_data_source (
+create table user_r_data_sources (
   users_id                       bigint not null,
   data_source_id                 bigint not null,
-  constraint pk_users_data_source primary key (users_id, data_source_id))
+  constraint pk_user_r_data_source primary key (users_id, data_source_id))
+;
+
+create table user_w_data_sources (
+  users_id                       bigint not null,
+  data_source_id                 bigint not null,
+  constraint pk_user_w_data_source primary key (users_id, data_source_id))
+;
+
+create table client_users (
+  users_id                       bigint not null,
+  client_id                      bigint not null,
+  constraint pk_client_users primary key (users_id, client_id))
 ;
 
 create table users_groups (
@@ -160,9 +178,13 @@ create index ix_token_action_targetUser_7 on token_action (target_user_id);
 
 
 
-alter table groups_data_source add constraint fk_groups_data_source_groups_01 foreign key (groups_id) references groups (id) on delete restrict on update restrict;
+alter table group_r_data_sources add constraint fk_group_r_data_sources_groups_01 foreign key (groups_id) references groups (id) on delete restrict on update restrict;
 
-alter table groups_data_source add constraint fk_groups_data_source_data_so_02 foreign key (data_source_id) references data_source (id) on delete restrict on update restrict;
+alter table group_r_data_sources add constraint fk_group_w_data_sources_data_02 foreign key (data_source_id) references data_source (id) on delete restrict on update restrict;
+
+alter table group_w_data_sources add constraint fk_group_w_data_sources_groups_01 foreign key (groups_id) references groups (id) on delete restrict on update restrict;
+
+alter table group_w_data_sources add constraint fk_group_w_data_sources_data_02 foreign key (data_source_id) references data_source (id) on delete restrict on update restrict;
 
 alter table users_security_role add constraint fk_users_security_role_users_01 foreign key (users_id) references users (id) on delete restrict on update restrict;
 
@@ -172,9 +194,17 @@ alter table users_user_permission add constraint fk_users_user_permission_user_0
 
 alter table users_user_permission add constraint fk_users_user_permission_user_02 foreign key (user_permission_id) references user_permission (id) on delete restrict on update restrict;
 
-alter table users_data_source add constraint fk_users_data_source_users_01 foreign key (users_id) references users (id) on delete restrict on update restrict;
+alter table user_r_data_sources add constraint fk_user_r_data_sources_users_01 foreign key (users_id) references users (id) on delete restrict on update restrict;
 
-alter table users_data_source add constraint fk_users_data_source_data_sou_02 foreign key (data_source_id) references data_source (id) on delete restrict on update restrict;
+alter table user_r_data_sources add constraint fk_user_r_data_sources_data_02 foreign key (data_source_id) references data_source (id) on delete restrict on update restrict;
+
+alter table user_w_data_sources add constraint fk_user_w_data_sources_users_01 foreign key (users_id) references users (id) on delete restrict on update restrict;
+
+alter table user_w_data_sources add constraint fk_user_w_data_sources_data_02 foreign key (data_source_id) references data_source (id) on delete restrict on update restrict;
+
+alter table client_users add constraint fk_client_users_users_01 foreign key (users_id) references users (id) on delete restrict on update restrict;
+
+alter table client_users add constraint fk_client_users_client_02 foreign key (client_id) references client (id) on delete restrict on update restrict;
 
 alter table users_groups add constraint fk_users_groups_users_01 foreign key (users_id) references users (id) on delete restrict on update restrict;
 
@@ -188,9 +218,13 @@ drop table if exists client;
 
 drop table if exists data_source;
 
-drop table if exists groups_data_source;
+drop table if exists group_r_data_sources;
 
-drop table if exists users_data_source;
+drop table if exists user_r_data_sources;
+
+drop table if exists group_w_data_sources;
+
+drop table if exists user_w_data_sources;
 
 drop table if exists groups;
 
@@ -207,6 +241,8 @@ drop table if exists security_role;
 drop table if exists token_action;
 
 drop table if exists users;
+
+drop table if exists client_users;
 
 drop table if exists users_security_role;
 

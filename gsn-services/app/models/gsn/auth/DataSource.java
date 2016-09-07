@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.UniqueConstraint;
 
@@ -28,15 +29,19 @@ public class DataSource extends AppModel implements Permission {
 	public boolean is_public;
 
 	@ManyToMany(mappedBy = "w_dataSources")
+	@JoinTable(name="group_w_data_sources")
 	public List<Group> w_groups;
 	
 	@ManyToMany(mappedBy = "w_dataSources")
+	@JoinTable(name="user_w_data_sources")
 	public List<User> w_users;
 	
 	@ManyToMany(mappedBy = "r_dataSources")
+	@JoinTable(name="group_r_data_sources")
 	public List<Group> r_groups;
 	
 	@ManyToMany(mappedBy = "r_dataSources")
+	@JoinTable(name="user_r_data_sources")
 	public List<User> r_users;
 	
 	public static play.db.ebean.Model.Finder<Long, DataSource> find = new play.db.ebean.Model.Finder<Long, DataSource>(

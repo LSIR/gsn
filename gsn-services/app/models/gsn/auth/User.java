@@ -62,13 +62,18 @@ public class User extends AppModel implements Subject {
 	public List<UserPermission> permissions;
 	
 	@ManyToMany
+	@JoinTable(name="user_w_data_sources")
 	public List<DataSource> w_dataSources;
 	
 	@ManyToMany
+	@JoinTable(name="user_r_data_sources")
 	public List<DataSource> r_dataSources;
 	
 	@ManyToMany
 	public List<Group> groups;
+	
+	@ManyToMany(mappedBy = "trusted_users")
+	public List<Client> trusted_clients;
 
 	public static play.db.ebean.Model.Finder<Long, User> find = new play.db.ebean.Model.Finder<Long, User>(
 			Long.class, User.class);

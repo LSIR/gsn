@@ -2,4 +2,5 @@
 
 . /usr/share/gsn-webui/bin/env3/bin/activate
 cd /usr/share/gsn-webui
+runuser -u gsn python /usr/share/gsn-webui/manage.py migrate
 gunicorn app.wsgi > /var/log/gsn-webui/gunicorn.log

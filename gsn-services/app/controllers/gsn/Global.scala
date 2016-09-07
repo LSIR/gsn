@@ -12,6 +12,8 @@ import play.mvc.Call
 
 import models.gsn.auth.SecurityRole;
 
+import org.zeromq.ZMQ
+
 import com.feth.play.module.pa.PlayAuthenticate
 import com.feth.play.module.pa.PlayAuthenticate.Resolver
 import com.feth.play.module.pa.exceptions.AccessDeniedException
@@ -23,6 +25,7 @@ object Global extends GlobalSettings {
   val gsnConf = GsnConf.load(conf.getString("gsn.config"))
   val ds = new DataStore(gsnConf)
   val pageLength = conf.getInt("gsn.ui.pagination.length")
+  val context  = ZMQ.context(1)
   
   override def onStart(app: Application) {
     Logger.info("Application has started")
