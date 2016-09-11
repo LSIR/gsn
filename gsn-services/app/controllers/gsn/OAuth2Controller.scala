@@ -38,12 +38,12 @@ object OAuth2Controller extends Controller with OAuth2Provider with DeadboltActi
                val s = request.queryString.get("client_secret").get.head
                val client = Client.findById(c)
                if (client != null && client.secret == s){
-                 if (u.trusted_clients.contains(c)){
+                 if (u.trusted_clients.contains(client)){
                    val c = OAuthCode.generate(u,client)
                    c.save()
                    Redirect(client.redirect+"?code="+c.code+"&response_type=code&user_name="+UriEncoding.encodePathSegment(u.name,"UTF-8")+"&user_email="+UriEncoding.encodePathSegment(u.email,"UTF-8"))
                  }else{
-                   Ok(access.auth.render(c, s, client.redirect, u))
+                   Ok(access.auth.render(c, s, client.redirect, u, client.name))
                  }
                }else{
                    Forbidden("This client is not registered for accessing GSN, please contact the administrator if you need to add it.")
