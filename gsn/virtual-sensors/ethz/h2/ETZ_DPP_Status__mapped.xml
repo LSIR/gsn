@@ -11,6 +11,7 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="GENERATION_TIME_MICROSEC" type="BIGINT"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="TARGET_ID" type="INTEGER" />
             <field name="MESSAGE_TYPE" type="INTEGER" />
             <field name="SEQNR" type="INTEGER" />
             <field name="PAYLOAD_LENGTH" type="INTEGER" />

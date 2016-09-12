@@ -1,12 +1,16 @@
 package gsn.wrappers.backlog.plugins;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 
 import gsn.beans.DataField;
+import gsn.beans.InputInfo;
+import gsn.wrappers.BackLogWrapper;
 
 
 /**
@@ -15,42 +19,61 @@ import gsn.beans.DataField;
  * @author Tonio Gsell
  */
 public class DPPMessagePlugin extends AbstractPlugin {
+
+	private static final String DPP_MESSAGE_CLASS = "message-classname";
 	
-	private static DataField[] dataField = {
+	private static DataField[] headerDataField = {
 			new DataField("TIMESTAMP", "BIGINT"),
 			new DataField("GENERATION_TIME", "BIGINT"),
 			new DataField("GENERATION_TIME_MICROSEC", "BIGINT"),
 			new DataField("DEVICE_ID", "INTEGER"),
 			new DataField("MESSAGE_TYPE", "INTEGER"),
+			new DataField("TARGET_ID", "INTEGER"),
 			new DataField("SEQNR", "INTEGER"),
-			new DataField("PAYLOAD_LENGTH", "INTEGER"),
+			new DataField("PAYLOAD_LENGTH", "INTEGER")};
 
-			new DataField("UPTIME", "BIGINT"),
-			new DataField("TEMP", "INTEGER"),
-			new DataField("VCC", "INTEGER"),
-			new DataField("CPU_DC", "INTEGER"),
-			new DataField("RF_DC", "INTEGER"),
-			new DataField("LWB_RX_CNT", "INTEGER"),
-			new DataField("LWB_N_RX_HOPS", "INTEGER"),
-			new DataField("RF_PER", "INTEGER"),
-			new DataField("RF_SNR", "SMALLINT"),
-			new DataField("LWB_RSSI1", "SMALLINT"),
-			new DataField("LWB_RSSI2", "SMALLINT"),
-			new DataField("LWB_RSSI3", "SMALLINT"),
-			new DataField("LWB_FSR", "INTEGER"),
-			new DataField("LWB_TX_BUF", "SMALLINT"),
-			new DataField("LWB_RX_BUF", "SMALLINT"),
-			new DataField("LWB_TX_DROP", "SMALLINT"),
-			new DataField("LWB_RX_DROP", "SMALLINT"),
-			new DataField("LWB_BOOTSTRAP_CNT", "SMALLINT"),
-			new DataField("LWB_SLEEP_CNT", "SMALLINT"),
-			new DataField("LFXT_TICKS", "BIGINT")};
+	private DataField[] msgDataField;
 
 	private final transient Logger logger = Logger.getLogger( DPPMessagePlugin.class );
 
+	private Constructor<?> messageConstructor = null;
+
+	private DPPMessageMultiplexer dppMsgMultiplexer = null;
+
+	private gsn.wrappers.backlog.plugins.dpp.Message msgClass;
+
+	@Override
+	public boolean initialize(BackLogWrapper backlogwrapper, String coreStationName, String deploymentName) {
+		activeBackLogWrapper = backlogwrapper;
+		String p = getActiveAddressBean().getPredicateValue("priority");
+		if (p == null)
+			priority = null;
+		else
+			priority = Integer.valueOf(p);
+		
+		try {
+			dppMsgMultiplexer = DPPMessageMultiplexer.getInstance(coreStationName, backlogwrapper.getBLMessageMultiplexer());
+			
+			// get the DPP message class for the specified DPP packet
+			Class<?> classTemplate = Class.forName(getActiveAddressBean().getPredicateValueWithException(DPP_MESSAGE_CLASS));
+			messageConstructor = classTemplate.getConstructor();
+			
+			msgClass = ((gsn.wrappers.backlog.plugins.dpp.Message) messageConstructor.newInstance());
+			
+			msgDataField = (DataField[])ArrayUtils.addAll(headerDataField, msgClass.getOutputFormat());
+			
+			dppMsgMultiplexer.registerListener(msgClass.getType(), this);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return false;
+		}
+		
+		return true;
+	}
+
 	@Override
 	public String getPluginName() {
-		return "DPPMessagPlugin";
+		return "DPPMessagPlugin-"+messageConstructor.getName();
 	}
 
 	@Override
@@ -60,62 +83,58 @@ public class DPPMessagePlugin extends AbstractPlugin {
             boolean ext_msg = (Boolean)data[1];
             int type = toInteger(data[2]);
             int payload_len = toInteger(data[3]);
+            ByteBuffer payload;
+            Serializable[] header;
             if (ext_msg) {
-	    		ByteBuffer payload = ByteBuffer.wrap((byte[]) data[4]);
-	    		payload.order(ByteOrder.LITTLE_ENDIAN);
-	    		
-	    		logger.warn("no extended DPP message functionality implemented");
+	    		payload = ByteBuffer.wrap((byte[]) data[4]);
+	    		header = new Serializable[] {timestamp, null, null, device_id, type, null, null, payload_len};
             }
             else {
-	            int seq_no = toInteger(data[4]);
-	            long generation_time = toLong(data[5]);
-	    		ByteBuffer payload = ByteBuffer.wrap((byte[]) data[6]);
-	    		payload.order(ByteOrder.LITTLE_ENDIAN);
-	
-	    		long uptime = payload.getInt() & 0xffffffffL; 				// uint32_t: uptime in seconds
-	    		int temp = payload.getShort() & 0xffff; 					// int16_t: temperature value in 100x °C
-	    		int vcc = payload.getShort() & 0xffff; 						// uint16_t: supply voltage (raw ADC value)
-	    		int cpu_dc = payload.getShort() & 0xffff; 					// uint16_t: cpu duty cycle in per thousands
-	    		int rf_dc = payload.getShort() & 0xffff; 					// uint16_t: radio duty cycle in per thousands
-	    		int lwb_rx_cnt = payload.getShort() & 0xffff; 				// uint16_t: reception counter (total # successfully rcvd pkts)
-	    		int lwb_n_rx_hops = payload.getShort() & 0xffff;			// uint16_t: RX count (CRC ok) + hop cnts of last Glossy flood
-	    		int rf_per = payload.getShort() & 0xffff; 					// uint16_t: total packet error rate in per 10'000
-	    		short rf_snr = (short) (payload.get() & 0xff); 				// uint8_t: signal-to-noise ratio of the last reception
-	    		short lwb_rssi1 = payload.get(); 							// int8_t: RSSI value of the first Glossy flood
-	    		short lwb_rssi2 = payload.get(); 							// int8_t: RSSI value of the second Glossy flood
-	    		short lwb_rssi3 = payload.get(); 							// int8_t: RSSI value of the third Glossy flood
-	    		int lwb_fsr = payload.getShort() & 0xffff; 					// uint16_t: LWB flood success rate in per 10'000
-	    		short lwb_tx_buf = (short) (payload.get() & 0xff); 			// uint8_t: number of packets in the transmit buffer
-	    		short lwb_rx_buf = (short) (payload.get() & 0xff); 			// uint8_t: number of packets in the receive buffer
-	    		short lwb_tx_drop = (short) (payload.get() & 0xff); 		// uint8_t: dropped tx packets since last health message
-	    		short lwb_rx_drop = (short) (payload.get() & 0xff); 		// uint8_t: dropped rx packets since last health message
-	    		short lwb_bootstrap_cnt = (short) (payload.get() & 0xff);	// uint8_t: 
-	    		short lwb_sleep_cnt = (short) (payload.get() & 0xff);		// uint8_t: 
-	    		long lfxt_ticks = payload.getInt() & 0xffffffffL;			// uint32_t: in 32kHz ticks, rollover of ~36h
-	            
-				if( dataProcessed(System.currentTimeMillis(), new Serializable[]{timestamp, (long)(generation_time/1000.0), generation_time, device_id, 
-						type, seq_no, payload_len, uptime, temp, vcc, cpu_dc, rf_dc, lwb_rx_cnt, lwb_n_rx_hops, rf_per, rf_snr, lwb_rssi1, lwb_rssi2, 
-						lwb_rssi3, lwb_fsr, lwb_tx_buf, lwb_rx_buf, lwb_tx_drop, lwb_rx_drop, lwb_bootstrap_cnt, lwb_sleep_cnt, lfxt_ticks}) ) {
-					ackMessage(timestamp, super.priority);
-					return true;
-				} else {
-					logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
-				}
+            	int target_id = toInteger(data[4]);
+	            int seq_no = toInteger(data[5]);
+	            long generation_time = toLong(data[6]);
+	    		payload = ByteBuffer.wrap((byte[]) data[7]);
+	    		header = new Serializable[] {timestamp, (long)(generation_time/1000.0), generation_time, device_id, type, target_id, seq_no, payload_len};
+	    		
             }
+    		payload.order(ByteOrder.LITTLE_ENDIAN);
+    		Serializable[] msg = (Serializable[])ArrayUtils.addAll(header, msgClass.receivePayload(payload));
+    		
+			if( dataProcessed(System.currentTimeMillis(), msg) ) {
+				ackMessage(timestamp, super.priority);
+				return true;
+			} else {
+				logger.warn("The message with timestamp >" + timestamp + "< could not be stored in the database.");
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 		return false;
+	}
+	
+	@Override
+	public InputInfo sendToPlugin(String action, String[] paramNames, Object[] paramValues) {
+		//TODO: implement upload functionality
+		if (getDeviceID() != null) {
+			//ret = sendRemote(System.currentTimeMillis(), new Serializable[] {packet}, super.priority);
+		}
+		return null;
 	}
 
 	@Override
 	public short getMessageType() {
 		return gsn.wrappers.backlog.BackLogMessage.DPP_MESSAGE_TYPE;
 	}
+	
+	
+	@Override
+	public void dispose() {
+		dppMsgMultiplexer.deregisterListener(msgClass.getType(), this);
+	}
 
 	@Override
 	public DataField[] getOutputFormat() {
-		return dataField;
+		return msgDataField;
 	}
 
 }

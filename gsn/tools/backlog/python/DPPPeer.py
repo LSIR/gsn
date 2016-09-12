@@ -34,7 +34,7 @@ I2C_CMD_READ_MSG = 1
 I2C_CMD_TIMESYNC = 2
 
 I2C_HEADER_LENGTH = 2
-I2C_MSG_HEADER_LENGTH = 14
+I2C_MSG_HEADER_LENGTH = 16
 I2C_MSG_CRC16_LENGTH = 2
 
 SEND_QUEUE_SIZE = 25
@@ -42,11 +42,6 @@ SEND_QUEUE_SIZE = 25
 class DPPPeerClass(Thread, Statistics):
     '''
     Offers the functionality to communicate with the MSP432 over i2c on DPP
-    
-    The binary dpp message has the following format:
-        |                          DPP message header                           | DPP message payload | DPP crc |
-        | device_id | ext_msg | type  | payload_len |  seqnr  | generation_time |       payload       |  crc16  |
-        |  2 bytes  |  1 bit  | 7 bit |   1 byte    | 2 bytes |     8 bytes     |  payload_len bytes  | 2 bytes |
         
     The binary message part transmitted over i2c (max. 32 bytes per transmission)
     has the following format:
@@ -152,16 +147,16 @@ class DPPPeerClass(Thread, Statistics):
                 i2cPacketCnt = i2cPacketCnt + 1
                 
                 if i2cPacketCnt == i2cNrOfPkts:
-                    msgHeader = struct.unpack('<HBBHQ',msg[:I2C_MSG_HEADER_LENGTH])
+                    msgHeader = struct.unpack('<HBBHHQ',msg[:I2C_MSG_HEADER_LENGTH])
                     payload = msg[I2C_MSG_HEADER_LENGTH:I2C_MSG_HEADER_LENGTH+msgHeader[2]]
                     type = msgHeader[1] & 0x7F
                     ext_msg = True if (msgHeader[1] >> 7 == 0x01) else False
                     crc16 = struct.unpack('<H', msg[I2C_MSG_HEADER_LENGTH+msgHeader[2]:I2C_MSG_HEADER_LENGTH+msgHeader[2]+I2C_MSG_CRC16_LENGTH])[0]
                     
-                    dppMsg = dict(device_id=msgHeader[0], ext_msg=ext_msg, type=type, payload_len=msgHeader[2], seqnr=msgHeader[3], generation_time=msgHeader[4], payload=bytearray(payload))
+                    dppMsg = dict(device_id=msgHeader[0], ext_msg=ext_msg, type=type, payload_len=msgHeader[2], target_id=msgHeader[3], seqnr=msgHeader[4], generation_time=msgHeader[5], payload=bytearray(payload))
                 
                     if isEnabledFor(logging.DEBUG):
-                        self._logger.debug('rcv (timestamp=%d, device_id=%d, ext_msg=%d, type=%d, payload_len=%d, seqnr=%d, generation_time=%d, crc16=%d)' % (firstTimestamp, dppMsg['device_id'], dppMsg['ext_msg'], dppMsg['type'], dppMsg['payload_len'], dppMsg['seqnr'], dppMsg['generation_time'], crc16))
+                        self._logger.debug('rcv (timestamp=%d, device_id=%d, ext_msg=%d, type=%d, payload_len=%d, target_id=%d, seqnr=%d, generation_time=%d, crc16=%d)' % (firstTimestamp, dppMsg['device_id'], dppMsg['ext_msg'], dppMsg['type'], dppMsg['payload_len'], dppMsg['target_id'], dppMsg['seqnr'], dppMsg['generation_time'], crc16))
                         self._logger.debug('payload [' + ','.join(str(int(x)) for x in dppMsg['payload']) + ']')
                     
                     if crc16 == self._crc16.calculate(bytearray(msg[:I2C_MSG_HEADER_LENGTH+dppMsg["payload_len"]])):
@@ -171,7 +166,7 @@ class DPPPeerClass(Thread, Statistics):
                             # TODO: implement proper message acknowledge and make sure no messages can get lost
                             self.counterAction(self._ackSentCounterId)
                     else:
-                        self.exception("CRC16 not correct for message -> drop corrupted content")
+                        self.exception("CRC16 not correct for message (device_id=%d, maybe corrupted) -> drop corrupted content" % (dppMsg['device_id'],))
                         
                     msg = ''
                     i2cPacketCnt = 0
@@ -196,7 +191,7 @@ class DPPPeerClass(Thread, Statistics):
 
     def timesync(self):
         try:
-            packet = dict(device_id=self._backlogMain.device_id, type=DPPTypes.MSG_TYPE_TIMESYNC, payload_len=0, seqnr=0, generation_time=0, payload=None)
+            packet = dict(device_id=self._backlogMain.device_id, type=DPPTypes.MSG_TYPE_TIMESYNC, payload_len=0, target_id=self._backlogMain.device_id, seqnr=0, generation_time=0, payload=None)
             self._dppWriter.addMsg(packet)
         except Exception, e:
             self.exception(str(e))
@@ -268,16 +263,16 @@ class DPPWriter(Thread):
             try:
                 if dppMsg['type'] == DPPTypes.MSG_TYPE_TIMESYNC:
                     if isEnabledFor(logging.DEBUG):
-                        self._logger.debug('write MSG_TYPE_TIMESYNC message (%d,%d,%d,%d,%d)' % (dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['seqnr'], int(time.time()*1000000)))
-                    msg = array.array('B', struct.pack('<HBBHQ', dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['seqnr'], int(time.time()*1000000))).tolist()
+                        self._logger.debug('write MSG_TYPE_TIMESYNC message (%d,%d,%d,%d,%d,%d)' % (dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['target_id'], dppMsg['seqnr'], int(time.time()*1000000)))
+                    msg = array.array('B', struct.pack('<HBBHHQ', dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['target_id'], dppMsg['seqnr'], int(time.time()*1000000))).tolist()
                     type = I2C_CMD_TIMESYNC
                 else:
                     if isEnabledFor(logging.DEBUG):
                         self._logger.debug('write message with type %d' % dppMsg['type'])
                     if (dppMsg['ext_msg']):
-                        msg = array.array('B', struct.pack('<HBBHQ%dc' % dppMsg['payload_len'], dppMsg['device_id'], 0x80 & dppMsg['type'], dppMsg['payload_len'], dppMsg['payload'])).tolist()
+                        msg = array.array('B', struct.pack('<HBBH%dc' % dppMsg['payload_len'], dppMsg['device_id'], 0x80 & dppMsg['type'], dppMsg['payload_len'], dppMsg['payload'])).tolist()
                     else:
-                        msg = array.array('B', struct.pack('<HBBHQ%dc' % dppMsg['payload_len'], dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['seqnr'], dppMsg['generation_time'], dppMsg['payload'])).tolist()
+                        msg = array.array('B', struct.pack('<HBBHHQ%dc' % dppMsg['payload_len'], dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['target_id'], dppMsg['seqnr'], dppMsg['generation_time'], dppMsg['payload'])).tolist()
                     type = I2C_CMD_READ_MSG
                     
                 msg = msg + array.array('B', struct.pack('<H', self._dppPeer._crc16.calculate(bytearray(msg)))).tolist()

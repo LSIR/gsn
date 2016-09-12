@@ -43,6 +43,7 @@
             <field name="GENERATION_TIME_MICROSEC" type="BIGINT"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
             <field name="NETWORK_DWELL_TIME" type="INTEGER" unit="ms" />
+            <field name="TARGET_ID" type="INTEGER" />
             <field name="MESSAGE_TYPE" type="INTEGER" />
             <field name="SEQNR" type="INTEGER" />
             <field name="PAYLOAD_LENGTH" type="INTEGER" />

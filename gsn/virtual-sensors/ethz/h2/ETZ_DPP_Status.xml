@@ -7,6 +7,7 @@
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="GENERATION_TIME_MICROSEC" type="BIGINT"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="TARGET_ID" type="INTEGER" />
             <field name="MESSAGE_TYPE" type="INTEGER" />
             <field name="SEQNR" type="INTEGER" />
             <field name="PAYLOAD_LENGTH" type="INTEGER" />
@@ -43,6 +44,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.DPPMessagePlugin</predicate>
+                    <predicate key="message-classname">gsn.wrappers.backlog.plugins.dpp.CommHealthMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -53,6 +55,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-bs02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.DPPMessagePlugin</predicate>
+                    <predicate key="message-classname">gsn.wrappers.backlog.plugins.dpp.CommHealthMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -63,6 +66,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-bs03.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.DPPMessagePlugin</predicate>
+                    <predicate key="message-classname">gsn.wrappers.backlog.plugins.dpp.CommHealthMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -73,6 +77,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.DPPMessagePlugin</predicate>
+                    <predicate key="message-classname">gsn.wrappers.backlog.plugins.dpp.CommHealthMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

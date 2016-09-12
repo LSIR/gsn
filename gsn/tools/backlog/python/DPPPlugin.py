@@ -45,11 +45,14 @@ class DPPPluginClass(AbstractPluginClass):
         if dppMsg['ext_msg']:
             return self.processMsg(timestamp, [dppMsg['device_id'], dppMsg['ext_msg'], dppMsg['type'], dppMsg['payload_len'], dppMsg['payload']], self._priority, self._backlog)
         else:
-            return self.processMsg(timestamp, [dppMsg['device_id'], dppMsg['ext_msg'], dppMsg['type'], dppMsg['payload_len'], dppMsg['seqnr'], dppMsg['generation_time'], dppMsg['payload']], self._priority, self._backlog)
+            return self.processMsg(timestamp, [dppMsg['device_id'], dppMsg['ext_msg'], dppMsg['type'], dppMsg['payload_len'], dppMsg['target_id'], dppMsg['seqnr'], dppMsg['generation_time'], dppMsg['payload']], self._priority, self._backlog)
     
     
     def msgReceived(self, data):
-        self.sendDPPmsg(dict(device_id=data[0], type=data[1], payload_len=data[2], seqnr=data[3], payload=data[4]))
+        if data[1]:
+            self.sendDPPmsg(dict(device_id=data[0], ext_msg=data[1], type=data[2], payload_len=data[3], payload=data[4]))
+        else:
+            self.sendDPPmsg(dict(device_id=data[0], ext_msg=data[1], type=data[2], payload_len=data[3], target_id=data[4], seqnr=data[5], generation_time=data[6], payload=data[7]))
     
     
     def isBusy(self):
