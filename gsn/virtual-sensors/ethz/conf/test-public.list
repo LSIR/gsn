@@ -71,8 +71,9 @@ ETZ_Dozer_EnviroScanMoisture__conv.xml
 ETZ_Dozer_EnviroScanParametersA__conv.xml
 ETZ_Dozer_EnviroScanParametersB__conv.xml
 ETZ_Dozer_EnviroScanParametersC__conv.xml
-ETZ_DPP_Status__mapped.xml
-ETZ_DPP_Status__conv.xml
+ETZ_DPP_Comm_Cmd__mapped.xml
+ETZ_DPP_Comm_Status__mapped.xml
+ETZ_DPP_Comm_Status__conv.xml
 ETZ_GPS_Inclinometer.xml
 ETZ_GPS_L2__conv.xml
 ETZ_GPS_L2__files__mapped.xml

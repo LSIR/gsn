@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_DPP_Status__conv" priority="10" >
+<virtual-sensor name="ETZ_DPP_Comm_Status__conv" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -73,7 +73,7 @@
             <field name="LFXT_TICKS" type="BIGINT" unit="32kHz ticks" />
         </output-structure>
     </processing-class>
-    <description>Converted DPP Status messages from the ETZ deployment</description>
+    <description>Converted DPP Communication Processor Status messages from the ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -81,7 +81,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from ETZ_DPP_Status__mapped </predicate>
+                    <predicate key="query"> select * from ETZ_DPP_Comm_Status__mapped </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>

@@ -62,7 +62,22 @@ public class CommHealthMsg implements Message {
 	}
 
 	@Override
+	public ByteBuffer sendPayload(String action, String[] paramNames, Object[] paramValues) throws Exception {
+		throw new Exception("sendPayload not implemented");
+	}
+
+	@Override
 	public int getType() {
 		return gsn.wrappers.backlog.plugins.dpp.MessageTypes.MSG_TYPE_COMM_HEALTH;
+	}
+
+	@Override
+	public boolean isExtended() {
+		return false;
+	}
+
+	@Override
+	public Serializable[] sendPayloadSuccess(boolean success) {
+		return null;
 	}
 }

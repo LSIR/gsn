@@ -270,9 +270,9 @@ class DPPWriter(Thread):
                     if isEnabledFor(logging.DEBUG):
                         self._logger.debug('write message with type %d' % dppMsg['type'])
                     if (dppMsg['ext_msg']):
-                        msg = array.array('B', struct.pack('<HBBH%dc' % dppMsg['payload_len'], dppMsg['device_id'], 0x80 & dppMsg['type'], dppMsg['payload_len'], dppMsg['payload'])).tolist()
+                        msg = array.array('B', struct.pack('<HBBH', dppMsg['device_id'], 0x80 & dppMsg['type'], dppMsg['payload_len'])).tolist() + array.array('B',dppMsg['payload']).tolist()
                     else:
-                        msg = array.array('B', struct.pack('<HBBHHQ%dc' % dppMsg['payload_len'], dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['target_id'], dppMsg['seqnr'], dppMsg['generation_time'], dppMsg['payload'])).tolist()
+                        msg = array.array('B', struct.pack('<HBBHHQ', dppMsg['device_id'], dppMsg['type'], dppMsg['payload_len'], dppMsg['target_id'], dppMsg['seqnr'], dppMsg['generation_time'])).tolist() + array.array('B',dppMsg['payload']).tolist()
                     type = I2C_CMD_READ_MSG
                     
                 msg = msg + array.array('B', struct.pack('<H', self._dppPeer._crc16.calculate(bytearray(msg)))).tolist()

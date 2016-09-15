@@ -22,6 +22,7 @@ public class DPPMessageMultiplexer implements BackLogMessageListener {
 	
 	private String coreStationName = null;
 	private BackLogMessageMultiplexer blMessageMultiplexer;
+	private int sequenceNumber;
 	
 	
 	public DPPMessageMultiplexer() throws Exception {
@@ -32,6 +33,7 @@ public class DPPMessageMultiplexer implements BackLogMessageListener {
 	private DPPMessageMultiplexer(String coreStationName, BackLogMessageMultiplexer blMsgMulti) throws Exception {
 		this.coreStationName = coreStationName;
 		blMessageMultiplexer = blMsgMulti;
+		sequenceNumber = 0;
 		
 		blMsgMulti.registerListener(BackLogMessage.DPP_MESSAGE_TYPE, this, true);
 	}
@@ -148,6 +150,10 @@ public class DPPMessageMultiplexer implements BackLogMessageListener {
 			logger.error(e.getMessage());
 			return false;
 		}
+	}
+	
+	public synchronized int getNextSequenceNumber() {
+		return sequenceNumber++;
 	}
 
 	@Override

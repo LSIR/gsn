@@ -8,10 +8,14 @@ import gsn.beans.DataField;
 public interface Message {
 
 	int getType();
+	
+	boolean isExtended();
 
 	Serializable[] receivePayload(ByteBuffer payload) throws Exception;
 
-	DataField[] getOutputFormat();
+	ByteBuffer sendPayload(String action, String[] paramNames, Object[] paramValues) throws Exception;
+	
+	Serializable[] sendPayloadSuccess(boolean success);
 
-	default ByteBuffer sendPayload(String action, String[] paramNames, Object[] paramValues) throws Exception { throw new Exception("sendMessage not implemented"); };
+	DataField[] getOutputFormat();
 }
