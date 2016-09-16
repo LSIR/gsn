@@ -1,6 +1,6 @@
 /**
 * Global Sensor Networks (GSN) Source Code
-* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* Copyright (c) 2006-2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 * 
 * This file is part of GSN.
 * 

@@ -1,3 +1,3 @@
 # GSN Global Sensor Networks : extra packages
 
-This module contains all the optional extra packages that have been moved from the Core to reduce its dependencies and make it lighter. If you include the jar file and all its dependencies in the lib folder of a deployed Core, you should get back all the functionalities. But you cal also selectively build them by downloading the sources and removing the unnecessary ones.
+This module contains all the optional extra packages that have been moved from the Core to reduce its dependencies and make it lighter. If you include the jar file and all its dependencies in the lib folder of a deployed Core, you should get back all the functionalities. But you can also selectively build them by downloading the sources and removing the unnecessary ones.

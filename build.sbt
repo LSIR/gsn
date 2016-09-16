@@ -1,9 +1,9 @@
 
 lazy val commonSettings = Seq(
-  organization := "gsn",
+  organization := "ch.epfl.gsn",
   version := "2.0.0-SNAPSHOT",
   scalaVersion := "2.11.2",
-  javacOptions ++= Seq("-source", "1.7", "-target", "1.7", "-bootclasspath", "/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar"),
+  javacOptions in (Compile, compile) ++= Seq("-source", "1.7", "-target", "1.7", "-bootclasspath", "/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar"),
   resolvers ++= Seq(
     DefaultMavenRepository,
     "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
@@ -14,16 +14,53 @@ lazy val commonSettings = Seq(
     "play-authenticate (snapshot)" at "https://oss.sonatype.org/content/repositories/snapshots/",
     "Local ivy Repository" at ""+Path.userHome.asFile.toURI.toURL+"/.ivy2/local"
   ),
-  publishTo := Some("Artifactory Realm" at "http://osper.epfl.ch:8081/artifactory/gsn-release"),
-  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
+  //publishTo := Some("Artifactory Realm" at "http://osper.epfl.ch:8081/artifactory/gsn-release"),
+    publishTo := Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"),
+/*
+publishTo &lt;&lt;= version { v: String =&gt;
+  val nexus = "https://oss.sonatype.org/"
+  if (v.trim.endsWith("SNAPSHOT"))
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}*/
+
+  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials-sonatype"),
   publishMavenStyle := true,
   publishArtifact in (Compile) := false,
   publishArtifact in (Test) := false,
   publishArtifact in (Compile, packageBin) := true,
+  publishArtifact in (Compile, packageSrc) := true,
+  publishArtifact in (Compile, packageDoc) := true,
+  pomIncludeRepository := { x => false },
+  pomExtra := (
+  <url>http://gsn.epfl.ch</url>
+  <licenses>
+    <license>
+      <name>GPL-3.0+</name>
+      <url>https://opensource.org/licenses/GPL-3.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>git@github.com:LSIR/gsn.git</url>
+    <connection>scm:git:git@github.com:LSIR/gsn.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>EPFL-LSIR</id>
+      <name>The GSN Team</name>
+      <url>http://gsn.epfl.ch</url>
+    </developer>
+  </developers>
+),
   crossPaths := false,
+  useGpg := true,
   parallelExecution in Test := false,
   EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
 )
+
+usePgpKeyHex("DC900B5F")
 
 lazy val root = (project in file(".")).
   aggregate(core, tools, extra, services)

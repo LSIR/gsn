@@ -45,7 +45,7 @@ libraryDependencies ++= Seq(
 )
 
 
-mainClass := Some("gsn.Main")
+mainClass := Some("ch.epfl.gsn.Main")
 
 NativePackagerKeys.packageSummary in com.typesafe.sbt.SbtNativePackager.Linux := "GSN Server"
 
@@ -100,6 +100,6 @@ scalacOptions += "-deprecation"
 
 EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
 
-mainClass in Revolver.reStart := Some("gsn.Main")
+mainClass in Revolver.reStart := Some("ch.epfl.gsn.Main")
 
 Revolver.reStartArgs := Seq("22232", "../conf", "../virtual-sensors")

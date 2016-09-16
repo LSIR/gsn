@@ -11,7 +11,7 @@
     </encoder>
   </appender>
 	
-	<logger name="gsn.data" level="DEBUG" />
+	<logger name="ch.epfl.gsn.data" level="DEBUG" />
 	<logger name="application" level="DEBUG" />
 	<root level="WARN">
 		<appender-ref ref="ROLLING" />

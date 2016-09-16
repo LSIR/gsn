@@ -1,6 +1,6 @@
 /**
 * Global Sensor Networks (GSN) Source Code
-* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* Copyright (c) 2006-2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 * 
 * This file is part of GSN.
 * 
@@ -25,16 +25,17 @@
 
 package ch.slf;
 
-import gsn.beans.DataField;
-import gsn.beans.DataTypes;
-import gsn.beans.StreamElement;
-
 import java.io.Serializable;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.complex.Complex;
 import org.apache.commons.math.transform.FastFourierTransformer;
 import org.slf4j.LoggerFactory;
+
+import ch.epfl.gsn.beans.DataField;
+import ch.epfl.gsn.beans.DataTypes;
+import ch.epfl.gsn.beans.StreamElement;
+
 import org.slf4j.Logger;
 
 /**

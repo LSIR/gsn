@@ -1,3 +1,28 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: app/controllers/gsn/api/SensorService.scala
+*
+* @author Jean-Paul Calbimonte
+* @author Julien Eberle
+*
+*/
 package controllers.gsn.api
 
 import scala.collection.JavaConversions.asScalaBuffer
@@ -27,13 +52,13 @@ import scalaoauth2.provider.AuthInfoRequest
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatterBuilder
 import controllers.gsn.Global
-import gsn.config.ConfWatcher
-import gsn.data._
-import gsn.data.format._
-import gsn.xpr.XprConditions
-import gsn.config.GetSensorConf
-import gsn.config.VsConf
-import gsn.beans.StreamElement
+import ch.epfl.gsn.config.ConfWatcher
+import ch.epfl.gsn.data._
+import ch.epfl.gsn.data.format._
+import ch.epfl.gsn.xpr.XprConditions
+import ch.epfl.gsn.config.GetSensorConf
+import ch.epfl.gsn.config.VsConf
+import ch.epfl.gsn.beans.StreamElement
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext

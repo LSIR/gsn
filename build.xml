@@ -36,14 +36,14 @@
     <target name="build" depends="build-gsn-core,build-gsn-extra" description="Compile the cource code." />
 
     <target name="cleandb" depends="build">
-        <java classname="gsn.storage.CleanDB" fork="true" dir="${basedir}" inputstring=""  classpathref="core-classpath" />
+        <java classname="ch.epfl.gsn.storage.CleanDB" fork="true" dir="${basedir}" inputstring=""  classpathref="core-classpath" />
     </target>
 
 
     <!-- Run -->
 
     <target name="gsn" depends="cleandb" description="Run GSN server in non graphical mode.">
-        <java classname="gsn.Main" maxmemory="${maxMemoryUsage}" spawn="false" fork="true" dir="${basedir}" classpathref="core-classpath">
+        <java classname="ch.epfl.gsn.Main" maxmemory="${maxMemoryUsage}" spawn="false" fork="true" dir="${basedir}" classpathref="core-classpath">
             <jvmarg value="-Djavax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"/>
             <jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger"/>
             <jvmarg value="-DmaxServlets=${max-servlets}"/>
@@ -64,7 +64,7 @@
     <target name="restart" depends="stop,gsn" description="Restart GSN Server in non graphical mode."/>
 
     <target name="stop" depends="build" description="Stop the running GSN server (if any).">
-        <java classname="gsn.GSNStop" maxmemory="${maxMemoryUsage}" fork="false" dir="${basedir}"
+        <java classname="ch.epfl.gsn.GSNStop" maxmemory="${maxMemoryUsage}" fork="false" dir="${basedir}"
               classpathref="core-classpath">
             <arg id="gsnc-port" value="${gsn-controller-port}"/>
         </java>

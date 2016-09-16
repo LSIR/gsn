@@ -22,6 +22,5 @@
         <Logger name="httpclient.wire" level="WARN" additivity="true" />
         <Logger name="org.eclipse.jetty" level="WARN" additivity="true" />
         <Logger name="net.sf.jasperreports" level="WARN" additivity="true" />
-        <Logger name="gsn.http.restapi" level="WARN" additivity="true" />
       </Loggers>
     </Configuration>

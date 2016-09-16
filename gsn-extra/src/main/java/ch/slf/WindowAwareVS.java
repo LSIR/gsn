@@ -1,6 +1,6 @@
 /**
 * Global Sensor Networks (GSN) Source Code
-* Copyright (c) 2006-2014, Ecole Polytechnique Federale de Lausanne (EPFL)
+* Copyright (c) 2006-2016, Ecole Polytechnique Federale de Lausanne (EPFL)
 * 
 * This file is part of GSN.
 * 
@@ -27,14 +27,15 @@
 
 package ch.slf;
 
-import gsn.beans.StreamElement;
-import gsn.vsensor.AbstractVirtualSensor;
-
 import java.util.Hashtable;
 import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.slf4j.LoggerFactory;
+
+import ch.epfl.gsn.beans.StreamElement;
+import ch.epfl.gsn.vsensor.AbstractVirtualSensor;
+
 import org.slf4j.Logger;
 
 /**

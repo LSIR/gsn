@@ -1,11 +1,36 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: app/controllers/gsn/Global.scala
+*
+* @author Jean-Paul Calbimonte
+* @author Julien Eberle
+*
+*/
 package controllers.gsn
 
 import com.typesafe.config.ConfigFactory
 
 import akka.actor._
-import gsn.config.GsnConf
-import gsn.data.DataStore
-import gsn.data.SensorStore
+import ch.epfl.gsn.config.GsnConf
+import ch.epfl.gsn.data.DataStore
+import ch.epfl.gsn.data.SensorStore
 import play.api._
 import play.api.libs.concurrent.Akka
 import play.mvc.Call

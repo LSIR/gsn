@@ -125,7 +125,6 @@
         <jar destfile="${jars.dir}/${extra-jar.file}" basedir="${extra-build.dir}">
             <manifest>
                 <attribute name="Built-By" value="GSN Development Team."/>
-                <attribute name="Main-Class" value="gsn.Main"/>
             </manifest>
         </jar>
     </target>

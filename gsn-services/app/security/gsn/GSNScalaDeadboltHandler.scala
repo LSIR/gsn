@@ -1,3 +1,27 @@
+/**
+* Global Sensor Networks (GSN) Source Code
+* Copyright (c) 2006-2016, Ecole Polytechnique Federale de Lausanne (EPFL)
+* 
+* This file is part of GSN.
+* 
+* GSN is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+* 
+* GSN is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with GSN.  If not, see <http://www.gnu.org/licenses/>.
+* 
+* File: app/security/gsn/GSNScalaDeadboltHandler.scala
+*
+* @author Julien Eberle
+*
+*/
 package security.gsn
 
 import be.objectify.deadbolt.scala.{DynamicResourceHandler, DeadboltHandler}
@@ -28,7 +52,6 @@ class GSNScalaDeadboltHandler(dynamicResourceHandler: Option[DynamicResourceHand
 			// defined by your resolver
 		  val context = JavaHelpers.createJavaContext(request)
 			val originalUrl = PlayAuthenticate.storeOriginalUrl(context)
-		  println("++++++++++++++++"+originalUrl)
 			context.flash().put("error", "You need to log in first, to view '" + originalUrl + "'")
       Option(Future(play.mvc.Results.redirect(PlayAuthenticate.getResolver().login()).toScala().withSession(new Session(context.session().toMap))))
 

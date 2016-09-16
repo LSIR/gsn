@@ -10,8 +10,6 @@ val buildSettings = Defaults.defaultSettings ++ Seq(
 
 sources in (Compile,doc) := Seq.empty
 
-publishArtifact in (Compile, packageDoc) := false
-
 libraryDependencies ++= Seq(
   jdbc,
   ws,
@@ -32,7 +30,7 @@ libraryDependencies ++= Seq(
   "org.zeromq" % "jeromq" % "0.3.5",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
   "org.scalatestplus" %% "play" % "1.1.0" % "test",
-  "gsn" % "gsn-core" % "2.0.0-SNAPSHOT" exclude("org.apache.logging.log4j", "log4j-slf4j-impl"),
+  "ch.epfl.gsn" % "gsn-core" % "2.0.0-SNAPSHOT" exclude("org.apache.logging.log4j", "log4j-slf4j-impl"),
   "com.typesafe.play" %% "play-json" % "2.3.10",
   "com.typesafe.akka" %% "akka-actor" % "2.3.14"
   )

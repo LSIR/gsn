@@ -69,15 +69,15 @@
 					</td>
 					<td>
 						<ul class="list-unstyled hideable">
-							@for(u <- v.w_users) {
-							<li>@u.firstName @u.lastName (@u.email)
+							@for(uu <- v.w_users) {
+							<li>@uu.firstName @uu.lastName (@uu.email)
 								<button type="button" class="btn btn-danger btn-xs"
-									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=uw' + @u.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.users.remove")</button>
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=uw' + @uu.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.users.remove")</button>
 							</li> } @if(v.w_users.size < users.size){
-							<li><select id="uw_@v.id"> @for(u <- users) {
-									@if(!v.w_users.contains(u)){
-									<option value="uw@u.id">@u.firstName @u.lastName
-										(@u.email)</option> } }
+							<li><select id="uw_@v.id"> @for(uu <- users) {
+									@if(!v.w_users.contains(uu)){
+									<option value="uw@uu.id">@uu.firstName @uu.lastName
+										(@uu.email)</option> } }
 							</select>
 								<button type="button" class="btn btn-primary btn-xs"
 									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#uw_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.groups.add")</button>
