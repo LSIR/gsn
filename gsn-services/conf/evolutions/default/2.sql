@@ -5,7 +5,7 @@ INSERT INTO users(id, email, name, first_name, last_name, active, email_validate
 INSERT INTO users_security_role(users_id, security_role_id) VALUES (0, 1);
 INSERT INTO users_security_role(users_id, security_role_id) VALUES (0, 2);
 INSERT INTO linked_account(id, user_id, provider_user_id, provider_key) VALUES (0,0,'$2a$10$lRUloW/0IZTsQ1SUi7yFj.bZjSNw9MwrHR3h9VZZvafuPmzNNi0aq','password');
-INSERT INTO client(id, name, client_id, secret, redirect, linked, user_id) VALUES (0, 'Default Web UI', 'web-gui-public', 'web-gui-secret', 'http://127.0.0.1:8000/profile/', 0, 0);
+INSERT INTO client(id, name, client_id, secret, redirect, linked, user_id) VALUES (0, 'Default Web UI', 'web-gui-public', 'web-gui-secret', 'http://127.0.0.1:8000/profile/', False, 0);
 
 # --- !Downs
 

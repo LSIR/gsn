@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN.  If not, see <http://www.gnu.org/licenses/>.
 * 
-* File: app/models/gsn/auth/DataSource.java
+* File: app/models/gsn/auth/UserDataSourceWrite.java
 *
 * @author Julien Eberle
 *
@@ -26,19 +26,21 @@ package models.gsn.auth;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import be.objectify.deadbolt.core.models.Permission;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * Initial version based on work by Steve Chaloner (steve@objectify.be) for
  * Deadbolt2
  */
 @Entity
-public class DataSource extends AppModel implements Permission {
+@Table(name="user_data_source_write",  uniqueConstraints={
+		   @UniqueConstraint(columnNames={"user", "data_source"})
+		})
+public class UserDataSourceWrite extends AppModel {
 	/**
 	 * 
 	 */
@@ -47,38 +49,25 @@ public class DataSource extends AppModel implements Permission {
 	@Id
 	public Long id;
     
-	public String value;
+	@ManyToOne
+	public User user;
 	
-	public boolean is_public;
+	@ManyToOne
+	public DataSource data_source;
 	
-	@OneToMany(cascade = CascadeType.ALL)
-	public List<UserDataSourceRead> userRead;
-	
-	@OneToMany(cascade = CascadeType.ALL)
-	public List<GroupDataSourceRead> groupRead;
-	
-	@OneToMany(cascade = CascadeType.ALL)
-	public List<UserDataSourceWrite> userWrite;
-	
-	@OneToMany(cascade = CascadeType.ALL)
-	public List<GroupDataSourceWrite> groupWrite;
-	
-	public static play.db.ebean.Model.Finder<Long, DataSource> find = new play.db.ebean.Model.Finder<Long, DataSource>(
-			Long.class, DataSource.class);
+	public static play.db.ebean.Model.Finder<Long, UserDataSourceWrite> find = new play.db.ebean.Model.Finder<Long, UserDataSourceWrite>(
+			Long.class, UserDataSourceWrite.class);
 
-	public String getValue() {
-		return value;
+	public static List<UserDataSourceWrite> findByUser(User value) {
+		return find.where().eq("user", value).findList();
 	}
 	
-	public boolean getIs_public(){
-		return is_public;
+	public static List<UserDataSourceWrite> findByDataSource(DataSource value) {
+		return find.where().eq("data_source", value).findList();
 	}
 	
-	public void setIs_public(boolean p){
-		is_public=p;
+	public static UserDataSourceWrite findByBoth(User u, DataSource d) {
+		return find.where().eq("user", u).eq("data_source", d).findUnique();
 	}
 
-	public static DataSource findByValue(String value) {
-		return find.where().eq("value", value).findUnique();
-	}
 }

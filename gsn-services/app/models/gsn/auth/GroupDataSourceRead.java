@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU General Public License
 * along with GSN.  If not, see <http://www.gnu.org/licenses/>.
 * 
-* File: app/models/gsn/auth/DataSource.java
+* File: app/models/gsn/auth/GroupDataSourceRead.java
 *
 * @author Julien Eberle
 *
@@ -26,19 +26,21 @@ package models.gsn.auth;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import be.objectify.deadbolt.core.models.Permission;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * Initial version based on work by Steve Chaloner (steve@objectify.be) for
  * Deadbolt2
  */
 @Entity
-public class DataSource extends AppModel implements Permission {
+@Table(name="group_data_source_read",  uniqueConstraints={
+		   @UniqueConstraint(columnNames={"group", "data_source"})
+		})
+public class GroupDataSourceRead extends AppModel {
 	/**
 	 * 
 	 */
@@ -47,38 +49,25 @@ public class DataSource extends AppModel implements Permission {
 	@Id
 	public Long id;
     
-	public String value;
+	@ManyToOne
+	public Group group;
 	
-	public boolean is_public;
+	@ManyToOne
+	public DataSource data_source;
 	
-	@OneToMany(cascade = CascadeType.ALL)
-	public List<UserDataSourceRead> userRead;
-	
-	@OneToMany(cascade = CascadeType.ALL)
-	public List<GroupDataSourceRead> groupRead;
-	
-	@OneToMany(cascade = CascadeType.ALL)
-	public List<UserDataSourceWrite> userWrite;
-	
-	@OneToMany(cascade = CascadeType.ALL)
-	public List<GroupDataSourceWrite> groupWrite;
-	
-	public static play.db.ebean.Model.Finder<Long, DataSource> find = new play.db.ebean.Model.Finder<Long, DataSource>(
-			Long.class, DataSource.class);
+	public static play.db.ebean.Model.Finder<Long, GroupDataSourceRead> find = new play.db.ebean.Model.Finder<Long, GroupDataSourceRead>(
+			Long.class, GroupDataSourceRead.class);
 
-	public String getValue() {
-		return value;
+	public static List<GroupDataSourceRead> findByUser(Group value) {
+		return find.where().eq("group", value).findList();
 	}
 	
-	public boolean getIs_public(){
-		return is_public;
+	public static List<GroupDataSourceRead> findByDataSource(DataSource value) {
+		return find.where().eq("data_source", value).findList();
 	}
 	
-	public void setIs_public(boolean p){
-		is_public=p;
+	public static GroupDataSourceRead findByBoth(Group g, DataSource d) {
+		return find.where().eq("group", g).eq("data_source", d).findUnique();
 	}
 
-	public static DataSource findByValue(String value) {
-		return find.where().eq("value", value).findUnique();
-	}
 }

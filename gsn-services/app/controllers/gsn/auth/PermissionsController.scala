@@ -28,7 +28,7 @@ import scala.concurrent.{Future, Promise}
 import akka.actor._
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.mvc._
-import models.gsn.auth.{Group, User, DataSource, SecurityRole}
+import models.gsn.auth.{Group, User, DataSource, SecurityRole, UserDataSourceRead, GroupDataSourceRead, UserDataSourceWrite, GroupDataSourceWrite}
 import views.html._
 import be.objectify.deadbolt.scala.DeadboltActions
 import security.gsn.GSNScalaDeadboltHandler
@@ -200,7 +200,7 @@ object PermissionsController extends Controller with DeadboltActions {
       }
   }
   
-  def addtovs(page:Int) = Restrict(Array(LocalAuthController.ADMIN_ROLE),new GSNScalaDeadboltHandler) { Action.async { implicit request => Future {
+  def addtovs(page:Int) = Restrict(Array(LocalAuthController.ADMIN_ROLE),new GSNScalaDeadboltHandler) { Action { implicit request => {
       //hack to work with java-style templates
       Context.current.set(JavaHelpers.createJavaContext(request))
       val count = DataSource.find.findRowCount()
@@ -208,20 +208,28 @@ object PermissionsController extends Controller with DeadboltActions {
       v.fold(BadRequest(access.vslist.render(DataSource.find.setFirstRow((page - 1) * Global.pageLength).setMaxRows(Global.pageLength).findList().asScala, Group.find.findList().asScala, User.find.findList().asScala, count, page, Global.pageLength)))(vs => {
           request.queryString.get("id").map {x => x.head match {
               case s if s.startsWith("ur") => {
-                  vs.r_users.add(User.find.byId(s.stripPrefix("ur").toLong))
-                  vs.saveManyToManyAssociations("r_users")
+                  val uds = new UserDataSourceRead()
+                  uds.user = User.find.byId(s.substring(2).toLong)
+                  uds.data_source = vs
+                  uds.save
+                  }
+             case s if s.startsWith("uw") => {
+                  val uds = new UserDataSourceWrite()
+                  uds.user = User.find.byId(s.substring(2).toLong)
+                  uds.data_source = vs
+                  uds.save
                   }
               case s if s.startsWith("gr") => {
-                  vs.r_groups.add(Group.find.byId(s.stripPrefix("gr").toLong))
-                  vs.saveManyToManyAssociations("r_groups")
+                  val gds = new GroupDataSourceRead()
+                  gds.group = Group.find.byId(s.substring(2).toLong)
+                  gds.data_source = vs
+                  gds.save
                   }
-              case s if s.startsWith("uw") => {
-                  vs.w_users.add(User.find.byId(s.stripPrefix("uw").toLong))
-                  vs.saveManyToManyAssociations("w_users")
-                  }
-              case s if s.startsWith("gw") => {
-                  vs.w_groups.add(Group.find.byId(s.stripPrefix("gw").toLong))
-                  vs.saveManyToManyAssociations("w_groups")
+             case s if s.startsWith("gw") => {
+                  val gds = new GroupDataSourceWrite()
+                  gds.group = Group.find.byId(s.substring(2).toLong)
+                  gds.data_source = vs
+                  gds.save
                   }
               case s if s.startsWith("a") => {
                   vs.setIs_public(true)
@@ -234,28 +242,28 @@ object PermissionsController extends Controller with DeadboltActions {
       }
   }
   
-  def removefromvs(page:Int) = Restrict(Array(LocalAuthController.ADMIN_ROLE),new GSNScalaDeadboltHandler) { Action.async { implicit request => Future {
+  def removefromvs(page:Int) = Restrict(Array(LocalAuthController.ADMIN_ROLE),new GSNScalaDeadboltHandler) { Action { implicit request => {
       //hack to work with java-style templates
       Context.current.set(JavaHelpers.createJavaContext(request))
       val count = DataSource.find.findRowCount()
       val v = request.queryString.get("vs_id").map { x => DataSource.find.byId(x.head.toLong) }
       v.fold(BadRequest(access.vslist.render(DataSource.find.setFirstRow((page - 1) * Global.pageLength).setMaxRows(Global.pageLength).findList().asScala, Group.find.findList().asScala, User.find.findList().asScala, count, page, Global.pageLength)))(vs => {
           request.queryString.get("id").map {x => x.head match {
-              case s if s.startsWith("ur") => {
-                  vs.r_users.remove(User.find.byId(s.stripPrefix("ur").toLong))
-                  vs.saveManyToManyAssociations("r_users")
+             case s if s.startsWith("ur") => {
+                  val uds = UserDataSourceRead.findByBoth(User.find.byId(s.substring(2).toLong), vs)
+                  if (uds != null) uds.delete
                   }
-              case s if s.startsWith("gr") => {
-                  vs.r_groups.remove(Group.find.byId(s.stripPrefix("gr").toLong))
-                  vs.saveManyToManyAssociations("r_groups")
+             case s if s.startsWith("uw") => {
+                  val uds = UserDataSourceWrite.findByBoth(User.find.byId(s.substring(2).toLong), vs)
+                  if (uds != null) uds.delete
                   }
-              case s if s.startsWith("uw") => {
-                  vs.w_users.remove(User.find.byId(s.stripPrefix("uw").toLong))
-                  vs.saveManyToManyAssociations("w_users")
+             case s if s.startsWith("gr") => {
+                  val gds = GroupDataSourceRead.findByBoth(Group.find.byId(s.substring(2).toLong), vs)
+                  if (gds != null) gds.delete
                   }
-              case s if s.startsWith("gw") => {
-                  vs.w_groups.remove(Group.find.byId(s.stripPrefix("gw").toLong))
-                  vs.saveManyToManyAssociations("w_groups")
+             case s if s.startsWith("gw") => {
+                  val gds = GroupDataSourceWrite.findByBoth(Group.find.byId(s.substring(2).toLong), vs)
+                  if (gds != null) gds.delete
                   }
               case s if s.startsWith("a") => {
                   vs.setIs_public(false)

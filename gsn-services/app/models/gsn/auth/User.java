@@ -85,13 +85,11 @@ public class User extends AppModel implements Subject {
 	@ManyToMany
 	public List<UserPermission> permissions;
 	
-	@ManyToMany
-	@JoinTable(name="user_w_data_sources")
-	public List<DataSource> w_dataSources;
+	@OneToMany(cascade = CascadeType.ALL)
+	public List<UserDataSourceRead> dataSourceRead;
 	
-	@ManyToMany
-	@JoinTable(name="user_r_data_sources")
-	public List<DataSource> r_dataSources;
+	@OneToMany(cascade = CascadeType.ALL)
+	public List<UserDataSourceWrite> dataSourceWrite;
 	
 	@ManyToMany
 	public List<Group> groups;
@@ -123,16 +121,13 @@ public class User extends AppModel implements Subject {
 	}
 	
 	public boolean hasAccessTo(DataSource ds, Boolean toWrite){
-		if (toWrite) {
-			if (w_dataSources.contains(ds)) return true;
-			for (Group g : groups){
-				if (g.w_dataSources.contains(ds)) return true;
-			}
-		}else{
-			if (r_dataSources.contains(ds)) return true;
-			for (Group g : groups){
-				if (g.r_dataSources.contains(ds)) return true;
-			}
+		if(toWrite && null != UserDataSourceWrite.findByBoth(this, ds)) return true;
+		else if (!toWrite && null != UserDataSourceRead.findByBoth(this, ds)) return true;
+		else {
+		    for (Group g : groups){
+			    if(toWrite && null != GroupDataSourceWrite.findByBoth(g, ds)) return true;
+			    else if (!toWrite && null != GroupDataSourceRead.findByBoth(g, ds)) return true;
+		    }
 		}
 		return false;
 	}

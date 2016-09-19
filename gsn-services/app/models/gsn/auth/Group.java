@@ -26,10 +26,11 @@ package models.gsn.auth;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 
@@ -49,13 +50,11 @@ public class Group extends AppModel{
 	public String name;
 	public String description;
 	
-	@ManyToMany
-	@JoinTable(name="group_r_data_sources")
-	public List<DataSource> r_dataSources;
+	@OneToMany(cascade = CascadeType.ALL)
+	public List<GroupDataSourceRead> dataSourceRead;
 	
-	@ManyToMany
-	@JoinTable(name="group_w_data_sources")
-	public List<DataSource> w_dataSources;
+	@OneToMany(cascade = CascadeType.ALL)
+	public List<GroupDataSourceWrite> dataSourceWrite;
 	
 	@ManyToMany(mappedBy = "groups")
 	public List<User> users;
