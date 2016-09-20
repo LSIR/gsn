@@ -48,7 +48,7 @@
 					<td>
 						<ul class="list-unstyled  hideable">
 							@for(g <- v.groupRead) {
-							<li>[ @g.group.name ]
+							<li>[ @g.group.getName ]
 								<button type="button" class="btn btn-danger btn-xs"
 									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=gr' + @g.group.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.users.remove")</button>
 							</li>
@@ -88,7 +88,7 @@
 					<td>
 						<ul class="list-unstyled  hideable">
 							@for(g <- v.groupWrite) {
-							<li>[ @g.group.name ]
+							<li>[ @g.group.getName ]
 								<button type="button" class="btn btn-danger btn-xs"
 									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=gw' + @g.group.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.users.remove")</button>
 							</li>

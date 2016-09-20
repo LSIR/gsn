@@ -30,9 +30,9 @@
 					<td>
 						<ul class="list-unstyled">
 							@for(u <- g.dataSourceRead) {
-							<li>@u.data_source.value (@Messages("gsn.access.vs.allowed.read"))</li> }
+							<li>@u.data_source.getValue (@Messages("gsn.access.vs.allowed.read"))</li> }
 							@for(u <- g.dataSourceWrite) {
-							<li>@u.data_source.value (@Messages("gsn.access.vs.allowed.write"))</li> }
+							<li>@u.data_source.getValue (@Messages("gsn.access.vs.allowed.write"))</li> }
 						</ul>
 					</td>
 					<td>
