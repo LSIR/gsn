@@ -30,23 +30,21 @@ import play.api.mvc._
 import scala.util.Try
 import org.zeromq.ZMQ
 import controllers.gsn.Global
-import java.io.ByteArrayInputStream
 import java.util.Date
-import com.esotericsoftware.kryo.Kryo
-import com.esotericsoftware.kryo.io.{Input => kInput}
 import ch.epfl.gsn.beans.StreamElement
 import ch.epfl.gsn.data._
 import ch.epfl.gsn.data.format._
 
 
 object WebSocketForwarder extends Controller{
-  
-    val kryo = new Kryo()
+
 
     def socket(sensorid:String) = WebSocket.using[String] { request =>
+      
+        val deserializer = new StreamElementDeserializer()
         
 		    val subscriber = Global.context.socket(ZMQ.SUB)
-		    subscriber.connect("tcp://localhost:22022")
+		    subscriber.connect("tcp://localhost:"+Global.gsnConf.zmqConf.proxyPort)
 		    subscriber.setReceiveTimeOut(3000)
 		    subscriber.subscribe((sensorid+":").getBytes)
 
@@ -70,9 +68,7 @@ object WebSocketForwarder extends Controller{
     				        subscriber.subscribe((sensorid+":").getBytes)
     				        rec = subscriber.recv()
     				    }
-    					  val bais = new ByteArrayInputStream(rec)
-    					  bais.skip(sensorid.length + 2)
-    					  val o = kryo.readObjectOrNull(new kInput(bais), classOf[StreamElement])
+                val o = deserializer.deserialize(sensorid, rec)
     					  val ts = new Date(o.getTimeStamp())
     					  "{ \"timestamp\":\""+ts+"\","+o.getFieldNames.map(x =>  "\"" + x.toLowerCase() + "\":" + o.getData(x)).mkString(",")+"}"
             }.recover{

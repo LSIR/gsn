@@ -2,6 +2,7 @@ import csv
 import json
 from datetime import datetime, timedelta
 import requests
+import re
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -9,7 +10,6 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, HttpRe
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.template import loader
-from django.template.context_processors import csrf
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from gsn.models import GSNUser
@@ -18,14 +18,14 @@ from gsn.models import GSNUser
 
 
 # OAUTH2
-oauth_server_address = settings.GSN['SERVER_URL']
 oauth_client_id = settings.GSN['CLIENT_ID']
 oauth_client_secret = settings.GSN['CLIENT_SECRET']
-oauth_redirection_url = settings.GSN['REDIRECTION_URL']
-oauth_sensors_url = settings.GSN['SENSORS_URL']
-oauth_auth_url = settings.GSN['AUTH_URL']
-oauth_token_url = settings.GSN['TOKEN_URL']
-oauth_user_url = settings.GSN['USER_INF_URL']
+oauth_redirection_url = settings.GSN['WEBUI_URL'] + "gsn/profile/"
+oauth_sensors_url = settings.GSN['SERVICE_URL_LOCAL'] + "api/sensors"
+oauth_auth_url = settings.GSN['SERVICE_URL_PUBLIC'] + "oauth2/auth"
+oauth_token_url = settings.GSN['SERVICE_URL_LOCAL'] + "oauth2/token"
+oauth_user_url = settings.GSN['SERVICE_URL_LOCAL'] + "api/user"
+api_websocket = re.sub(r"http(s)?://", "ws://", settings.GSN['SERVICE_URL_PUBLIC'])
 max_query_size = settings.GSN['MAX_QUERY_SIZE']
 
 
@@ -40,14 +40,14 @@ def index(request):
             'log_page': 'logout',
             'logged_in': 'true',
             'user': request.user.username,
-            'ws_url': settings.GSN['WEBSOCKET_URL']
+            'ws_url': api_websocket
         }
 
     else:
         context = {
             'log_page': 'login',
             'logged_out': 'true',
-            'ws_url': settings.GSN['WEBSOCKET_URL']
+            'ws_url': api_websocket
         }
 
     template = loader.get_template('gsn/index.html')

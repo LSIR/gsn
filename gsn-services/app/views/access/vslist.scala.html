@@ -33,7 +33,7 @@
 							@for(u <- v.userRead) {
 							<li>@u.user.firstName @u.user.lastName (@u.user.email)
 								<button type="button" class="btn btn-danger btn-xs"
-									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=ur' + @u.user.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.users.remove")</button>
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=ur' + @u.user.id, function(data){document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)'});">@Messages("gsn.access.users.remove")</button>
 							</li> } @if(v.userRead.size < users.size){
 							<li><select id="ur_@v.id"> @for(u <- users) {
 									@if(null == UserDataSourceRead.findByBoth(u,v)){
@@ -41,7 +41,7 @@
 										(@u.email)</option> } }
 							</select>
 								<button type="button" class="btn btn-primary btn-xs"
-									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#ur_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.groups.add")</button>
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#ur_@v.id').val(), function(data){document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)'});">@Messages("gsn.access.groups.add")</button>
 							</li> }
 						</ul>
 					</td>
@@ -50,7 +50,7 @@
 							@for(g <- v.groupRead) {
 							<li>[ @g.group.getName ]
 								<button type="button" class="btn btn-danger btn-xs"
-									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=gr' + @g.group.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.users.remove")</button>
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=gr' + @g.group.id, function(data){document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)'});">@Messages("gsn.access.users.remove")</button>
 							</li>
 							<span class="text-muted">
 								<ul class="list-inline">
@@ -64,7 +64,7 @@
 									<option value="gr@g.id">[ @g.name ]</option> } }
 							</select>
 								<button type="button" class="btn btn-primary btn-xs"
-									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#gr_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.groups.add")</button>
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#gr_@v.id').val(), function(data){document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)'});">@Messages("gsn.access.groups.add")</button>
 							</li> }
 						</ul>
 					</td>
@@ -73,7 +73,7 @@
 							@for(u <- v.userWrite) {
 							<li>@u.user.firstName @u.user.lastName (@u.user.email)
 								<button type="button" class="btn btn-danger btn-xs"
-									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=uw' + @u.user.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.users.remove")</button>
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=uw' + @u.user.id, function(data){document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)'});">@Messages("gsn.access.users.remove")</button>
 							</li> } @if(v.userWrite.size < users.size){
 							<li><select id="uw_@v.id"> @for(u <- users) {
 									@if(null == UserDataSourceWrite.findByBoth(u,v)){
@@ -81,7 +81,7 @@
 										(@u.email)</option> } }
 							</select>
 								<button type="button" class="btn btn-primary btn-xs"
-									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#uw_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.groups.add")</button>
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#uw_@v.id').val(), function(data){document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)'});">@Messages("gsn.access.groups.add")</button>
 							</li> }
 						</ul>
 					</td>
@@ -90,7 +90,7 @@
 							@for(g <- v.groupWrite) {
 							<li>[ @g.group.getName ]
 								<button type="button" class="btn btn-danger btn-xs"
-									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=gw' + @g.group.id).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.users.remove")</button>
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + @v.id + '&id=gw' + @g.group.id, function(data){document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)'});">@Messages("gsn.access.users.remove")</button>
 							</li>
 							<span class="text-muted">
 								<ul class="list-inline">
@@ -104,7 +104,7 @@
 									<option value="gw@g.id">[ @g.name ]</option> } }
 							</select>
 								<button type="button" class="btn btn-primary btn-xs"
-									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#gw_@v.id').val()).done(document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)');">@Messages("gsn.access.groups.add")</button>
+									onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + @v.id + '&id=' + $('#gw_@v.id').val(), function(data){document.location='@controllers.gsn.auth.routes.PermissionsController.vs(page)'});">@Messages("gsn.access.groups.add")</button>
 							</li> }
 						</ul>
 					</td>
@@ -122,9 +122,9 @@
 function check(item){
 	var i = $(item);
 	if (i[0].checked){
-		$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + i.data('id') + '&id=a').done($('#row_'+i.data('id')).toggleClass('success',true))
+		$.post('@controllers.gsn.auth.routes.PermissionsController.addtovs(page)?vs_id=' + i.data('id') + '&id=a', function(data){$('#row_'+i.data('id')).toggleClass('success',true)})
 	}else{
-		$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + i.data('id') + '&id=a').done($('#row_'+i.data('id')).toggleClass('success',false))
+		$.post('@controllers.gsn.auth.routes.PermissionsController.removefromvs(page)?vs_id=' + i.data('id') + '&id=a', function(data){$('#row_'+i.data('id')).toggleClass('success',false)})
 	}
 }
 $('select').select2();
