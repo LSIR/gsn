@@ -27,7 +27,9 @@ public class CommHealthMsg implements Message {
 			new DataField("LWB_RX_DROP", "SMALLINT"),
 			new DataField("LWB_BOOTSTRAP_CNT", "SMALLINT"),
 			new DataField("LWB_SLEEP_CNT", "SMALLINT"),
-			new DataField("LFXT_TICKS", "BIGINT")};
+			new DataField("LWB_T_TO_RX", "BIGINT"),
+			new DataField("LWB_T_FLOOD", "BIGINT"),
+			new DataField("LWB_N_RX_STARTED", "BIGINT")};
 
 	@Override
 	public Serializable[] receivePayload(ByteBuffer payload) throws Exception {
@@ -50,10 +52,13 @@ public class CommHealthMsg implements Message {
 		short lwb_rx_drop = (short) (payload.get() & 0xff); 		// uint8_t: dropped rx packets since last health message
 		short lwb_bootstrap_cnt = (short) (payload.get() & 0xff);	// uint8_t: 
 		short lwb_sleep_cnt = (short) (payload.get() & 0xff);		// uint8_t: 
-		long lfxt_ticks = payload.getInt() & 0xffffffffL;			// uint32_t: in 32kHz ticks, rollover of ~36h
+		int lwb_t_to_rx = payload.getShort() & 0xffff;				// uint16_t: time[us] to first rx (offset to glossy_start)
+		int lwb_t_flood = payload.getShort() & 0xffff;				// uint16_t: flood duration [us]
+		short lwb_n_rx_started = (short) (payload.get() & 0xff);	// uint8_t: preambles+sync det. in last flood
         
 		return new Serializable[]{uptime, temp, vcc, cpu_dc, rf_dc, lwb_rx_cnt, lwb_n_rx_hops, rf_per, rf_snr, lwb_rssi1, lwb_rssi2, 
-				lwb_rssi3, lwb_fsr, lwb_tx_buf, lwb_rx_buf, lwb_tx_drop, lwb_rx_drop, lwb_bootstrap_cnt, lwb_sleep_cnt, lfxt_ticks};
+				lwb_rssi3, lwb_fsr, lwb_tx_buf, lwb_rx_buf, lwb_tx_drop, lwb_rx_drop, lwb_bootstrap_cnt, lwb_sleep_cnt, lwb_t_to_rx, 
+				lwb_t_flood, lwb_n_rx_started};
 	}
 
 	@Override

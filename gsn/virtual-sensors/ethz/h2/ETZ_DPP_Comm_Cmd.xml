@@ -5,7 +5,7 @@
         <web-input>
             <command name="dppmsg">
                 <field name="target_id" type="*text" defaultvalue="65535">the device_id of the LWB receiver node</field>
-                <field name="type" type="*select:|LWB_RESUME,0|LWB_PAUSE,1|LWB_ROUND_PERIOD,2|COMM_STATUS_PERIOD,3">the LWB command type</field>
+                <field name="type" type="*select:|LWB_RESUME,0|LWB_PAUSE,1|LWB_ROUND_PERIOD,2|COMM_STATUS_PERIOD,3|LWB_SET_TX_PWR,4">the LWB command type</field>
                 <field name="value" type="*text">the argument for this specific LWB command</field>
             </command>
         </web-input>

@@ -31,7 +31,9 @@
             <field name="LWB_RX_DROP" type="SMALLINT" />
             <field name="LWB_BOOTSTRAP_CNT" type="SMALLINT" />
             <field name="LWB_SLEEP_CNT" type="SMALLINT" />
-            <field name="LFXT_TICKS" type="BIGINT" />
+            <field name="LWB_T_TO_RX" type="INTEGER" />
+            <field name="LWB_T_FLOOD" type="INTEGER" />
+            <field name="LWB_N_RX_STARTED" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>DPP Communication Processor Status messages from the ETZ deployment</description>
