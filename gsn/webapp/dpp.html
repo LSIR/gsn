@@ -201,10 +201,24 @@ $(document).ready(function() {
           position: [0,4,20001,20031,20032,20034,20035,20039,20040,20042,20046,20048,20049,20050],
         }]
       },
-      { title:"CC430 32kHz ticks",
+      { title:"Time to first rx (offset to glossy_start) in [us]",
         signals: [{
           vsensor:".*_dpp_comm_status__conv",
-          field:["lfxt_ticks"],
+          field:["lwb_t_to_rx"],
+          position: [0,4,20001,20031,20032,20034,20035,20039,20040,20042,20046,20048,20049,20050],
+        }]
+      },
+      { title:"Flood duration in [us]",
+        signals: [{
+          vsensor:".*_dpp_comm_status__conv",
+          field:["lwb_t_flood"],
+          position: [0,4,20001,20031,20032,20034,20035,20039,20040,20042,20046,20048,20049,20050],
+        }]
+      },
+      { title:"Number of preambles+sync detections in last flood",
+        signals: [{
+          vsensor:".*_dpp_comm_status__conv",
+          field:["lwb_n_rx_started"],
           position: [0,4,20001,20031,20032,20034,20035,20039,20040,20042,20046,20048,20049,20050],
         }]
       },
