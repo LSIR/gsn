@@ -54,8 +54,8 @@ class GSNDataHandler extends DataHandler[User] {
   }
   
   def getAllTokens(authInfo: AuthInfo[User]): List[OAuthToken] = {
-    val o = Option(Client.findById(authInfo.clientId.getOrElse("")))
-    o.map(x => x.tokens.asScala.toList).getOrElse(List())
+    val c = Client.findById(authInfo.clientId.getOrElse(""))
+    OAuthToken.findByUserClient(authInfo.user, c).asScala.toList
   }
 
   def getStoredAccessToken(authInfo: AuthInfo[User]): Future[Option[AccessToken]] = Future {

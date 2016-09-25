@@ -24,12 +24,12 @@
 */
 package models.gsn.auth;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import scala.util.Random;
 
 @Entity
 public class OAuthToken extends AppModel{
@@ -55,7 +55,10 @@ public class OAuthToken extends AppModel{
 
 	public static final AppModel.Finder<Long, OAuthToken> find = new AppModel.Finder<Long, OAuthToken>(
 			Long.class, OAuthToken.class);
-
+	
+	public static List<OAuthToken> findByUserClient(User u, Client c) {
+		return find.where().eq("user", u).eq("client", c).findList();
+	}
 
 	public static OAuthToken findByToken(String value) {
 		return find.where().eq("token", value).findUnique();
