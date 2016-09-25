@@ -59,7 +59,7 @@ class GSNDataHandler extends DataHandler[User] {
   }
 
   def getStoredAccessToken(authInfo: AuthInfo[User]): Future[Option[AccessToken]] = Future {
-    getAllTokens(authInfo).map(t => AccessToken(t.token, Option(t.refresh), Some("all"), Some(t.duration/1000),new Date(t.creation))).headOption
+    getAllTokens(authInfo).map(t => AccessToken(t.token, Option(t.refresh), Some("all"), Some((t.creation - System.currentTimeMillis + t.duration)/1000),new Date(t.creation))).headOption
   }
 
   def refreshAccessToken(authInfo: AuthInfo[User], refreshToken: String): Future[AccessToken] = {
