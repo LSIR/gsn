@@ -34,6 +34,8 @@ import ch.epfl.gsn.data.SensorStore
 import play.api._
 import play.api.libs.concurrent.Akka
 import play.mvc.Call
+import models.gsn.auth.User
+import models.gsn.auth.DataSource
 
 import models.gsn.auth.SecurityRole;
 
@@ -114,6 +116,15 @@ object Global extends GlobalSettings {
 				admin.save
 		}
 	}
+  
+  def hasAccess(user: User,toWrite: Boolean,vsnames: String*):Boolean =  
+    vsnames.foldRight[Boolean](true)((vs,b) => b && hasAccess(user,toWrite,vs))
+
+       
+   def hasAccess(user: User,toWrite: Boolean,vsname: String):Boolean = {
+     val ds = DataSource.findByValue(vsname)
+     ds == null || (ds.getIs_public && !toWrite) || user.hasAccessTo(ds, toWrite)
+   }
 
   /*
   override def onError(request: RequestHeader, ex: Throwable) = {

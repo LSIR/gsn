@@ -26,8 +26,19 @@ package controllers.gsn.api
 
 import play.api.libs.iteratee._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import com.feth.play.module.pa.PlayAuthenticate
 import play.api.mvc._
 import scala.util.Try
+import scala.concurrent.Future
+import play.mvc.Http
+import security.gsn.GSNDeadboltHandler
+import play.core.j.JavaHelpers
+import scalaoauth2.provider.AuthInfoRequest
+import models.gsn.auth.User
+import models.gsn.auth.DataSource
+import controllers.gsn.GSNDataHandler
+import collection.JavaConversions._
+import scalaoauth2.provider.{ProtectedResource, ProtectedResourceRequest}
 import org.zeromq.ZMQ
 import controllers.gsn.Global
 import java.util.Date
@@ -39,45 +50,63 @@ import ch.epfl.gsn.data.format._
 object WebSocketForwarder extends Controller{
 
 
-    def socket(sensorid:String) = WebSocket.using[String] { request =>
+    def socket(sensorid:String) = WebSocket.tryAccept [String] { request => 
       
-        val deserializer = new StreamElementDeserializer()
-        
-		    val subscriber = Global.context.socket(ZMQ.SUB)
-		    subscriber.connect("tcp://localhost:"+Global.gsnConf.zmqConf.proxyPort)
-		    subscriber.setReceiveTimeOut(3000)
-		    subscriber.subscribe((sensorid+":").getBytes)
+        val socket = {
+      
+            val deserializer = new StreamElementDeserializer()
+		        val subscriber = Global.context.socket(ZMQ.SUB)
+		        subscriber.connect("tcp://localhost:"+Global.gsnConf.zmqConf.proxyPort)
+		        subscriber.setReceiveTimeOut(3000)
+		        subscriber.subscribe((sensorid+":").getBytes)
 
-        val in = {
-            def cont: Iteratee[String, Unit] = Cont {
-                case Input.EOF => {
-                  subscriber.close()
-                  Done((), Input.EOF)
+            val in = {
+                def cont: Iteratee[String, Unit] = Cont {
+                    case Input.EOF => {
+                        subscriber.close()
+                        Done((), Input.EOF)
+                    }
+                    case other => {
+                        cont
+                    }
                 }
-                case other => {
-                  cont
+                cont
+            }
+
+            val out = Enumerator.repeat {
+                Try {
+                    var rec = subscriber.recv()
+    				        while (rec == null){
+    				            subscriber.subscribe((sensorid+":").getBytes)
+    				            rec = subscriber.recv()
+    				        }
+                    val o = deserializer.deserialize(sensorid, rec)
+    					      val ts = new Date(o.getTimeStamp())
+    					      "{ \"timestamp\":\""+ts+"\","+o.getFieldNames.map(x =>  "\"" + x.toLowerCase() + "\":\"" + o.getData(x) + "\"").mkString(",")+"}"
+                }.recover{
+                    case t:Exception=>
+                        "{\"error\": \""+t.getMessage+"\"}" 
+                }.get 
+		        }
+		
+            (in, out)
+        }
+      
+        if (PlayAuthenticate.isLoggedIn(new Http.Session(request.session.data))) {
+            val u = User.findByAuthUserIdentity(PlayAuthenticate.getUser(JavaHelpers.createJavaContext(request)))
+            if (Global.hasAccess(u,false,sensorid)) Future(Right(socket))
+            else Future(Left(Forbidden("Logged in user has no access to these resources")))
+        }else{
+          
+            ProtectedResource.handleRequest(new ProtectedResourceRequest(request.headers.toMap, request.queryString), new GSNDataHandler()).flatMap {
+                case Left(e) => Future(Left(Forbidden("Logged in user has no access to these resources")))
+                case Right(authInfo) => {
+                    val u = User.findById(authInfo.user.id)
+                    if (Global.hasAccess(u,false,sensorid)) Future(Right(socket))
+                    else Future(Left(Forbidden("Logged in user has no access to these resources")))
                 }
             }
-            cont
         }
-
-        val out = Enumerator.repeat {
-            Try {
-                var rec = subscriber.recv()
-    				    while (rec == null){
-    				        subscriber.subscribe((sensorid+":").getBytes)
-    				        rec = subscriber.recv()
-    				    }
-                val o = deserializer.deserialize(sensorid, rec)
-    					  val ts = new Date(o.getTimeStamp())
-    					  "{ \"timestamp\":\""+ts+"\","+o.getFieldNames.map(x =>  "\"" + x.toLowerCase() + "\":" + o.getData(x)).mkString(",")+"}"
-            }.recover{
-              case t:Exception=>
-                "{\"error\": \""+t.getMessage+"\"}" 
-            }.get 
-		    }
-		
-        (in, out)
-    }
+  }
  
 }
