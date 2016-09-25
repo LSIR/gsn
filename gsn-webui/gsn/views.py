@@ -20,7 +20,7 @@ from gsn.models import GSNUser
 # OAUTH2
 oauth_client_id = settings.GSN['CLIENT_ID']
 oauth_client_secret = settings.GSN['CLIENT_SECRET']
-oauth_redirection_url = settings.GSN['WEBUI_URL'] + "gsn/profile/"
+oauth_redirection_url = settings.GSN['WEBUI_URL'] + "profile/"
 oauth_sensors_url = settings.GSN['SERVICE_URL_LOCAL'] + "api/sensors"
 oauth_auth_url = settings.GSN['SERVICE_URL_PUBLIC'] + "oauth2/auth"
 oauth_token_url = settings.GSN['SERVICE_URL_LOCAL'] + "oauth2/token"
