@@ -167,17 +167,17 @@ public class DPPMessagePlugin extends AbstractPlugin {
 	            
 	            int payload_len = (byte)(payload.length & 0xff); // payload_len
 				
-	            message[0] = (short)(device_id & 0xffff);
+	            message[0] = device_id;
 	            message[1] = ext_msg;
-	            message[2] = (byte)(type & 0xff);
-	            message[3] = (byte)(payload_len & 0xff);
+	            message[2] = type;
+	            message[3] = payload_len;
 	            if (msgClass.isExtended()) {
 	            	message[4] = payload;
 		    		header = new Serializable[] {timestamp, null, null, device_id, type, null, null, payload_len};
 	            }
 	            else {
-		            message[4] = (short)(target_id & 0xffff);
-		            message[5] = (short)(seqnr & 0xffff);
+		            message[4] = target_id;
+		            message[5] = seqnr;
 		            message[6] = generation_time;
 	            	message[7] = payload;
 		    		header = new Serializable[] {timestamp, (long)(generation_time/1000.0), generation_time, device_id, type, target_id, seqnr, payload_len};

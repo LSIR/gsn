@@ -1,0 +1,63 @@
+<virtual-sensor name="ETZ_DPP_NodeInfo__conv" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                	try {
+                    	if (COMPILE_DATE != null)
+                    		COMPILE_DATE = COMPILE_DATE * 1000;
+                    	if (COMPILER_VER != null)
+                    		COMPILER_VER = ((COMPILER_VER >> 10) & 0x3F) + "." + ((COMPILER_VER >> 5) & 0x1F) + "." + (COMPILER_VER & 0x1F);
+                    	if (FW_VER != null)
+                    		FW_VER = ((FW_VER >> 8) & 0xFF) + "." + (FW_VER & 0xFF);
+                    	if (SW_REV_ID != null)
+                    		SW_REV_ID = Integer.toHexString(SW_REV_ID);
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="GENERATION_TIME_MICROSEC" type="BIGINT"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="TARGET_ID" type="INTEGER" />
+            <field name="MESSAGE_TYPE" type="INTEGER" />
+            <field name="SEQNR" type="INTEGER" />
+            <field name="PAYLOAD_LENGTH" type="INTEGER" />
+            
+            <field name="COMPONENT_ID" type="SMALLINT" />
+            <field name="RST_CNT" type="SMALLINT" />
+            <field name="RST_FLAG" type="SMALLINT" />
+            <field name="MCU_DESC" type="VARCHAR(12)" />
+            <field name="COMPILER_DESC" type="VARCHAR(3)" />
+            <field name="COMPILER_VER" type="VARCHAR(16)" />
+            <field name="COMPILE_DATE" type="BIGINT" unit="unixtime" />
+            <field name="FW_NAME" type="VARCHAR(8)" />
+            <field name="FW_VER" type="VARCHAR(16)" />
+            <field name="SW_REV_ID" type="VARCHAR(16)" />
+        </output-structure>
+    </processing-class>
+    <description>Converted DPP Node info messages from the ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_DPP_NodeInfo__mapped </predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

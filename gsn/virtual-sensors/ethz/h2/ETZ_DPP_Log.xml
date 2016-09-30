@@ -1,14 +1,7 @@
-<virtual-sensor name="ETZ_DPP_Comm_Cmd" priority="10" >
+<virtual-sensor name="ETZ_DPP_Log" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
-        <web-input>
-            <command name="dppmsg">
-                <field name="target_id" type="*text" defaultvalue="65535">the device_id of the LWB receiver node</field>
-                <field name="type" type="*select:|LWB_RESUME,0|LWB_PAUSE,1|LWB_ROUND_PERIOD,2|COMM_STATUS_PERIOD,3|LWB_SET_TX_PWR,4|NODE_RESET,50">the LWB command type</field>
-                <field name="value" type="*text">the argument for this specific LWB command</field>
-            </command>
-        </web-input>
         <output-structure>
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
@@ -19,11 +12,13 @@
             <field name="SEQNR" type="INTEGER" />
             <field name="PAYLOAD_LENGTH" type="INTEGER" />
             
-            <field name="TYPE" type="INTEGER" />
-            <field name="VALUE" type="SMALLINT" />
+            <field name="COMPONENT_ID" type="SMALLINT" />
+            <field name="TYPE" type="SMALLINT" />
+            <field name="VALUE" type="INTEGER" />
+            <field name="EXTRA_DATA" type="VARCHAR(255)" />
         </output-structure>
     </processing-class>
-    <description>DPP Communication Processor Command messages from the ETZ deployment</description>
+    <description>DPP Log messages from the ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -33,7 +28,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.DPPMessagePlugin</predicate>
-                    <predicate key="message-classname">gsn.wrappers.backlog.plugins.dpp.CommCmdMsg</predicate>
+                    <predicate key="message-classname">gsn.wrappers.backlog.plugins.dpp.LogMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -44,7 +39,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-bs02.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.DPPMessagePlugin</predicate>
-                    <predicate key="message-classname">gsn.wrappers.backlog.plugins.dpp.CommCmdMsg</predicate>
+                    <predicate key="message-classname">gsn.wrappers.backlog.plugins.dpp.LogMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -55,7 +50,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etz-bs03.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.DPPMessagePlugin</predicate>
-                    <predicate key="message-classname">gsn.wrappers.backlog.plugins.dpp.CommCmdMsg</predicate>
+                    <predicate key="message-classname">gsn.wrappers.backlog.plugins.dpp.LogMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
@@ -66,7 +61,7 @@
                 <address wrapper="backlog">
                     <predicate key="remote-connection">permasense-etzl-bs01.ethz.ch:9003</predicate>
                     <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.DPPMessagePlugin</predicate>
-                    <predicate key="message-classname">gsn.wrappers.backlog.plugins.dpp.CommCmdMsg</predicate>
+                    <predicate key="message-classname">gsn.wrappers.backlog.plugins.dpp.LogMsg</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>

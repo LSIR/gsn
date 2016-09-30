@@ -39,10 +39,18 @@ public class CommCmdMsg implements Message {
 		if( action.compareToIgnoreCase("dppmsg") == 0 ) {
 			for (int i=0; i<paramNames.length;i++) {
 				if (paramNames[i].trim().compareToIgnoreCase(DPP_CMD_TYPE) == 0) {
-		            type = new Short((String)paramValues[i]);
+					try {
+		            	type = new Short((String)paramValues[i]);
+					} catch (NumberFormatException e) {
+						throw new Exception("type field has to be an integer");
+					}
 				}
 				else if (paramNames[i].trim().compareToIgnoreCase(DPP_CMD_VALUE) == 0) {
-		            value = new Integer((String)paramValues[i]);
+					try {
+						value = new Integer((String)paramValues[i]);
+					} catch (NumberFormatException e) {
+						throw new Exception("value field has to be an integer");
+					}
 				}
 			}
 			if (type == null)

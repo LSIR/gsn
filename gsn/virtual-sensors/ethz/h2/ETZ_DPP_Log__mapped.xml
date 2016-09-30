@@ -1,0 +1,42 @@
+<virtual-sensor name="ETZ_DPP_Log__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="GENERATION_TIME_MICROSEC" type="BIGINT"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime" />
+            <field name="TARGET_ID" type="INTEGER" />
+            <field name="MESSAGE_TYPE" type="INTEGER" />
+            <field name="SEQNR" type="INTEGER" />
+            <field name="PAYLOAD_LENGTH" type="INTEGER" />
+            
+            <field name="COMPONENT_ID" type="SMALLINT" />
+            <field name="TYPE" type="SMALLINT" />
+            <field name="VALUE" type="INTEGER" />
+            <field name="EXTRA_DATA" type="VARCHAR(255)" />
+        </output-structure>
+    </processing-class>
+    <description>DPP Log messages from the ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from ETZ_DPP_Log</predicate>
+                    <predicate key="remote-contact-point">http://tpvt.permasense.ethz.ch/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
