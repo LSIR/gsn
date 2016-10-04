@@ -48,6 +48,8 @@ public final class DataField implements Serializable {
 
    private String unit = "";
    
+   private boolean index = false;
+   
    public DataField() {}
 
 

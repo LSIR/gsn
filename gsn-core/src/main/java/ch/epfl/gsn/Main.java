@@ -123,7 +123,7 @@ public final class Main {
 
     private Main() throws Exception {
 
-		ValidityTools.checkAccessibilityOfFiles ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , gsnConfFolder + "/ch.epfl.gsn.xml");
+		ValidityTools.checkAccessibilityOfFiles ( WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , gsnConfFolder + "/gsn.xml");
 		ValidityTools.checkAccessibilityOfDirs ( virtualSensorDirectory );
 		containerConfig = loadContainerConfiguration();
 		updateSplashIfNeeded(new String[] {"GSN is starting...", "All GSN logs are available at: logs/ch.epfl.gsn.log"});
@@ -237,7 +237,7 @@ public final class Main {
 		if (args.length > 1) {
 			Main.virtualSensorDirectory = args[1];
 		}
-		updateSplashIfNeeded(new String[] {"GSN is trying to start.","All GSN logs are available at: logs/ch.epfl.gsn.log"});
+		updateSplashIfNeeded(new String[] {"GSN is trying to start.","All GSN logs are available at: logs/gsn.log"});
 		Runtime.getRuntime().addShutdownHook(new Thread()
 	        {
 	            @Override
@@ -276,7 +276,7 @@ public final class Main {
 			Main.getInstance();
 		}catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			updateSplashIfNeeded(new String[] {"Starting GSN failed! Look at logs/ch.epfl.gsn.log for more information."});
+			updateSplashIfNeeded(new String[] {"Starting GSN failed! Look at logs/gsn.log for more information."});
 			try {
 				Thread.sleep(4000);
 			} catch (InterruptedException e1) {}
@@ -285,11 +285,11 @@ public final class Main {
 	}
 
 	public static ContainerConfig loadContainerConfiguration() {
-		ValidityTools.checkAccessibilityOfFiles (WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , gsnConfFolder + "/ch.epfl.gsn.xml");
+		ValidityTools.checkAccessibilityOfFiles (WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE , gsnConfFolder + "/gsn.xml");
 		ValidityTools.checkAccessibilityOfDirs (virtualSensorDirectory);
 		ContainerConfig toReturn = null;
 		try {
-			toReturn = loadContainerConfig (gsnConfFolder + "/ch.epfl.gsn.xml");
+			toReturn = loadContainerConfig (gsnConfFolder + "/gsn.xml");
 			logger.info ( "Loading wrappers.properties at : " + WrappersUtil.DEFAULT_WRAPPER_PROPERTIES_FILE);
 			wrappers = WrappersUtil.loadWrappers(new HashMap<String, Class<?>>());
 			logger.info ( "Wrappers initialization ..." );
@@ -303,7 +303,7 @@ public final class Main {
 
 	public static ContainerConfig loadContainerConfig (String gsnXMLpath) throws ClassNotFoundException {
 		if (!new File(gsnXMLpath).isFile()) {
-			logger.error("Couldn't find the ch.epfl.gsn.xml file @: "+(new File(gsnXMLpath).getAbsolutePath()));
+			logger.error("Couldn't find the gsn.xml file @: "+(new File(gsnXMLpath).getAbsolutePath()));
 			System.exit(1);
 		}		
 		GsnConf gsn = GsnConf.load(gsnXMLpath);
@@ -343,7 +343,7 @@ public final class Main {
 	public static ContainerConfig getContainerConfig() {
 		if (singleton == null)
 			try {
-				return loadContainerConfig(Main.gsnConfFolder + "/ch.epfl.gsn.xml");
+				return loadContainerConfig(Main.gsnConfFolder + "/gsn.xml");
 			} catch (Exception e) {
 				return null;
 			}

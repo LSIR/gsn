@@ -1,0 +1,29 @@
+# #####################################
+# ##### Environment Configuration #####
+# #####################################
+
+# This file is parsed by systemd. You can modify it to specify environment
+# variables for your application.
+#
+# For a description of the format, see: `man systemd.exec`, section
+# `EnvironmentFile`.
+
+# Available replacements
+# ------------------------------------------------
+# LSIR EPFL <gsn@epfl.ch>			debian author
+# GSN Services			debian package description
+# gsn-services				startup script name
+# /usr/share/gsn-services			app directory
+# 0			retries for startup
+# 60		retry timeout
+# gsn-services			normalized app name
+# gsn		daemon user
+# -------------------------------------------------
+
+# Setting JAVA_OPTS
+# -----------------
+JAVA_OPTS="-Dconfig.file=/etc/gsn-services/application.conf"
+
+# Setting PIDFILE
+# ---------------
+# PIDFILE="/var/run/gsn-services/play.pid"

@@ -21,7 +21,7 @@ curl -s -X PUT -d notification-id=2.3456789 -data-urlencode data@xml.xml http://
 
      -->
 	<processing-class>
-		<class-name>gsn.vsensor.BridgeVirtualSensor</class-name>
+		<class-name>ch.epfl.gsn.vsensor.BridgeVirtualSensor</class-name>
 		<output-structure>
 			<field name="value" type="int" />
 			<field name="latitude" type="double" />

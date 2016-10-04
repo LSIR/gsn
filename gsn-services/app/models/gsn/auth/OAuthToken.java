@@ -74,7 +74,7 @@ public class OAuthToken extends AppModel{
 		t.client = client;
 		t.token =  UUID.randomUUID().toString();
 		t.creation = System.currentTimeMillis();
-		t.duration = 36000000L;
+		t.duration = 600000L;
 		t.refresh = UUID.randomUUID().toString();
 		t.save();
 		return t;
