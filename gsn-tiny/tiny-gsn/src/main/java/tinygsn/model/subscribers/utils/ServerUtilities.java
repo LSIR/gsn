@@ -52,7 +52,6 @@ import java.util.Map.Entry;
 import java.util.Random;
 import android.content.Context;
 import android.util.Log;
-import tinygsn.gui.android.R;
 
 
 /**
@@ -89,10 +88,6 @@ public final class ServerUtilities {
 				post(serverUrl, params);
 
 
-
-				String message = context.getString(R.string.server_registered);
-
-
 				return;
 			}
 			catch (IOException e) {
@@ -120,8 +115,6 @@ public final class ServerUtilities {
 				backoff *= 2;
 			}
 		}
-		String message = context.getString(R.string.server_register_error,
-				MAX_ATTEMPTS);
 
 	}
 
@@ -145,13 +138,7 @@ public final class ServerUtilities {
 			Log.d(CommonUtilities.TAG, "Attempt #" + i + " to register");
 			try {
 
-						context.getString(R.string.server_registering, i, MAX_ATTEMPTS);
 				post(serverUrl, params);
-
-
-
-				String message = context.getString(R.string.server_registered);
-
 
 				return;
 			}
@@ -180,8 +167,6 @@ public final class ServerUtilities {
 				backoff *= 2;
 			}
 		}
-		String message = context.getString(R.string.server_register_error,
-				MAX_ATTEMPTS);
 
 	}
 
@@ -196,8 +181,6 @@ public final class ServerUtilities {
 		try {
 			post(serverUrl, params);
 
-			String message = context.getString(R.string.server_unregistered);
-
 		}
 		catch (IOException e) {
 			// At this point the device is unregistered from GCM, but still
@@ -205,8 +188,6 @@ public final class ServerUtilities {
 			// We could try to unregister again, but it is not necessary:
 			// if the server tries to send a message to the device, it will get
 			// a "NotRegistered" error message and should unregister the device.
-			String message = context.getString(R.string.server_unregister_error,
-					e.getMessage());
 
 		}
 	}

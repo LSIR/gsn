@@ -25,6 +25,8 @@
 
 package tinygsn.model.vsensor;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Pair;
 
@@ -134,7 +136,7 @@ public abstract class AbstractVirtualSensor implements Serializable {
 		dataProduced(streamElement, true);
 	}
 
-	/**
+	/*
 	 * First checks compatibility of the data type of each output data item in the
 	 * stream element with the defined output in the VSD file. (this check is done
 	 * regardless of the value for adjust flag).
@@ -263,15 +265,11 @@ public abstract class AbstractVirtualSensor implements Serializable {
 			double longitude = (double) streamElement.getData("longitudeTopLeft");
 			Pair<LatLng, LatLng> obfuscatedPosition = prot.getObfuscationLocation(new LatLng(latitude, longitude), streamElement.getTimeStamp());
 
-			AndroidGPSWrapper wrapper = new AndroidGPSWrapper();
-			StreamElement obfuscatedStreamElement = new StreamElement(wrapper.getFieldList(), wrapper.getFieldType(),
-					                                               new Serializable[]{obfuscatedPosition.first.latitude, obfuscatedPosition.first.longitude,
-							                                                                 obfuscatedPosition.second.latitude, obfuscatedPosition.second.longitude});
-
-			return obfuscatedStreamElement;
-		} else {
-			return streamElement;
+			streamElement = new StreamElement(streamElement.getFieldNames(), streamElement.getFieldTypes(),
+					new Serializable[]{obfuscatedPosition.first.latitude, obfuscatedPosition.first.longitude,
+							obfuscatedPosition.second.latitude, obfuscatedPosition.second.longitude});
 		}
+		return streamElement;
 	}
 
 	/**
@@ -321,16 +319,16 @@ public abstract class AbstractVirtualSensor implements Serializable {
 
 
 	protected void initLog(String logtag) {
-		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "LOGGING")) {
+		/*if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "LOGGING")) {
 			loggingSubFolder = Logging.createNewLoggingFolder(StaticData.globalContext, logtag);
-		}
+		}*/
 	}
 	protected void log(String logtag, String s) {
-		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "LOGGING")) {
+		/*if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "LOGGING")) {
 			long startlogging = System.currentTimeMillis();
 			Log.d(logtag, System.currentTimeMillis() + " : " + s);
 			Logging.appendLog(loggingSubFolder, logtag + ".txt", s, StaticData.globalContext);
 			logTime = (System.currentTimeMillis() - startlogging);
-		}
+		}*/
 	}
 }

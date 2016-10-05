@@ -76,8 +76,11 @@ public class VSensorConfig implements Parcelable {
 				ss.setInputStream(inputStream);
 				streamSources.add(ss);
 				inputStream.addStreamSource(ss);
-				outputStructure = w.getOutputStructure();
-				outputStructure = StaticData.getProcessingClassByVSConfig(this).getOutputStructure(outputStructure);
+                DataField[] woutputStructure = ss.getWrapper().getOutputStructure();
+                DataField[] _outputStructure = StaticData.getProcessingClassByVSConfig(this).getOutputStructure(woutputStructure);
+                if (_outputStructure != null){
+                    outputStructure = _outputStructure;
+                }
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
@@ -110,8 +113,11 @@ public class VSensorConfig implements Parcelable {
 				s.setInputStream(inputStream);
 				streamSources.add(s);
 				inputStream.addStreamSource(s);
-				outputStructure = s.getWrapper().getOutputStructure();
-				outputStructure = StaticData.getProcessingClassByVSConfig(this).getOutputStructure(outputStructure);
+				DataField[] woutputStructure = s.getWrapper().getOutputStructure();
+				DataField[] _outputStructure = StaticData.getProcessingClassByVSConfig(this).getOutputStructure(woutputStructure);
+				if (_outputStructure != null){
+                    outputStructure = _outputStructure;
+                }
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

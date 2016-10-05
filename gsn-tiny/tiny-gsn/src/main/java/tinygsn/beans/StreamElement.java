@@ -25,6 +25,13 @@
 
 package tinygsn.beans;
 
+import android.util.Base64;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import tinygsn.utils.CaseInsensitiveComparator;
 
 import java.io.Serializable;
@@ -218,15 +225,111 @@ public final class StreamElement implements Serializable {
 		}
 	}
 
+    public static String toJSON(String vs_name, StreamElement[] s){
+
+		GeoJsonField[] fields = new GeoJsonField[s[0].getFieldNames().length+1];
+		fields[0] = new GeoJsonField();
+		fields[0].setName("timestamp");
+		fields[0].setType("time");
+		fields[0].setUnit("ms");
+		for(int i = 1; i < fields.length; i++){
+			fields[i] = new GeoJsonField();
+			fields[i].setName(s[0].getFieldNames()[i-1]);
+			fields[i].setType(DataTypes.TYPE_NAMES[s[0].getFieldTypes()[i-1]]);
+		}
+		Serializable[][] values = new Serializable[s.length][fields.length];
+		for(int i = 0; i < s.length; i++){
+			values[i][0] = s[i].getTimeStamp();
+			for(int j = 1; j < fields.length; j++){
+				values[i][j] = s[i].getData()[j-1];
+			}
+		}
+		GeoJsonProperties prop = new GeoJsonProperties();
+		prop.setVs_name(vs_name);
+		prop.setFields(fields);
+		prop.setValues(values);
+        GeoJsonFeature feature = new GeoJsonFeature();
+        feature.setPage_size(1);
+        feature.setTotal_size(1);
+		feature.setType("Feature");
+		feature.setProperties(prop);
+
+		Gson gson = new Gson();
+		return gson.toJson(feature);
+    }
+
+	/**
+	 * Build stream elements from a JSON representation like this one:
+	 * {"type":"Feature","properties":{"vs_name":"geo_oso3m","values":[[1464094800000,21,455.364922]],"fields":[{"name":"timestamp","type":"time","unit":"ms"},{"name":"station","type":"smallint","unit":null},{"name":"altitude","type":"float","unit":null}],"stats":{"start-datetime":1381953249010,"end-datetime":1464096133100},"geographical":"Lausanne, Switzerland","description":"OZ47 Sensor"},"geometry":{"type":"Point","coordinates":[6.565356337141691,46.5608445136986,689.7967]},"total_size":0,"page_size":0}
+	 * Expecting the first value to be the timestamp
+	 * @param s
+	 * @return
+	 */
+
+	public static StreamElement[] fromJSON(String s){
+        JsonParser parser = new JsonParser();
+		JsonObject jn = parser.parse(s).getAsJsonObject().get("properties").getAsJsonObject();
+		DataField[] df = new DataField[jn.get("fields").getAsJsonArray().size()-1];
+		int i = 0;
+		for(JsonElement f : jn.get("fields").getAsJsonArray()){
+			if (f.getAsJsonObject().get("name").getAsString().equals("timestamp")) continue;
+			df[i] = new DataField(f.getAsJsonObject().get("name").getAsString(),f.getAsJsonObject().get("type").getAsString());
+			i++;
+		}
+		StreamElement[] ret = new StreamElement[jn.get("values").getAsJsonArray().size()];
+		int k = 0;
+		for(JsonElement v : jn.get("values").getAsJsonArray()){
+			Serializable[] data = new Serializable[df.length];
+			for(int j=1;j < v.getAsJsonArray().size();j++){
+				switch(df[j].getDataTypeID()){
+					case DataTypes.DOUBLE:
+						data[j] = v.getAsJsonArray().get(j).getAsDouble();
+						break;
+					case DataTypes.FLOAT:
+						data[j] = (float)v.getAsJsonArray().get(j).getAsDouble();
+						break;
+					case DataTypes.BIGINT:
+						data[j] = v.getAsJsonArray().get(j).getAsLong();
+						break;
+					case DataTypes.TINYINT:
+						data[j] = (byte)v.getAsJsonArray().get(j).getAsInt();
+						break;
+					case DataTypes.SMALLINT:
+					case DataTypes.INTEGER:
+						data[j] = v.getAsJsonArray().get(j).getAsInt();
+						break;
+					case DataTypes.CHAR:
+					case DataTypes.VARCHAR:
+						data[j] = v.getAsJsonArray().get(j).getAsString();
+						break;
+					case DataTypes.BINARY:
+						data[j] = Base64.decode(v.getAsJsonArray().get(j).getAsString(), Base64.DEFAULT);
+						break;
+					default:
+						//logger.error("The data type of the field cannot be parsed: " + df[j].toString());
+				}
+			}
+			ret[k] = new StreamElement(df, data, v.getAsJsonArray().get(0).getAsLong());
+		}
+		return ret;
+	}
+
 	public String toString() {
 		final StringBuffer output = new StringBuffer("timed = ");
 		output.append(new Date(this.getTimeStamp())).append("\n");
 
 		DecimalFormat df = new DecimalFormat("#.###");
-		for (int i = 0; i < this.fieldNames.length; i++)
-			output.append("\t").append(this.fieldNames[i]).append(" = ")
-					.append(df.format(this.fieldValues[i]) + "\n");
-
+		for (int i = 0; i < this.fieldNames.length; i++) {
+			if (this.fieldTypes[i] == DataTypes.VARCHAR ||
+				this.fieldTypes[i] == DataTypes.CHAR ||
+				this.fieldTypes[i] == DataTypes.BINARY) {
+				output.append("\t").append(this.fieldNames[i]).append(" = ")
+						.append(this.fieldValues[i].toString() + "\n");
+			} else {
+				output.append("\t").append(this.fieldNames[i]).append(" = ")
+						.append(df.format(this.fieldValues[i]) + "\n");
+			}
+		}
 		return output.toString();
 	}
 

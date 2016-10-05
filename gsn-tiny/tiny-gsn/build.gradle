@@ -5,7 +5,7 @@ android {
     buildToolsVersion '21.1.2'
     defaultConfig {
         applicationId "tinygsn.gui.android"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 21
     }
     buildTypes {
@@ -46,6 +46,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:8.1.0'
     compile files('libs/achartengine-1.0.0.jar')
     compile files('libs/commons-math3-3.3.jar')
+    compile 'com.google.code.gson:gson:2.4'
     compile files('libs/weka-stable-3.6.6.jar')
     compile files('libs/xstream-1.4.3.jar')
     compile project(':LocPrivLib')

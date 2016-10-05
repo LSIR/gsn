@@ -2,8 +2,8 @@
     package="tinygsn.gui.android"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto"
-    android:versionCode="4"
-    android:versionName="2.0.0">
+    android:versionCode="5"
+    android:versionName="2.0.1">
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -13,6 +13,8 @@
     <uses-permission android:name="android.permission.ACCESS_ASSISTED_GPS"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.LOCATION"/>
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION"/>
@@ -30,6 +32,7 @@
         android:name="tinygsn.gui.android.permission.C2D_MESSAGE"
         android:protectionLevel="signature"/>
     <!-- App receives GCM messages. -->
+<uses-feature android:name="android.hardware.bluetooth_le" android:required="false"/>
 
 
     <application
@@ -58,8 +61,11 @@
         <service android:name="tinygsn.model.wrappers.AndroidMagneticFieldWrapper$MagneticService"/>
         <service android:name="tinygsn.model.wrappers.AndroidRotationVectorWrapper$RotationService"/>
         <service android:name="tinygsn.model.wrappers.USBplugO3Wrapper$USBplugService"/>
+        <service android:name="tinygsn.model.wrappers.SerialBTWrapper$SerialBTService"/>
+        <service android:name="com.nordicsemi.nrfUARTv2.SerialBLEWrapper$SerialBLEService"/>
         <service android:name="tinygsn.model.wrappers.WifiWrapper$WifiService"/>
         <service android:name="tinygsn.model.wrappers.LocalWrapper$LocalService"/>
+        <service android:enabled="true" android:name="com.nordicsemi.nrfUARTv2.UartService" />
 
 
         <activity

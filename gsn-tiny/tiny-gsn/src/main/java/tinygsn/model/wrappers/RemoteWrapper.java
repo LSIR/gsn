@@ -1,19 +1,10 @@
 package tinygsn.model.wrappers;
 
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import tinygsn.beans.DataField;
+import tinygsn.beans.StreamElement;
 import tinygsn.beans.Subscription;
 import tinygsn.beans.WrapperConfig;
+import tinygsn.model.utils.Oauth2Connection;
 import tinygsn.services.WrapperService;
 import tinygsn.storage.db.SqliteStorageManager;
 
@@ -37,8 +28,7 @@ public class RemoteWrapper extends AbstractWrapper {
 
 	private DataField[] outputS = null;
 	private Subscription sub = null;
-	private HttpGet httpGet;
-	private DefaultHttpClient httpclient = new DefaultHttpClient();
+	private Oauth2Connection connection;
 
 	@Override
 	public void initialize() {
@@ -51,26 +41,18 @@ public class RemoteWrapper extends AbstractWrapper {
 	public DataField[] getOutputStructure() {
 		if (outputS == null) {
 			try {
-				httpGet = new HttpGet(sub.getUrl() + "/rest/sensors/" + sub.getVsname() + "?from=0000-00-00T00:00:00&to=0000-00-00T00:00:00");
-				HttpResponse response = httpclient.execute(httpGet);
-				int statusCode = response.getStatusLine().getStatusCode();
-				InputStreamReader is = new InputStreamReader(response.getEntity().getContent(), "UTF-8");
-				if (statusCode == 200) {
-					BufferedReader bufferedReader = new BufferedReader(is);
-					String line = bufferedReader.readLine();
-					if (line != null) {
-						JSONObject obj = new JSONObject(line);
-						JSONArray f = obj.getJSONArray("features").getJSONObject(0).getJSONObject("properties").getJSONArray("fields");
-						outputS = new DataField[f.length() - 2];
-						for (int i = 2; i < f.length(); i++) {
-							JSONObject v = f.getJSONObject(i);
-							outputS[i - 2] = new DataField(v.getString("name"), v.getString("type"));
-						}
+				connection = new Oauth2Connection(sub.getUrl(), sub.getUsername(), sub.getPassword());
+				connection.authenticate();
+				StreamElement[] ses = StreamElement.fromJSON(connection.doJsonRequest("GET","/api/sensors/"+sub.getVsname()+"/data?from=0000-00-00T00:00:00&to=0000-00-00T00:00:00",""));
+				if (ses != null && ses.length > 0) {
+					outputS = new DataField[ses[0].getFieldNames().length];
+					for (int i = 0; i < ses[0].getFieldNames().length; i++) {
+						outputS[i] = new DataField(ses[0].getFieldNames()[i], ses[0].getFieldTypes()[i]);
 					}
 				}
-				is.close();
 			} catch (Exception e) {
 				e.printStackTrace();
+				outputS = null;
 			}
 		}
 		return outputS;

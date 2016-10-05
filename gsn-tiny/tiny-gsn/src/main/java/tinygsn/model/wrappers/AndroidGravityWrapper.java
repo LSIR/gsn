@@ -83,7 +83,7 @@ public class AndroidGravityWrapper extends AbstractWrapper implements
 			output.add(new DataField(FIELD_NAMES[i], FIELD_TYPES_STRING[i],
 					FIELD_DESCRIPTION[i]));
 
-		return output.toArray(new DataField[] {});
+		return output.toArray(new DataField[output.size()]);
 	}
 
 	@Override

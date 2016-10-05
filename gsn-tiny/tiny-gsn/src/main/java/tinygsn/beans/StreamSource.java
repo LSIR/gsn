@@ -108,14 +108,13 @@ public class StreamSource implements Serializable{
 		}
 		switch (aggregator) {
 		case 0:
-			// 1. Get sum
+			// Average
 			for (int i = 1; i < data.size(); i++) {
 				for (int j = 0; j < se.getFieldNames().length; j++) {
 					StreamElement se_i = data.get(i);
 					se.setData(j, getDouble(se.getData()[j]) + getDouble(se_i.getData()[j]));
 				}
 			}
-			// 2. Average
 			for (int j = 0; j < se.getFieldNames().length; j++) {
 				se.setData(j, getDouble(se.getData()[j]) / data.size());
 			}

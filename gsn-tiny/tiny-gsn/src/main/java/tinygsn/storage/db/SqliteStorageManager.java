@@ -62,6 +62,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 
 
 	private static final long serialVersionUID = 7774503312823392567L;
+	private static final String TAG = "SqliteStorageManager";
 	private SQLiteDatabase database;
 	private static SQLiteDatabaseOpenHelper dbOpenHelper;
 
@@ -70,15 +71,17 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		this.isSQLite = true;
 		dbOpenHelper = getInstance();
 		File myFilesDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
-				                           + "/Android/data/tinygsn");
+				                           + "/Android/data/ch.epfl.gsn.tiny");
 		myFilesDir.mkdirs();
 		database = dbOpenHelper.getWritableDatabase();
 	}
 
 	public static synchronized SQLiteDatabaseOpenHelper getInstance() {
 		if (dbOpenHelper == null) {
-			dbOpenHelper = new SQLiteDatabaseOpenHelper(StaticData.globalContext, Const.DATABASE_NAME,
-					                                           null, Const.DATABASE_VERSION);
+			dbOpenHelper = new SQLiteDatabaseOpenHelper(StaticData.globalContext,
+					Environment.getExternalStorageDirectory().getAbsolutePath()
+					+ "/Android/data/ch.epfl.gsn.tiny/" + Const.DATABASE_NAME,
+					null, Const.DATABASE_VERSION);
 		}
 		return dbOpenHelper;
 	}
@@ -136,7 +139,32 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		ContentValues newCon = new ContentValues();
 
 		for (int i = 0; i < se.getFieldNames().length; i++) {
-			newCon.put(se.getFieldNames()[i], se.getData(se.getFieldNames()[i]) + "");
+			switch (se.getFieldTypes()[i]){
+				case DataTypes.TIME:
+				case DataTypes.BIGINT:
+					newCon.put(se.getFieldNames()[i], (Long) se.getData(se.getFieldNames()[i]));
+					break;
+				case DataTypes.INTEGER:
+					newCon.put(se.getFieldNames()[i], (Integer) se.getData(se.getFieldNames()[i]));
+					break;
+				case DataTypes.SMALLINT:
+					newCon.put(se.getFieldNames()[i], (Short) se.getData(se.getFieldNames()[i]));
+					break;
+				case DataTypes.TINYINT:
+					newCon.put(se.getFieldNames()[i], (Byte) se.getData(se.getFieldNames()[i]));
+					break;
+				case DataTypes.FLOAT:
+					newCon.put(se.getFieldNames()[i], (Float) se.getData(se.getFieldNames()[i]));
+					break;
+				case DataTypes.DOUBLE:
+					newCon.put(se.getFieldNames()[i], (Double) se.getData(se.getFieldNames()[i]));
+					break;
+				case DataTypes.VARCHAR:
+				case DataTypes.CHAR:
+				case DataTypes.BINARY:
+					newCon.put(se.getFieldNames()[i], (String) se.getData(se.getFieldNames()[i]));
+					break;
+			}
 		}
 
 		newCon.put("timed", se.getTimeStamp());
@@ -163,8 +191,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		}
 	}
 
-	public ArrayList<StreamElement> executeQueryGetLatestValues(String tableName,
-	                                                            String[] FIELD_NAMES, Byte[] FIELD_TYPES, int num) {
+	public ArrayList<StreamElement> executeQueryGetLatestValues(String tableName, String[] FIELD_NAMES, Byte[] FIELD_TYPES, int num) {
 		return executeQueryGetLatestValues(tableName, FIELD_NAMES, FIELD_TYPES, num, 0);
 	}
 
@@ -175,8 +202,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	 * @param num
 	 * @return
 	 */
-	public ArrayList<StreamElement> executeQueryGetLatestValues(String tableName,
-	                                                            String[] FIELD_NAMES, Byte[] FIELD_TYPES, int num, long minTimestamp) {
+	public ArrayList<StreamElement> executeQueryGetLatestValues(String tableName, String[] FIELD_NAMES, Byte[] FIELD_TYPES, int num, long minTimestamp) {
 
 		Serializable[] fieldValues;
 		ArrayList<StreamElement> result = new ArrayList<StreamElement>();
@@ -186,7 +212,29 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		while (cursor.moveToNext()) {
 			fieldValues = new Serializable[FIELD_NAMES.length];
 			for (int i = 0; i < FIELD_NAMES.length; i++) {
-				fieldValues[i] = cursor.getDouble(cursor.getColumnIndex(FIELD_NAMES[i].toLowerCase(Locale.ENGLISH)));
+				switch (FIELD_TYPES[i]){
+					case DataTypes.VARCHAR:
+					case DataTypes.CHAR:
+					case DataTypes.BINARY:
+						fieldValues[i] = cursor.getString(cursor.getColumnIndex(FIELD_NAMES[i].toLowerCase(Locale.ENGLISH)));
+						break;
+					case DataTypes.TIME:
+					case DataTypes.BIGINT:
+						fieldValues[i] = cursor.getLong(cursor.getColumnIndex(FIELD_NAMES[i].toLowerCase(Locale.ENGLISH)));
+						break;
+					case DataTypes.DOUBLE:
+						fieldValues[i] = cursor.getDouble(cursor.getColumnIndex(FIELD_NAMES[i].toLowerCase(Locale.ENGLISH)));
+						break;
+					case DataTypes.FLOAT:
+						fieldValues[i] = cursor.getFloat(cursor.getColumnIndex(FIELD_NAMES[i].toLowerCase(Locale.ENGLISH)));
+						break;
+					case DataTypes.INTEGER:
+						fieldValues[i] = cursor.getInt(cursor.getColumnIndex(FIELD_NAMES[i].toLowerCase(Locale.ENGLISH)));
+						break;
+					case DataTypes.SMALLINT:
+					case DataTypes.TINYINT:
+						fieldValues[i] = cursor.getShort(cursor.getColumnIndex(FIELD_NAMES[i].toLowerCase(Locale.ENGLISH)));
+				}
 			}
 			long time = cursor.getLong(cursor.getColumnIndex("timed"));
 
@@ -195,6 +243,112 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			result.add(se);
 		}
 		cursor.close();
+		return result;
+	}
+
+	public ArrayList<StreamElement> executeQueryGetLatestValues(String tableName, int num) throws SQLException {
+		return executeQueryGetLatestValues(tableName, num, 0);
+	}
+
+
+	public ArrayList<StreamElement> executeQueryGetLatestValues(String tableName, int num, long minTimestamp) throws SQLException{
+
+		Serializable[] fieldValues;
+		DataField[] structure = tableToStructure(tableName);
+		ArrayList<StreamElement> result = new ArrayList<StreamElement>();
+		String query = "Select * from " + tableName + " where timed > " + minTimestamp + " order by _id desc limit ?";
+		Cursor cursor = database.rawQuery(query, new String[]{num + ""});
+
+		while (cursor.moveToNext()) {
+			fieldValues = new Serializable[structure.length];
+			for (int i = 0; i < structure.length; i++) {
+				byte dtype = structure[i].getDataTypeID();
+				String name = structure[i].getName().toLowerCase(Locale.ENGLISH);
+				switch (dtype){
+					case DataTypes.VARCHAR:
+					case DataTypes.CHAR:
+					case DataTypes.BINARY:
+						fieldValues[i] = cursor.getString(cursor.getColumnIndex(name));
+						break;
+					case DataTypes.TIME:
+					case DataTypes.BIGINT:
+						fieldValues[i] = cursor.getLong(cursor.getColumnIndex(name));
+						break;
+					case DataTypes.DOUBLE:
+						fieldValues[i] = cursor.getDouble(cursor.getColumnIndex(name));
+						break;
+					case DataTypes.FLOAT:
+						fieldValues[i] = cursor.getFloat(cursor.getColumnIndex(name));
+						break;
+					case DataTypes.INTEGER:
+						fieldValues[i] = cursor.getInt(cursor.getColumnIndex(name));
+						break;
+					case DataTypes.SMALLINT:
+					case DataTypes.TINYINT:
+						fieldValues[i] = cursor.getShort(cursor.getColumnIndex(name));
+				}
+			}
+			long time = cursor.getLong(cursor.getColumnIndex("timed"));
+
+			StreamElement se = new StreamElement(structure, fieldValues, time);
+			result.add(se);
+		}
+		cursor.close();
+		return result;
+	}
+
+	public ArrayList<StreamElement> executeQueryGetRangeData(String vsName, long start, long end) throws SQLException{
+		return executeQueryGetRangeData(vsName, start, end, 0);
+	}
+
+	public ArrayList<StreamElement> executeQueryGetRangeData(String vsName, long start, long end, long limit) throws SQLException{
+		Serializable[] fieldValues;
+		DataField[] structure = tableToStructure(vsName);
+		ArrayList<StreamElement> result = new ArrayList<>();
+
+		String query = "Select * from " + vsName + " where CAST(timed AS NUMERIC) >= ? AND CAST(timed AS NUMERIC) <= ? ORDER BY timed";
+
+		if (limit > 0){
+			query += " ASC limit " + limit;
+		} else {
+			query += " ASC";
+		}
+
+		Cursor cursor = database.rawQuery(query, new String[]{start + "", end + ""});
+
+		while (cursor.moveToNext()) {
+			fieldValues = new Serializable[structure.length];
+			for (int i = 0; i < structure.length; i++) {
+				byte dtype = structure[i].getDataTypeID();
+				String name = structure[i].getName().toLowerCase(Locale.ENGLISH);
+				switch (dtype){
+					case DataTypes.VARCHAR:
+					case DataTypes.CHAR:
+					case DataTypes.BINARY:
+						fieldValues[i] = cursor.getString(cursor.getColumnIndex(name));
+						break;
+					case DataTypes.TIME:
+					case DataTypes.BIGINT:
+						fieldValues[i] = cursor.getLong(cursor.getColumnIndex(name));
+						break;
+					case DataTypes.DOUBLE:
+						fieldValues[i] = cursor.getDouble(cursor.getColumnIndex(name));
+						break;
+					case DataTypes.FLOAT:
+						fieldValues[i] = cursor.getFloat(cursor.getColumnIndex(name));
+						break;
+					case DataTypes.INTEGER:
+						fieldValues[i] = cursor.getInt(cursor.getColumnIndex(name));
+						break;
+					case DataTypes.SMALLINT:
+					case DataTypes.TINYINT:
+						fieldValues[i] = cursor.getShort(cursor.getColumnIndex(name));
+				}
+			}
+			long time = cursor.getLong(cursor.getColumnIndex("timed"));
+			StreamElement se = new StreamElement(structure, fieldValues, time);
+			result.add(se);
+		}
 		return result;
 	}
 
@@ -351,7 +505,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			case Cursor.FIELD_TYPE_BLOB:
 				return DataTypes.BINARY;
 			default:
-				// logger.error("The type can't be converted to GSN form : " + jdbcType);
+				Log.e(TAG, "convertLocalTypeToGSN: The type can't be converted to GSN form : " + jdbcType);
 				break;
 		}
 		return -100;
@@ -458,7 +612,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		String query = "Select * from vsList where vsname = ?;";
 		Cursor cursor = database.rawQuery(query, new String[]{vsName});
 
-		while (cursor.moveToNext()) {
+		if (cursor.moveToNext()) {
 			int id = cursor.getInt(cursor.getColumnIndex("_id"));
 			int running = cursor.getInt(cursor.getColumnIndex("running"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
@@ -488,7 +642,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	public boolean vsExists(String vsName) {
 		String query = "Select vsname from vsList where vsname = ?;";
 		Cursor cursor = database.rawQuery(query, new String[]{vsName});
-		while (cursor.moveToNext()) {
+		if (cursor.moveToNext()) {
 			return true;
 		}
 		return false;
@@ -649,9 +803,9 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	}
 
 
-	public boolean updatePublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, long iterationTime, boolean active) {
-		String query = "UPDATE publishDestination SET url = ?, vsname = ?, key = ?, mode = ?, lastTime = ?, iterationTime = ?, active = ?  WHERE _id = ?;";
-		Cursor cursor = database.rawQuery(query, new String[]{url, vsname, key, mode + "", lastTime + "", iterationTime + "", active ? "1" : "0", "" + id});
+	public boolean updatePublishInfo(int id, String url, String vsname, String clientId, String clientSecret, int mode, long lastTime, long iterationTime, boolean active) {
+		String query = "UPDATE publishDestination SET url = ?, vsname = ?, clientId = ?, clientSecret = ?, mode = ?, lastTime = ?, iterationTime = ?, active = ?  WHERE _id = ?;";
+		Cursor cursor = database.rawQuery(query, new String[]{url, vsname, clientId, clientSecret, mode + "", lastTime + "", iterationTime + "", active ? "1" : "0", "" + id});
 		if (cursor.moveToNext())
 			return true;
 		return false;
@@ -664,12 +818,13 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		while (cursor.moveToNext()) {
 			String url = cursor.getString(cursor.getColumnIndex("url"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
-			String key = cursor.getString(cursor.getColumnIndex("key"));
+			String clientId = cursor.getString(cursor.getColumnIndex("clientId"));
+			String clientSecret = cursor.getString(cursor.getColumnIndex("clientSecret"));
 			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
 			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
 			long iterationTime = cursor.getLong(cursor.getColumnIndex("iterationTime"));
 			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
-			DeliveryRequest dr = new DeliveryRequest(url, key, mode, vsname, id, iterationTime);
+			DeliveryRequest dr = new DeliveryRequest(url, clientId, clientSecret, mode, vsname, id, iterationTime);
 			dr.setActive(active);
 			dr.setLastTime(lastTime);
 			return dr;
@@ -682,19 +837,20 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 		database.execSQL(query);
 	}
 
-	public void setPublishInfo(int id, String url, String vsname, String key, int mode, long lastTime, long iterationTime, boolean active) {
+	public void setPublishInfo(int id, String url, String vsname, String clientId, String clientSecret, int mode, long lastTime, long iterationTime, boolean active) {
 		if (id == -1 || getPublishInfo(id) == null) {
 			ContentValues newCon = new ContentValues();
 			newCon.put("url", url);
 			newCon.put("vsname", vsname);
-			newCon.put("key", key);
+			newCon.put("clientId", clientId);
+			newCon.put("clientSecret", clientSecret);
 			newCon.put("mode", mode);
 			newCon.put("lastTime", lastTime);
 			newCon.put("iterationTime", iterationTime);
 			newCon.put("active", active ? "1" : "0");
 			database.insert("publishDestination", null, newCon);
 		} else {
-			updatePublishInfo(id, url, vsname, key, mode, lastTime, iterationTime, active);
+			updatePublishInfo(id, url, vsname, clientId, clientSecret, mode, lastTime, iterationTime, active);
 		}
 	}
 
@@ -706,12 +862,13 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			int id = cursor.getInt(cursor.getColumnIndex("_id"));
 			String url = cursor.getString(cursor.getColumnIndex("url"));
 			String vsname = cursor.getString(cursor.getColumnIndex("vsname"));
-			String key = cursor.getString(cursor.getColumnIndex("key"));
+			String clientId = cursor.getString(cursor.getColumnIndex("clientId"));
+			String clientSecret = cursor.getString(cursor.getColumnIndex("clientSecret"));
 			int mode = cursor.getInt(cursor.getColumnIndex("mode"));
 			long lastTime = cursor.getLong(cursor.getColumnIndex("lastTime"));
 			long iterationTime = cursor.getLong(cursor.getColumnIndex("iterationTime"));
 			boolean active = cursor.getString(cursor.getColumnIndex("active")).equals("1");
-			DeliveryRequest dr = new DeliveryRequest(url, key, mode, vsname, id, iterationTime);
+			DeliveryRequest dr = new DeliveryRequest(url, clientId, clientSecret, mode, vsname, id, iterationTime);
 			dr.setActive(active);
 			dr.setLastTime(lastTime);
 			r.add(dr);
@@ -720,8 +877,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 	}
 
 	public DataField[] tableToStructure(CharSequence tableName) throws SQLException {
-		StringBuilder sb = new StringBuilder("select * from ").append(tableName)
-				                   .append(" where 1=0 ");
+		StringBuilder sb = new StringBuilder("select * from ").append(tableName).append(" limit 1");
 		Cursor cursor = database.rawQuery(sb.toString(), new String[]{});
 		boolean c = cursor.moveToFirst();
 		ArrayList<DataField> toReturnArr = new ArrayList<DataField>();
@@ -729,7 +885,7 @@ public class SqliteStorageManager extends StorageManager implements Serializable
 			String colName = cursor.getColumnName(i);
 			if (colName.equalsIgnoreCase("_id") || colName.equalsIgnoreCase("timed"))
 				continue;
-			int colType = Cursor.FIELD_TYPE_FLOAT;
+			int colType = Cursor.FIELD_TYPE_STRING;
 			if (c) { //can only get type from data
 				colType = cursor.getType(i);
 			}

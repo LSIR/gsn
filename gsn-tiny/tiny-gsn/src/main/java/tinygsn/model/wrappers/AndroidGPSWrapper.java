@@ -103,11 +103,11 @@ public class AndroidGPSWrapper extends AbstractWrapper implements LocationListen
 		stopGPS();
 	}
 
-	public void startGPS() {
+	public void startGPS() throws SecurityException{
 		try {
-			if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "GPSPERFORMANCE")) {
-				startMethodTracing("Android/data/tinygsn.gui.android/whole_gps_process" + System.currentTimeMillis());
-			}
+			//if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "GPSPERFORMANCE")) {
+			//	startMethodTracing("Android/data/tinygsn.gui.android/whole_gps_process" + System.currentTimeMillis());
+			//}
 			locationManager = (LocationManager) StaticData.globalContext.getSystemService(StaticData.globalContext.LOCATION_SERVICE);
 
 			boolean isGPSUsageEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -162,7 +162,7 @@ public class AndroidGPSWrapper extends AbstractWrapper implements LocationListen
 		}
 	}
 
-	public void stopGPS() {
+	public void stopGPS() throws SecurityException{
 		if (locationManager != null) {
 			locationManager.removeUpdates(this);
 		}

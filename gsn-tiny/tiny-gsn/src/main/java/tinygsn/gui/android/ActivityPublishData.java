@@ -25,6 +25,7 @@
 
 package tinygsn.gui.android;
 
+import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,7 +63,8 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 	private AndroidControllerPublish controller;
 	private EditText serverEditText = null;
 	private Button publishButton = null;
-	private EditText keyEditText = null;
+	private EditText clientEditText = null;
+	private EditText secretEditText = null;
 	private EditText fromdateEditText = null;
 	private EditText fromtimeEditText = null;
 	private EditText totimeEditText = null;
@@ -81,7 +83,8 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		serverEditText = (EditText) findViewById(R.id.editText_server);
-		keyEditText = (EditText) findViewById(R.id.editText_key);
+		clientEditText = (EditText) findViewById(R.id.editText_client);
+		secretEditText = (EditText) findViewById(R.id.editText_secret);
 		fromdateEditText = (EditText) findViewById(R.id.fromdate);
 		todateEditText = (EditText) findViewById(R.id.todate);
 		totimeEditText = (EditText) findViewById(R.id.totime);
@@ -103,7 +106,8 @@ public class ActivityPublishData extends AbstractFragmentActivity {
 			try {
 				dr = storage.getPublishInfo(Integer.parseInt(extra));
 				serverEditText.setText(dr.getUrl());
-				keyEditText.setText(dr.getKey());
+				clientEditText.setText(dr.getClientID());
+				secretEditText.setText(dr.getClientSecret());
 				cal.setTimeInMillis(dr.getLastTime());
 				iterationTime.setText("" + dr.getIterationTime());
 			} catch (Exception e) {
@@ -209,7 +213,7 @@ public class ActivityPublishData extends AbstractFragmentActivity {
         int mode = modeSpinner.getSelectedItemPosition();
         long last = 0;
         if (iterationTime.getText().toString().equals("") || serverEditText.getText().toString().equals("") || vsnameSpinner.getSelectedItem().toString().equals("") ||
-                keyEditText.getText().toString().equals("")) {
+                clientEditText.getText().toString().equals("") || secretEditText.getText().toString().equals("")) {
             ToastUtils.showToastInUiThread(this, "One of the field is empty. It should not !", Toast.LENGTH_SHORT);
             return false;
         } else {
@@ -229,7 +233,7 @@ public class ActivityPublishData extends AbstractFragmentActivity {
                     return false;
                 }
             }
-            storage.setPublishInfo(id, serverEditText.getText().toString(), vsnameSpinner.getSelectedItem().toString(), keyEditText.getText().toString(), mode, last, Long.valueOf(iterationTime.getText().toString()), active);
+            storage.setPublishInfo(id, serverEditText.getText().toString(), vsnameSpinner.getSelectedItem().toString(), clientEditText.getText().toString(), secretEditText.getText().toString(), mode, last, Long.valueOf(iterationTime.getText().toString()), active);
             return true;
         }
     }
@@ -247,6 +251,8 @@ public class ActivityPublishData extends AbstractFragmentActivity {
                 dataPublisher.publish(end);
             } catch (ParseException e) {
                 ToastUtils.showToastInUiThread(this, "Unable to parse time.", Toast.LENGTH_SHORT);
+            } catch (MalformedURLException e) {
+                ToastUtils.showToastInUiThread(this, "Unable to parse server url.", Toast.LENGTH_SHORT);
             }
 
         }

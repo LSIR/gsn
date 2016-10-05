@@ -23,6 +23,8 @@
  */
 package tinygsn.model.wrappers;
 
+import android.annotation.TargetApi;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.FeatureInfo;
@@ -32,6 +34,7 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -57,6 +60,7 @@ import tinygsn.model.utils.Parameter;
 import tinygsn.services.WrapperService;
 import tinygsn.storage.db.SqliteStorageManager;
 import tinygsn.utils.Logging;
+import tinygsn.utils.ToastUtils;
 
 public abstract class AbstractWrapper {
 
@@ -78,6 +82,7 @@ public abstract class AbstractWrapper {
 
 	}
 
+	@TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
 	public static Properties getWrapperList(Context context) {
 		Properties wrapperList = new Properties();
 		Properties wrapperListTemp = new Properties();
@@ -113,6 +118,20 @@ public abstract class AbstractWrapper {
 				if (isPlayServiceAvailable()) {
 					wrapperListTemp.put("activityrecognition", wrapperList.getProperty("android.google.activityrecognition"));
 				}
+				BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+				if (mBluetoothAdapter != null) {
+                    if (!mBluetoothAdapter.isEnabled()) {
+                        ToastUtils.showToastInUiThread(context, "To connect to external sensors, please enable Bluetooth.", Toast.LENGTH_LONG);
+                    } else {
+						if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+							wrapperListTemp.put("serial.bluetoothle.openswiss", wrapperList.getProperty("serial.bluetoothle.openswiss"));
+
+						}else{
+							ToastUtils.showToastInUiThread(context, "Bluetooth Low Energy not available.", Toast.LENGTH_LONG);
+						}
+                        wrapperListTemp.put("serial.bluetooth.openswiss", wrapperList.getProperty("serial.bluetooth.openswiss"));
+                    }
+                }
 				//wrapperListTemp.put("file_reader", wrapperList.getProperty("file_reader"));
 				wrapperList = wrapperListTemp;
 			}
@@ -283,11 +302,11 @@ public abstract class AbstractWrapper {
 	}
 
 	protected static void log(Context context, String s) {
-		if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
+		/*if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
 			Log.d(LOGTAG, s);
 			Logging.createNewLoggingFolder(context, "Wrapper");
 			Logging.appendLog("Wrapper", LOGTAG + ".txt", s, context);
-		}
+		}*/
 	}
 
 }

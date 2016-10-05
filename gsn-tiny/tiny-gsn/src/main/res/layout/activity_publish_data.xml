@@ -38,15 +38,15 @@
             android1:layout_height="wrap_content">
 
             <TextView
-                android1:id="@+id/textView_key"
+                android1:id="@+id/textView_client"
                 android1:layout_width="wrap_content"
                 android1:layout_height="wrap_content"
-                android1:text="@string/pubKey"
+                android1:text="@string/pubClient"
                 android1:textAppearance="?android:attr/textAppearanceSmall"
                 android1:textColor="@color/black"/>
 
             <EditText
-                android:id="@+id/editText_key"
+                android:id="@+id/editText_client"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="8"
@@ -54,6 +54,26 @@
                 android:textColor="@color/black"/>
         </LinearLayout>
 
+        <LinearLayout
+            android1:layout_width="match_parent"
+            android1:layout_height="wrap_content">
+
+            <TextView
+                android1:id="@+id/textView_secret"
+                android1:layout_width="wrap_content"
+                android1:layout_height="wrap_content"
+                android1:text="@string/pubSecret"
+                android1:textAppearance="?android:attr/textAppearanceSmall"
+                android1:textColor="@color/black"/>
+
+            <EditText
+                android:id="@+id/editText_secret"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="8"
+                android:inputType="numberDecimal"
+                android:textColor="@color/black"/>
+        </LinearLayout>
         <LinearLayout
             android1:layout_width="match_parent"
             android1:layout_height="wrap_content">

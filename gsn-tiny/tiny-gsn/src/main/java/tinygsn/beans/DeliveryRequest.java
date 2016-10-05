@@ -5,7 +5,8 @@ import android.os.Parcelable;
 
 public class DeliveryRequest implements Parcelable {
 	private String url;
-	private String key;
+	private String clientID;
+	private String clientSecret;
 	private int mode;
 	private String vsname;
 	private long lastTime;
@@ -13,10 +14,11 @@ public class DeliveryRequest implements Parcelable {
 	private boolean active;
 	private long iterationTime = 30000;
 
-	public DeliveryRequest(String url, String key, int mode, String vsname,
+	public DeliveryRequest(String url, String clientID, String clientSecret, int mode, String vsname,
 						   int id, long iterationTime) {
 		this.url = url;
-		this.key = key;
+		this.clientID = clientID;
+		this.clientSecret = clientSecret;
 		this.mode = mode;
 		this.vsname = vsname;
 		this.id = id;
@@ -26,7 +28,8 @@ public class DeliveryRequest implements Parcelable {
 	public DeliveryRequest(Parcel source) {
 		this.id = source.readInt();
 		this.url = source.readString();
-		this.key = source.readString();
+		this.clientID = source.readString();
+		this.clientSecret = source.readString();
 		this.vsname = source.readString();
 		this.mode = source.readInt();
 		this.lastTime = source.readLong();
@@ -59,12 +62,20 @@ public class DeliveryRequest implements Parcelable {
 		this.url = url;
 	}
 
-	public String getKey() {
-		return key;
+	public String getClientID() {
+		return clientID;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public void setClientID(String clientID) {
+		this.clientID = clientID;
+	}
+
+	public String getClientSecret() {
+		return clientSecret;
+	}
+
+	public void setClientSecret(String clientSecret) {
+		this.clientSecret = clientSecret;
 	}
 
 	public int getMode() {
@@ -108,7 +119,8 @@ public class DeliveryRequest implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(id);
 		dest.writeString(url);
-		dest.writeString(key);
+		dest.writeString(clientID);
+		dest.writeString(clientSecret);
 		dest.writeString(vsname);
 		dest.writeInt(mode);
 		dest.writeLong(lastTime);

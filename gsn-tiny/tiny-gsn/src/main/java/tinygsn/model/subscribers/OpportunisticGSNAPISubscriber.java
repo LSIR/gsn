@@ -28,13 +28,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import gsn.http.rest.PushDelivery;
-import tinygsn.beans.DeliveryRequest;
 import tinygsn.beans.StaticData;
-import tinygsn.beans.StreamElement;
 import tinygsn.beans.Subscription;
-import tinygsn.model.publishers.AbstractDataPublisher;
-import tinygsn.model.publishers.utils.PublishDataTask;
 import tinygsn.model.subscribers.utils.RetrieveDataTask;
 
 public class OpportunisticGSNAPISubscriber extends AbstractSubscriber {

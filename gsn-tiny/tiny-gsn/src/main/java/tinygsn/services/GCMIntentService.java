@@ -124,7 +124,7 @@ public class GCMIntentService extends IntentService {
 		notificationManager.notify(0, notification);
 	}
 
-	public class GCMBroadcastReceiver extends WakefulBroadcastReceiver {
+	public static class GCMBroadcastReceiver extends WakefulBroadcastReceiver {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {

@@ -129,4 +129,8 @@ public final class DataField implements Serializable {
 	public String getType() {
 		return this.type;
 	}
+
+	public boolean inNumeric(){
+		return dataTypeID > 1;
+	}
 }

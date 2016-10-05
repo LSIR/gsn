@@ -564,13 +564,21 @@ public class ActivityViewData extends AbstractFragmentActivity {
 	public static class DetailedDataFragment extends DialogFragment {
 		String text;
 
-		public static DetailedDataFragment newInstance(String text) {
-			return new DetailedDataFragment(text);
+		public String getText() {
+			return text;
 		}
 
-		public DetailedDataFragment(String text) {
+		public void setText(String text) {
 			this.text = text;
 		}
+
+		public static DetailedDataFragment newInstance(String text) {
+			DetailedDataFragment i = new DetailedDataFragment();
+			i.setText(text);
+			return i;
+		}
+
+		public DetailedDataFragment() {}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,

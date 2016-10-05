@@ -31,6 +31,8 @@ import android.widget.Toast;
 
 import org.epfl.locationprivacy.util.Utils;
 
+import java.net.MalformedURLException;
+
 import tinygsn.beans.DeliveryRequest;
 import tinygsn.beans.StaticData;
 import tinygsn.controller.AndroidControllerPublish;
@@ -64,7 +66,7 @@ public abstract class AbstractDataPublisher {
         return false;
     }
 
-	public abstract void publish(long until);
+	public abstract void publish(long until) throws MalformedURLException;
 
     public static AbstractDataPublisher getPublisher(DeliveryRequest dr){
         switch (dr.getMode()) {
@@ -79,11 +81,11 @@ public abstract class AbstractDataPublisher {
     }
 
 	protected static void log(Context context, String s) {
-		if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
+		/*if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
 			Log.d(LOGTAG, s);
 			Logging.createNewLoggingFolder(context, "Publish");
 			Logging.appendLog("Publish", LOGTAG + ".txt", s, context);
-		}
+		}*/
 	}
 
     public abstract long getNextRun();

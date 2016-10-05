@@ -115,7 +115,7 @@ public class ActivityListPublish extends AbstractActivity implements Serializabl
 					Calendar cal = Calendar.getInstance();
 					cal.setTimeInMillis(params[0].getLastTime());
 					String info = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH).format(cal.getTime());
-					return new PublishRow(params[0].getId(), params[0].getUrl(), params[0].getKey(), params[0].isActive(), "Last connection: " + info, params[0].getVsname());
+					return new PublishRow(params[0].getId(), params[0].getUrl(), params[0].getClientID(),params[0].getClientSecret(), params[0].isActive(), "Last connection: " + info, params[0].getVsname());
 				}
 
 				@Override

@@ -41,7 +41,25 @@ public class PublishRow implements Serializable  {
 	}
 
 	private String serverurl;
-	private String serverKey;
+
+	public String getServerSecret() {
+		return serverSecret;
+	}
+
+	public void setServerSecret(String serverSecret) {
+		this.serverSecret = serverSecret;
+	}
+
+	public String getServerID() {
+		return serverID;
+	}
+
+	public void setServerID(String serverID) {
+		this.serverID = serverID;
+	}
+
+	private String serverID;
+	private String serverSecret;
 	private boolean active;
 	private String info;
 	private String vsname;
@@ -52,14 +70,6 @@ public class PublishRow implements Serializable  {
 
 	public void setServerurl(String serverurl) {
 		this.serverurl = serverurl;
-	}
-
-	public String getServerKey() {
-		return serverKey;
-	}
-
-	public void setServerKey(String serverKey) {
-		this.serverKey = serverKey;
 	}
 
 	public boolean isActive() {
@@ -89,11 +99,12 @@ public class PublishRow implements Serializable  {
 	public PublishRow() {
 	}
 
-	public PublishRow(int id, String serverurl, String serverKey, boolean active,
+	public PublishRow(int id, String serverurl, String serverID, String serverSecret, boolean active,
 			String info, String vsname) {
 		this.id = id;
 		this.serverurl = serverurl;
-		this.serverKey = serverKey;
+		this.serverID = serverID;
+		this.serverSecret = serverSecret;
 		this.active = active;
 		this.info = info;
 		this.vsname = vsname;

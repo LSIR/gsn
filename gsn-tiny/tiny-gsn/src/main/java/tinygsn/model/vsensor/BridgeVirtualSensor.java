@@ -50,23 +50,23 @@ public class BridgeVirtualSensor extends AbstractVirtualSensor {
 
 	@Override
 	public void dataAvailable(String inputStreamName, StreamElement streamElement) {
-		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
+		/*if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE")) {
 			startMethodTracing("Android/data/tinygsn.gui.android/" + LOGTAG + "_" + inputStreamName + "_" + System.currentTimeMillis());
 		}
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "===========================================");
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Starting to process data in dataAvailable");
 		long startLogTime = System.currentTimeMillis();
-
+	*/
 		StreamElement anonymizedData = super.anonymizeData(inputStreamName, streamElement);
-
+/*
 		long endLogTime = System.currentTimeMillis();
 		log("dataAvailable_" + LOGTAG + "_" + inputStreamName, "Total Time to process data in dataAvailable() (without dataProduced()) : " + (endLogTime - startLogTime) + " ms.");
-
+*/
 		dataProduced(anonymizedData);
-
+/*
 		if ((boolean) Utils.getBuildConfigValue(StaticData.globalContext, "PERFORMANCE") || (boolean) Utils.getBuildConfigValue(StaticData.globalContext, "GPSPERFORMANCE")) {
 			stopMethodTracing();
-		}
+		}*/
 	}
 
 }

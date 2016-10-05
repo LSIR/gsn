@@ -76,11 +76,11 @@ public abstract class AbstractSubscriber {
     }
 
 	protected static void log(Context context, String s) {
-		if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
+		/*if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
 			Log.d(LOGTAG, s);
 			Logging.createNewLoggingFolder(context, "Subscribe");
 			Logging.appendLog("Subscribe", LOGTAG + ".txt", s, context);
-		}
+		}*/
 	}
 
     public abstract long getNextRun();

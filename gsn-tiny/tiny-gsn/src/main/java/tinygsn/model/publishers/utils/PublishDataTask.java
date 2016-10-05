@@ -29,51 +29,58 @@ import android.util.Log;
 
 import org.epfl.locationprivacy.util.Utils;
 
-import gsn.http.rest.PushDelivery;
+import java.io.IOException;
+import java.util.List;
+
 import tinygsn.beans.DeliveryRequest;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
-import tinygsn.model.publishers.AbstractDataPublisher;
+import tinygsn.model.utils.Oauth2Connection;
 import tinygsn.storage.db.SqliteStorageManager;
 import tinygsn.utils.Logging;
 
-public class PublishDataTask extends AsyncTask<StreamElement[], Void, Boolean> {
+public class PublishDataTask extends AsyncTask<List<StreamElement>, Void, Boolean> {
 
-	private static final String LOGTAG = "PublichDataTask";
-	private PushDelivery push;
-	private AbstractDataPublisher publisher;
+	private static final String LOGTAG = "PublishDataTask";
+	private Oauth2Connection connection;
 	private DeliveryRequest dr;
 
-	public PublishDataTask(PushDelivery p, AbstractDataPublisher publisher, DeliveryRequest dr) {
-		this.push = p;
-		this.publisher = publisher;
+	public PublishDataTask(Oauth2Connection c, DeliveryRequest dr) {
+		this.connection = c;
 		this.dr = dr;
 	}
 
-	private StreamElement[] se = null;
+	private List<StreamElement> se = null;
 
 	@Override
-	protected Boolean doInBackground(StreamElement[]... params) {
+	protected Boolean doInBackground(List<StreamElement>... params) {
 		se = params[0];
-		return push.writeStreamElements(se);
+		try {
+			connection.authenticate();
+			connection.doJsonRequest("POST", "/api/sensors/"+dr.getVsname().toLowerCase()+"/data", StreamElement.toJSON("tiny-gsn", se.toArray(new StreamElement[se.size()])));
+		}catch (IOException e){
+			log(StaticData.globalContext, "Error in publishing data: " + e.getMessage());
+			return false;
+		}
+		return true;
 	}
 
 	protected void onPostExecute(Boolean results) {
-		if (results == true) {
-			log(StaticData.globalContext, "Published: " + se.length);
+		if (results) {
+			log(StaticData.globalContext, "Published: " + se.size());
 			dr.setLastTime(System.currentTimeMillis());
             SqliteStorageManager storage = new SqliteStorageManager();
-			storage.setPublishInfo(dr.getId(), dr.getUrl(), dr.getVsname(), dr.getKey(), dr.getMode(), dr.getLastTime(), dr.getIterationTime(), dr.isActive());
+			storage.setPublishInfo(dr.getId(), dr.getUrl(), dr.getVsname(), dr.getClientID(), dr.getClientSecret(), dr.getMode(), dr.getLastTime(), dr.getIterationTime(), dr.isActive());
 		} else {
-			log(StaticData.globalContext, "Publish fail: " + se.length);
+			log(StaticData.globalContext, "Publish fail: " + se.size());
 		}
 	}
 
 	protected static void log(Context context, String s) {
-		if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
+/*		if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
 			Log.d(LOGTAG, s);
 			Logging.createNewLoggingFolder(context, "Publish");
 			Logging.appendLog("Publish", LOGTAG + ".txt", s, context);
-		}
+		}*/
 	}
 }

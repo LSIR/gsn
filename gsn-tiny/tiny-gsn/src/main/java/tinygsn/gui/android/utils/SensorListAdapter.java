@@ -153,15 +153,25 @@ public class SensorListAdapter extends ArrayAdapter<SensorRow> {
 	}
 
 	public static class DetailedDataFragment extends DialogFragment {
+		public String getText() {
+			return text;
+		}
+
+		public void setText(String text) {
+			this.text = text;
+		}
+
 		String text;
 
 		public static DetailedDataFragment newInstance(String text) {
-			return new DetailedDataFragment(text);
+			DetailedDataFragment i = new DetailedDataFragment();
+			i.setText(text);
+			return i;
 		}
 
-		public DetailedDataFragment(String text) {
-			this.text = text;
+		public DetailedDataFragment(){
 		}
+
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,

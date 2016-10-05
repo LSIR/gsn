@@ -26,11 +26,14 @@ package tinygsn.model.publishers;
 import android.content.Context;
 import android.net.ConnectivityManager;
 
-import gsn.http.rest.PushDelivery;
+import java.util.List;
+
 import tinygsn.beans.DeliveryRequest;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
+import tinygsn.model.utils.Oauth2Connection;
 import tinygsn.model.publishers.utils.PublishDataTask;
+import tinygsn.storage.db.SqliteStorageManager;
 
 
 public class OnDemandDataPublisher extends AbstractDataPublisher {
@@ -46,17 +49,22 @@ public class OnDemandDataPublisher extends AbstractDataPublisher {
 
 	@Override
 	public void publish(long until) {
-		StreamElement[] se = controller.loadRangeData(dr.getVsname(), dr.getLastTime(), until);
-		PushDelivery pd = new PushDelivery(dr.getUrl() + "/streaming/", Double.parseDouble(dr.getKey()));
-		if (se.length > 0) {
-			ConnectivityManager connManager = (ConnectivityManager) StaticData.globalContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-			if (connManager.getActiveNetworkInfo() == null) {
-				log(StaticData.globalContext, "No Network for uploading data");
+		try {
+			SqliteStorageManager storage = new SqliteStorageManager();
+			List<StreamElement> se = storage.executeQueryGetRangeData("vs_" + dr.getVsname(), dr.getLastTime(), until);
+			Oauth2Connection c = new Oauth2Connection(dr.getUrl(), dr.getClientID(), dr.getClientSecret());
+			if (se.size() > 0) {
+				ConnectivityManager connManager = (ConnectivityManager) StaticData.globalContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+				if (connManager.getActiveNetworkInfo() == null) {
+					log(StaticData.globalContext, "No Network for uploading data");
+				} else {
+					new PublishDataTask(c, dr).execute(se);
+				}
 			} else {
-				new PublishDataTask(pd, this, dr).execute(se);
+				log(StaticData.globalContext, "No data to publish");
 			}
-		} else {
-			log(StaticData.globalContext, "No data to publish");
+		}catch (Exception e){
+
 		}
 	}
 

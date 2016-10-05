@@ -44,8 +44,7 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 
 	public SQLiteDatabaseOpenHelper(Context context, String name,
 			CursorFactory factory, int version) {
-		super(context, Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/Android/data/tinygsn/"+ name, factory, version);
+		super(context, name, factory, version);
 	}
 
 	@Override
@@ -63,7 +62,7 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 
 
 		createQuery = "CREATE TABLE publishDestination (_id integer primary key autoincrement,"
-				+ "url text, vsname text, key text, mode integer, lastTime bigint, iterationTime bigint, active int"
+				+ "url text, vsname text, clientId text,  clientSecret text, mode integer, lastTime bigint, iterationTime bigint, active int"
 				+ ");";
 		db.execSQL(createQuery);
 
@@ -88,8 +87,6 @@ public class SQLiteDatabaseOpenHelper extends SQLiteOpenHelper implements Serial
 		db.execSQL(createQuery);
 		createQuery = "CREATE TABLE settings (key text primary key, value text);";
 		db.execSQL(createQuery);
-
-
 	}
 
 	@Override

@@ -89,12 +89,12 @@ public class PublishListAdapter extends ArrayAdapter<PublishRow> {
 								if (params[0]) {
                                     pr.setActive(true);
 									DeliveryRequest dr = storage.getPublishInfo(pr.getId());
-									storage.setPublishInfo(dr.getId(), dr.getUrl(), dr.getVsname(), dr.getKey(), dr.getMode(), dr.getLastTime(), dr.getIterationTime(), true);
+									storage.setPublishInfo(dr.getId(), dr.getUrl(), dr.getVsname(), dr.getClientID(), dr.getClientSecret(), dr.getMode(), dr.getLastTime(), dr.getIterationTime(), true);
 									return true;
 								} else {
 									pr.setActive(false);
                                     DeliveryRequest dr = storage.getPublishInfo(pr.getId());
-                                    storage.setPublishInfo(dr.getId(), dr.getUrl(), dr.getVsname(), dr.getKey(), dr.getMode(), dr.getLastTime(), dr.getIterationTime(), false);
+                                    storage.setPublishInfo(dr.getId(), dr.getUrl(), dr.getVsname(), dr.getClientID(), dr.getClientSecret(), dr.getMode(), dr.getLastTime(), dr.getIterationTime(), false);
 									return true;
 								}
 							} catch (Exception e) {

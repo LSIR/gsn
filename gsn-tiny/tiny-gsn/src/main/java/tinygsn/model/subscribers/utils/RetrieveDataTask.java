@@ -27,36 +27,24 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.epfl.locationprivacy.util.Utils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.lang.Exception;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import gsn.http.rest.PushDelivery;
-import jsqlite.*;
-import tinygsn.beans.DataField;
-import tinygsn.beans.DeliveryRequest;
 import tinygsn.beans.StaticData;
 import tinygsn.beans.StreamElement;
 import tinygsn.beans.Subscription;
-import tinygsn.model.publishers.AbstractDataPublisher;
+import tinygsn.model.utils.Oauth2Connection;
 import tinygsn.storage.db.SqliteStorageManager;
 import tinygsn.utils.Logging;
 
-public class RetrieveDataTask extends AsyncTask<String, Void, ArrayList<StreamElement>> {
+public class RetrieveDataTask extends AsyncTask<String, Void, List<StreamElement>> {
 
 	private static final String LOGTAG = "SubDataTask";
 	private Subscription su;
-    private DefaultHttpClient httpclient = new DefaultHttpClient();
+    private Oauth2Connection connection;
 
 	public RetrieveDataTask(Subscription su) {
 		this.su = su;
@@ -65,72 +53,20 @@ public class RetrieveDataTask extends AsyncTask<String, Void, ArrayList<StreamEl
 	private String apiUrl = "";
 
 	@Override
-	protected ArrayList<StreamElement> doInBackground(String ... params) {
+	protected List<StreamElement> doInBackground(String ... params) {
 		apiUrl = params[0];
-        ArrayList<StreamElement> se = new ArrayList<>();
+        List<StreamElement> se;
         try{
-            HttpGet httpGet = new HttpGet(apiUrl);
-            HttpResponse response = httpclient.execute(httpGet);
-            int statusCode = response.getStatusLine().getStatusCode();
-            InputStreamReader is = new InputStreamReader(response.getEntity().getContent(),"UTF-8");
-            if (statusCode == 200) {
-                BufferedReader bufferedReader = new BufferedReader(is);
-                String line = bufferedReader.readLine();
-                if(line != null){
-                    JSONObject obj = new JSONObject(line);
-                    JSONArray f = obj.getJSONArray("features");
-                    if (f.length() > 0){
-                        JSONObject vs = f.getJSONObject(0).getJSONObject("properties");
-                        DataField[] structure = parseFields(vs.getJSONArray("fields"));
-                        if (vs.has("values")) {
-                            JSONArray val = vs.getJSONArray("values");
-                            for (int i = 0; i < val.length(); i++) {
-                                JSONArray v = val.getJSONArray(i);
-                                Serializable[] vals = new Serializable[structure.length];
-                                for (int j = 0; j < structure.length; j++) {
-                                    vals[j] = parseValue(v, j, structure);
-                                }
-                                se.add(new StreamElement(structure, vals, v.getLong(1)));
-                            }
-                        }
-                    }
-                }
-            }
-            is.close();
+            connection = new Oauth2Connection(apiUrl, su.getUsername(), su.getPassword());
+            connection.authenticate();
+            StreamElement[] ses = StreamElement.fromJSON(connection.doJsonRequest("GET", "/api/sensors/"+su.getVsname()+"/" ,""));
+            se = Arrays.asList(ses);
         }catch(Exception e){
             e.printStackTrace();
             se = null;
         }
 		return se;
 	}
-
-    private Serializable parseValue(JSONArray v, int i, DataField[] structure) throws JSONException {
-        switch (structure[i].getDataTypeID()){
-            case 0:
-            case 1:
-                return v.getString(i + 2);
-            case 2:
-            case 7:
-            case 8:
-                return v.getInt(i + 2);
-            case 3:
-                return v.getLong(i + 2);
-            case 5:
-                return v.getDouble(i + 2);
-            default:
-                return "unsupported type";
-        }
-    }
-
-    private DataField[] parseFields(JSONArray fields) throws JSONException {
-        if (fields.length() < 2) return new DataField[0];
-
-        DataField[] ret = new DataField[fields.length()-2];
-        for (int i = 2; i<fields.length();i++){
-            ret[i-2] = new DataField(fields.getJSONObject(i).getString("name"),fields.getJSONObject(i).getString("type"));
-        }
-        return ret;
-    }
 
     protected void onPostExecute(ArrayList<StreamElement> results) {
         if (results != null) {
@@ -151,10 +87,10 @@ public class RetrieveDataTask extends AsyncTask<String, Void, ArrayList<StreamEl
 	}
 
 	protected static void log(Context context, String s) {
-		if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
+		/*if ((boolean) Utils.getBuildConfigValue(context, "LOGGING")) {
 			Log.d(LOGTAG, s);
 			Logging.createNewLoggingFolder(context, "Publish");
 			Logging.appendLog("Publish", LOGTAG + ".txt", s, context);
-		}
+		}*/
 	}
 }
