@@ -1,5 +1,18 @@
 ## GSN Change log
 
+### r2.0.0
+[commits](https://github.com/LSIR/gsn/commits/gsn-release-2.0.0)
+* This is a major release and some of the changes below are NOT backward compatible.
+* Splitting GSN into gsn-core, gsn-extra, gsn-services and gsn-webui.
+* New web UI, based on the GSN API.
+* Oauth2 provider (and consumer for Google login for example) and access control moved to the gsn-services
+* Completely removing Jetty from gsn-core (removing API v1 and v2 and all servlets. The plan is to move the actually needed one to gsn-services). [more details](https://github.com/LSIR/gsn/commit/fea30806e3da30720204eed46b1d6b74f036034b)
+* Adding websockets to the API for realtime streams (experimental feature).
+* Migrating from ant/maven to sbt.
+* Migrating all inter-GSN communication to zeroMQ/gsn-services API (zeromq-sync, zeromq-async, zeromq-push, remote-api wrappers).
+* Adding vagrant for quick demo
+* Migrating namespace from gsn to ch.epfl.gsn to publish artifacts on Sonatype.
+
 ### r1.1.8
 [commits](https://github.com/LSIR/gsn/commits/gsn-release-1.1.8)
 * Adding monitoring of GSN internal metrics, output to munin and collectd
