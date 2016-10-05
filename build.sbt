@@ -1,7 +1,7 @@
 
 lazy val commonSettings = Seq(
   organization := "ch.epfl.gsn",
-  version := "2.0.0",
+  version := "2.0.1-SNAPSHOT",
   scalaVersion := "2.11.2",
   javacOptions in (Compile, compile) ++= Seq("-source", "1.7", "-target", "1.7", "-bootclasspath", "/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar"),
   resolvers ++= Seq(
@@ -15,8 +15,8 @@ lazy val commonSettings = Seq(
     "Local ivy Repository" at ""+Path.userHome.asFile.toURI.toURL+"/.ivy2/local"
   ),
   //publishTo := Some("Artifactory Realm" at "http://osper.epfl.ch:8081/artifactory/gsn-release"),
-  //publishTo := Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"),
-    publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
+    publishTo := Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"),
+   // publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
 /*
 publishTo &lt;&lt;= version { v: String =&gt;
   val nexus = "https://oss.sonatype.org/"

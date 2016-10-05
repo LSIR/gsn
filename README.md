@@ -43,25 +43,10 @@ If you only need to write your own wrapper for a specific sensor communication p
 
 ```xml
 <dependency>
-    <groupId>gsn</groupId>
+    <groupId>ch.epfl.gsn</groupId>
     <artifactId>gsn-core</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.0.0</version>
 </dependency>
-```
-and the repository:
-```xml
-<distributionManagement>
-    <repository>
-        <id>osper</id>
-        <name>osper-releases</name>
-        <url>http://osper.epfl.ch:8081/artifactory/gsn-release</url>
-    </repository>
-    <snapshotRepository>
-        <id>osper</id>
-        <name>osper-snapshots</name>
-        <url>http://osper.epfl.ch:8081/artifactory/gsn-release</url>
-    </snapshotRepository>
-</distributionManagement>
 ```
 
 Then you can package your code as a jar and put it in the lib folder of the installer (after you followed the steps of the previous section) and you are ready to load you own wrapper or virtual sensor. In the case of a new wrapper you will also need to register it on the ``wrapper.properties`` file on your GSN installation.
