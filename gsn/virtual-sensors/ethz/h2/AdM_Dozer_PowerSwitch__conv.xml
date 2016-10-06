@@ -11,14 +11,22 @@
                 		
                 		// SIB
                 		if (DEVICE_ID < 3000) {
-                			TEMPERATURE = Double.toString(-66.875+218.75*(((2.56/65536)*PAYLOAD_TEMPERATURE)/3.2));
-                			HUMIDITY = Double.toString(-12.5+125*(((2.56/65536)*PAYLOAD_HUMIDITY)/3.2));
-                			IPORT1 = Double.toString(PAYLOAD_IPORT1 * (2.56/65536) / 50 / 0.005 * 1000);
-                			IPORT2 = Double.toString(PAYLOAD_IPORT2 * (2.56/65536) / 50 / 0.005 * 1000);
-                			V12EXT1 = Double.toString(PAYLOAD_V12EXT1 * (2.56/65536) * 8.5);
-                			V12EXT2 = Double.toString(PAYLOAD_V12EXT2 * (2.56/65536) * 8.5);
-                			V12EXT3 = Double.toString(PAYLOAD_V12EXT3 * (2.56/65536) * 8.5);
-                			V12EXT4 = Double.toString(PAYLOAD_V12EXT4 * (2.56/65536) * 8.5);
+                			if (PAYLOAD_TEMPERATURE != null)
+                				TEMPERATURE = Double.toString(-66.875+218.75*(((2.56/65536)*PAYLOAD_TEMPERATURE)/3.2));
+                			if (PAYLOAD_HUMIDITY != null)
+                				HUMIDITY = Double.toString(-12.5+125*(((2.56/65536)*PAYLOAD_HUMIDITY)/3.2));
+                			if (PAYLOAD_IPORT1 != null)
+                				IPORT1 = Double.toString(PAYLOAD_IPORT1 * (2.56/65536) / 50 / 0.005 * 1000);
+                			if (PAYLOAD_IPORT2 != null)
+                				IPORT2 = Double.toString(PAYLOAD_IPORT2 * (2.56/65536) / 50 / 0.005 * 1000);
+                			if (PAYLOAD_V12EXT1 != null)
+                				V12EXT1 = Double.toString(PAYLOAD_V12EXT1 * (2.56/65536) * 8.5);
+                			if (PAYLOAD_V12EXT2 != null)
+                				V12EXT2 = Double.toString(PAYLOAD_V12EXT2 * (2.56/65536) * 8.5);
+                			if (PAYLOAD_V12EXT3 != null)
+                				V12EXT3 = Double.toString(PAYLOAD_V12EXT3 * (2.56/65536) * 8.5);
+                			if (PAYLOAD_V12EXT4 != null)
+                				V12EXT4 = Double.toString(PAYLOAD_V12EXT4 * (2.56/65536) * 8.5);
                 		}
                 		// PowerSwitch
                 		else if (DEVICE_ID >= 6000 && DEVICE_ID < 7000) {
@@ -26,10 +34,14 @@
                 			    TEMPERATURE = Double.toString(0.01*PAYLOAD_TEMPERATURE - 39.63);
                 			    HUMIDITY = Double.toString(((0.01*PAYLOAD_TEMPERATURE)-64.63)*(0.01+(0.00008*PAYLOAD_HUMIDITY))+((0.0405*PAYLOAD_HUMIDITY)-4-(0.0000028*Math.pow(PAYLOAD_HUMIDITY,2))));
                 			}
-                			V12EXT1 = Double.toString(PAYLOAD_V12EXT1 * (1.5/4095) * 12);
-                			I12EXT1 = Double.toString(PAYLOAD_I12EXT1 * (1.5/4095) * 10 / 0.001);
-                			IPORT1 = Double.toString(PAYLOAD_IPORT1 * (1.5/4095) * 10 / 0.001);
-                			IPORT2 = Double.toString(PAYLOAD_IPORT2 * (1.5/4095) * 10 / 0.001);
+                			if (PAYLOAD_V12EXT1 != null)
+                				V12EXT1 = Double.toString(PAYLOAD_V12EXT1 * (1.5/4095) * 12);
+                			if (PAYLOAD_I12EXT1 != null)
+                				I12EXT1 = Double.toString(PAYLOAD_I12EXT1 * (1.5/4095) * 10 / 0.001);
+                			if (PAYLOAD_IPORT1 != null)
+                				IPORT1 = Double.toString(PAYLOAD_IPORT1 * (1.5/4095) * 10 / 0.001);
+                			if (PAYLOAD_IPORT2 != null)
+                				IPORT2 = Double.toString(PAYLOAD_IPORT2 * (1.5/4095) * 10 / 0.001);
                 		}
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
