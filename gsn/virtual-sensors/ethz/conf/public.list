@@ -33,6 +33,9 @@ AdM_Dozer_ModbusHolding__mapped.xml
 AdM_Dozer_NodeHealth__conv.xml
 AdM_Dozer_NodeHealth__mapped.xml
 AdM_Dozer_NodeInfo__mapped.xml
+AdM_Dozer_PowerSwitch__config.xml
+AdM_Dozer_PowerSwitch__conv.xml
+AdM_Dozer_PowerSwitch__mapped.xml
 AdM_Dozer_Rssi__conv.xml
 AdM_Dozer_Rssi__mapped.xml
 AdM_Dozer_Rssi__muxed__mapped.xml

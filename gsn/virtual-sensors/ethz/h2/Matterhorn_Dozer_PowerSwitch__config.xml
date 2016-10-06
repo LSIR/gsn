@@ -96,7 +96,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Matterhorn_Dozer_EventLogger__mapped where ((EVENT_ID = 4 and DEVICE_ID >= 6000 and DEVICE_ID &lt; 7000 and DEVICE_ID != 6666) or (EVENT_ID = 32 and EVENT_VALUE > 3))</predicate>
+                    <predicate key="query"> select * from Matterhorn_Dozer_EventLogger__mapped where (EVENT_ID = 4 or (EVENT_ID = 32 and EVENT_VALUE > 3))</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper</query>

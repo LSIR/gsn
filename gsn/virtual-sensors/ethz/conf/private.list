@@ -18,6 +18,7 @@ AdM_Dozer_EventLogger.xml
 AdM_Dozer_ModbusHolding.xml
 AdM_Dozer_NodeHealth.xml
 AdM_Dozer_NodeInfo.xml
+AdM_Dozer_PowerSwitch.xml
 AdM_Dozer_Rssi.xml
 AdM_Dozer_StateCounter.xml
 AdM_Binary_Http.xml

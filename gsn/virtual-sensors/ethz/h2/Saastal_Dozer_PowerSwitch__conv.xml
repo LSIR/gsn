@@ -2,6 +2,41 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                	try {
+                		TEMPERATURE = HUMIDITY = IPORT1 = IPORT2 = V12EXT1 = V12EXT2 = V12EXT3 = V12EXT4 = I12EXT1 =  null;
+                		
+                		// SIB
+                		if (DEVICE_ID < 3000) {
+                			TEMPERATURE = Double.toString(-66.875+218.75*(((2.56/65536)*PAYLOAD_TEMPERATURE)/3.2));
+                			HUMIDITY = Double.toString(-12.5+125*(((2.56/65536)*PAYLOAD_HUMIDITY)/3.2));
+                			IPORT1 = Double.toString(PAYLOAD_IPORT1 * (2.56/65536) / 50 / 0.005 * 1000);
+                			IPORT2 = Double.toString(PAYLOAD_IPORT2 * (2.56/65536) / 50 / 0.005 * 1000);
+                			V12EXT1 = Double.toString(PAYLOAD_V12EXT1 * (2.56/65536) * 8.5);
+                			V12EXT2 = Double.toString(PAYLOAD_V12EXT2 * (2.56/65536) * 8.5);
+                			V12EXT3 = Double.toString(PAYLOAD_V12EXT3 * (2.56/65536) * 8.5);
+                			V12EXT4 = Double.toString(PAYLOAD_V12EXT4 * (2.56/65536) * 8.5);
+                		}
+                		// PowerSwitch
+                		else if (DEVICE_ID >= 6000 && DEVICE_ID < 7000) {
+                		    if (PAYLOAD_TEMPERATURE != null && PAYLOAD_HUMIDITY != null) {
+                			    TEMPERATURE = Double.toString(0.01*PAYLOAD_TEMPERATURE - 39.63);
+                			    HUMIDITY = Double.toString(((0.01*PAYLOAD_TEMPERATURE)-64.63)*(0.01+(0.00008*PAYLOAD_HUMIDITY))+((0.0405*PAYLOAD_HUMIDITY)-4-(0.0000028*Math.pow(PAYLOAD_HUMIDITY,2))));
+                			}
+                			V12EXT1 = Double.toString(PAYLOAD_V12EXT1 * (1.5/4095) * 12);
+                			I12EXT1 = Double.toString(PAYLOAD_I12EXT1 * (1.5/4095) * 10 / 0.001);
+                			IPORT1 = Double.toString(PAYLOAD_IPORT1 * (1.5/4095) * 10 / 0.001);
+                			IPORT2 = Double.toString(PAYLOAD_IPORT2 * (1.5/4095) * 10 / 0.001);
+                		}
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+                ]]>
+            </param>
+        </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
             <field name="DEVICE_ID" type="INTEGER" />
@@ -12,13 +47,18 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="V12EXT" type="VARCHAR(30)" unit="V" />
-            <field name="I12EXT" type="VARCHAR(30)" unit="mA" />
-            <field name="IPORT1" type="VARCHAR(30)" unit="mA" />
-            <field name="IPORT2" type="VARCHAR(30)" unit="mA" />
+            <field name="TEMPERATURE" type="VARCHAR(30)" unit="°C" />
+            <field name="HUMIDITY" type="VARCHAR(30)" unit="%" />
+            <field name="PAYLOAD_POWERSTATE" type="TINYINT" />
             <field name="PAYLOAD_PORT1ON" type="TINYINT" />
             <field name="PAYLOAD_PORT2ON" type="TINYINT" />
-            <field name="PAYLOAD_POWERSTATE" type="TINYINT" />
+            <field name="IPORT1" type="VARCHAR(30)" unit="mA" />
+            <field name="IPORT2" type="VARCHAR(30)" unit="mA" />
+            <field name="V12EXT1" type="VARCHAR(30)" unit="V" />
+            <field name="V12EXT2" type="VARCHAR(30)" unit="V" />
+            <field name="V12EXT3" type="VARCHAR(30)" unit="V" />
+            <field name="V12EXT4" type="VARCHAR(30)" unit="V" />
+            <field name="I12EXT1" type="VARCHAR(30)" unit="mA" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerPowerSwitchMsg) from Saastal deployment converted</description>
@@ -32,13 +72,7 @@
                     <predicate key="query"> select * from Saastal_Dozer_PowerSwitch__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME, PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
-                cast(round(PAYLOAD_V12EXT * (1.5/4095) * 12, 2) as CHAR(30)) as V12EXT,
-                cast(round(PAYLOAD_I12EXT * (1.5/4095) * 10 / 0.001,2) as CHAR(30)) as I12EXT,
-                cast(round(PAYLOAD_IPORT1 * (1.5/4095) * 10 / 0.001,2) as CHAR(30)) as IPORT1,
-                cast(round(PAYLOAD_IPORT2 * (1.5/4095) * 10 / 0.001,2) as CHAR(30)) as IPORT2,
-                PAYLOAD_PORT1ON, PAYLOAD_PORT2ON, PAYLOAD_POWERSTATE
-                from wrapper </query>
+                <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

@@ -15,13 +15,18 @@
             <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
-            <field name="PAYLOAD_V12EXT" type="INTEGER" />
-            <field name="PAYLOAD_I12EXT" type="INTEGER" />
-            <field name="PAYLOAD_IPORT1" type="INTEGER" />
-            <field name="PAYLOAD_IPORT2" type="INTEGER" />
+            <field name="PAYLOAD_TEMPERATURE" type="INTEGER" />
+            <field name="PAYLOAD_HUMIDITY" type="INTEGER" />
+            <field name="PAYLOAD_POWERSTATE" type="TINYINT" />
             <field name="PAYLOAD_PORT1ON" type="TINYINT" />
             <field name="PAYLOAD_PORT2ON" type="TINYINT" />
-            <field name="PAYLOAD_POWERSTATE" type="TINYINT" />
+            <field name="PAYLOAD_IPORT1" type="INTEGER" />
+            <field name="PAYLOAD_IPORT2" type="INTEGER" />
+            <field name="PAYLOAD_V12EXT1" type="INTEGER" />
+            <field name="PAYLOAD_V12EXT2" type="INTEGER" />
+            <field name="PAYLOAD_V12EXT3" type="INTEGER" />
+            <field name="PAYLOAD_V12EXT4" type="INTEGER" />
+            <field name="PAYLOAD_I12EXT1" type="INTEGER" />
         </output-structure>
     </processing-class>
     <description>Dozer messages (DozerPowerSwitchMsg) from Dirruhorn deployment</description>
