@@ -91,6 +91,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 		"corestation-connected-field",			// 26
         "backlogstatus-dynamic-stream-name",	// 27: this stream does not count to the packetcount
         "backlogstatus-db-entries-field",		// 28
+        "dpp-stream-name",						// 29
 	};
 	
 	private static final String commandConfigurationParameter = "dozer-command-vs";
@@ -272,7 +273,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 			}
 			// BackLogStatus Dynamic
 			else if (inputStreamName.equals(configuration[27])) {
-				if (!node.corestation_online)
+				if (node.corestation_online == null || !node.corestation_online)
 					node.corestation_online = new Boolean(true);
 				// save always latest BackLog DB information
 				if (isLatest) {
@@ -348,14 +349,18 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 						// we do not want all sv packets generating a topology stream
 						return;
 				}
+				else if (inputStreamName.equals(configuration[29])) { // dpp packets
+					if(!node.isAccessNode() && !node.isDPPNode())
+						node.setNodeType(SensorNode.DPP);
+				}
 				s = data.getData(configuration[1]);
 				if (s instanceof Integer) {
 					node.parent_id = (Integer)s;
 				}
 	
-				// health
+				// dozer health
 				// save always latest health information
-				if (inputStreamName.equals(configuration[25]) && isLatest) {
+				if ((inputStreamName.equals(configuration[25]) || inputStreamName.equals(configuration[29])) && isLatest) {
 					// Vsys
 					s = data.getData(configuration[4]);
 					if (s instanceof Integer)
@@ -393,6 +398,8 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 					s = data.getData(configuration[9]);
 					if (s instanceof Integer)
 						node.uptime = (Integer)s;
+					else if (s instanceof Long)
+						node.uptime = ((Long)s).intValue();
 					// VSdi
 					s = data.getData(configuration[21]);
 					if (s instanceof Integer)

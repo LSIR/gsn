@@ -24,6 +24,10 @@ public class SensorNode {
 	public static final short GPS_LOGGER = 7;
 	public static final short WEBCAM = 8;
 	public static final short AE_TINYNODE = 9;
+	public static final short OUTPACK_MATE_3 = 10;
+	public static final short IMIS_WEATHER_STATION = 11;
+	public static final short GPS_L2 = 12;
+	public static final short DPP = 13;
 	public static final Short NODE_TYPE_UNKNOWN = -1;
 	
 	public static final short [] corestationTypes = {4, 5, 6};
@@ -95,6 +99,22 @@ public class SensorNode {
 
 	public boolean isWGPSNode() {
 		return nodetype == WGPS_TINYNODE;
+	}
+
+	public boolean isOutpackMate3Node() {
+		return nodetype == OUTPACK_MATE_3;
+	}
+
+	public boolean isIMISWeatherStationNode() {
+		return nodetype == IMIS_WEATHER_STATION;
+	}
+
+	public boolean isGPSL2Node() {
+		return nodetype == GPS_L2;
+	}
+
+	public boolean isDPPNode() {
+		return nodetype == DPP;
 	}
 
 	public boolean isDozerNode() {

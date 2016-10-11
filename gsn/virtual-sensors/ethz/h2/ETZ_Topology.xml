@@ -41,6 +41,8 @@
             <param name="backlogstatus-dynamic-stream-name">data27</param>
             <param name="backlogstatus-db-entries-field">DB_ENTRIES</param>
             
+            <param name="dpp-stream-name">data28</param>
+            
         </init-params>
         <web-input>
             <command name="dataconfiguration">
@@ -588,6 +590,23 @@
           </predicate>
         </address>
         <query>select DEVICE_ID as HEADER_ORIGINATORID, TIMESTAMP, GENERATION_TIME, DB_ENTRIES from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data28">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select  DEVICE_ID, TIMESTAMP, GENERATION_TIME, UPTIME, VCC, TEMP
+            from etz_dpp_comm_status
+          </predicate>
+        </address>
+        <query>select DEVICE_ID as HEADER_ORIGINATORID,
+                      TIMESTAMP,
+                      GENERATION_TIME,
+                      UPTIME as PAYLOAD_UPTIME,
+                      VCC as PAYLOAD_SYSVOLTAGE,
+                      TEMP as PAYLOAD_TEMPERATURE from wrapper</query>
       </source>
       <query> select * from source </query>
     </stream>

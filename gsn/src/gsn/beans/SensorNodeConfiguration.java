@@ -108,15 +108,14 @@ public class SensorNodeConfiguration {
 			events = (config & (1 << INDEX_EVENTS)) > 0;
 			rssi = (config & (1 << INDEX_RSSI)) > 0;
 			statecounter = (config & (1 << INDEX_STATECOUNTER)) > 0;
-			if (getNodeType() == SensorNode.SIB_TINYNODE) {
+			if (getNodeType() == SensorNode.SIB_TINYNODE || getNodeType() == SensorNode.POWERSWITCH_TN) {
 				adcmux = (config & (1 << INDEX_ADCMUX)) > 0;
 				adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0;
 				dcx = (config & (1 << INDEX_DCX)) > 0;
 				decagonmux = (config & (1 << INDEX_DECAGONMUX)) > 0;
 				vaisala_wxt520 = (config & (1 << INDEX_VAISALA_WXT520)) > 0;
-			}
-			else if (getNodeType() == SensorNode.POWERSWITCH_TN)
 				powerswitch= (config & (1 << INDEX_POWERSWITCH)) > 0;
+			}
 			else if (getNodeType() == SensorNode.AE_TINYNODE)
 				adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0; // ae data
 		}
@@ -149,6 +148,8 @@ public class SensorNodeConfiguration {
 	}
 	
 	public boolean hasDataConfig1() {
+		if (nodetype == SensorNode.DPP)
+			return false;
 		boolean hasconfig =
 			info!=null && 
 			health!=null &&
@@ -162,7 +163,8 @@ public class SensorNodeConfiguration {
 			adcmux!=null &&
 			adccomdiff!=null &&
 			dcx!=null &&
-			decagonmux!=null;
+			decagonmux!=null &&
+			powerswitch!=null;
 		case SensorNode.POWERSWITCH_TN:
 			return hasconfig &&
 			powerswitch!=null;
@@ -175,6 +177,8 @@ public class SensorNodeConfiguration {
 	}
 	
 	public boolean hasDataConfig2() {
+		if (nodetype == SensorNode.DPP)
+			return false;
 		return
 			th3!=null && 
 			enviroscan!=null &&
