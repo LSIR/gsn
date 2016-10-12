@@ -41,6 +41,8 @@
             <param name="backlogstatus-dynamic-stream-name">data27</param>
             <param name="backlogstatus-db-entries-field">DB_ENTRIES</param>
             
+            <param name="dpp-stream-name">data28</param>
+            
         </init-params>
         <web-input>
             <command name="dataconfiguration">
