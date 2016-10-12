@@ -12,10 +12,11 @@ public class SensorNodeConfiguration {
 	public Boolean rssi = null;
 	public Boolean statecounter = null;
 	public Boolean decagonmux = null;
-	public Boolean powerswitch = null;	// from powerswitch packet
+	public Boolean powerswitch = null;
 	public Boolean vaisala_wxt520 = null;
 	public Boolean th3 = null;
 	public Boolean enviroscan = null;
+	public Boolean teg = null;
 	public Boolean modbus = null;
 	public Boolean wgps = null;
 	public Boolean powerswitch_p1 = null;
@@ -39,16 +40,13 @@ public class SensorNodeConfiguration {
 	private final static int INDEX_EVENTS = 6;
 	private final static int INDEX_RSSI = 7;
 	private final static int INDEX_STATECOUNTER = 8;
-	private final static int INDEX_DECAGONMUX = 9;
 	private final static int INDEX_POWERSWITCH = 9;
 	private final static int INDEX_VAISALA_WXT520 = 10;
 	//data sources 2
 	private final static int INDEX_TH3 = 0;
 	private final static int INDEX_ENVIROSCAN = 1;
-	@SuppressWarnings("unused")
-	private final static int INDEX_UNUSED1 = 2;
-	@SuppressWarnings("unused")
-	private final static int INDEX_UNUSED2 = 3;
+	private final static int INDEX_DECAGONMUX = 2;
+	private final static int INDEX_TEG = 3;
 	private final static int INDEX_MODBUS = 4;
 	private final static int INDEX_WGPS = 5;
 
@@ -112,9 +110,8 @@ public class SensorNodeConfiguration {
 				adcmux = (config & (1 << INDEX_ADCMUX)) > 0;
 				adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0;
 				dcx = (config & (1 << INDEX_DCX)) > 0;
-				decagonmux = (config & (1 << INDEX_DECAGONMUX)) > 0;
+				powerswitch = (config & (1 << INDEX_POWERSWITCH)) > 0;
 				vaisala_wxt520 = (config & (1 << INDEX_VAISALA_WXT520)) > 0;
-				powerswitch= (config & (1 << INDEX_POWERSWITCH)) > 0;
 			}
 			else if (getNodeType() == SensorNode.AE_TINYNODE)
 				adccomdiff = (config & (1 << INDEX_ADCCOMDIFF)) > 0; // ae data
@@ -123,6 +120,8 @@ public class SensorNodeConfiguration {
 			if (getNodeType() == SensorNode.SIB_TINYNODE) {
 				th3 = (config & (1 << INDEX_TH3)) > 0;
 				enviroscan = (config & (1 << INDEX_ENVIROSCAN)) > 0;
+				decagonmux = (config & (1 << INDEX_DECAGONMUX)) > 0;
+				teg = (config & (1 << INDEX_TEG)) > 0;
 				modbus = (config & (1 << INDEX_MODBUS)) > 0;
 			}
 			else if (getNodeType() == SensorNode.WGPS_TINYNODE)
@@ -148,7 +147,7 @@ public class SensorNodeConfiguration {
 	}
 	
 	public boolean hasDataConfig1() {
-		if (nodetype == SensorNode.DPP)
+		if (getNodeType() == SensorNode.DPP)
 			return false;
 		boolean hasconfig =
 			info!=null && 
@@ -163,7 +162,6 @@ public class SensorNodeConfiguration {
 			adcmux!=null &&
 			adccomdiff!=null &&
 			dcx!=null &&
-			decagonmux!=null &&
 			powerswitch!=null;
 		case SensorNode.POWERSWITCH_TN:
 			return hasconfig &&
@@ -177,11 +175,13 @@ public class SensorNodeConfiguration {
 	}
 	
 	public boolean hasDataConfig2() {
-		if (nodetype == SensorNode.DPP)
+		if (getNodeType() == SensorNode.DPP)
 			return false;
 		return
 			th3!=null && 
 			enviroscan!=null &&
+			decagonmux!=null &&
+			teg!=null &&
 			modbus!=null &&
 			wgps!=null;
 	}
@@ -196,7 +196,6 @@ public class SensorNodeConfiguration {
 		events=null;
 		rssi=null;
 		statecounter=null;
-		decagonmux=null;
 		powerswitch=null;
 		vaisala_wxt520=null;
 	}
@@ -204,6 +203,8 @@ public class SensorNodeConfiguration {
 	public void removeDataConfig2() {
 		th3=null; 
 		enviroscan=null;
+		decagonmux=null;
+		teg=null;
 		modbus=null;
 		wgps=null;
 	}
@@ -219,7 +220,6 @@ public class SensorNodeConfiguration {
 			(events == null || !events ? 0: 1 << INDEX_EVENTS) +
 			(rssi == null || !rssi ? 0: 1 << INDEX_RSSI) +
 			(statecounter == null || !statecounter ? 0: 1 << INDEX_STATECOUNTER) +
-			(decagonmux == null || !decagonmux ? 0: 1 << INDEX_DECAGONMUX) +
 			(powerswitch == null || !powerswitch ? 0: 1 << INDEX_POWERSWITCH) +
 			(vaisala_wxt520 == null || !vaisala_wxt520 ? 0: 1 << INDEX_VAISALA_WXT520)
 		);
@@ -229,6 +229,8 @@ public class SensorNodeConfiguration {
 		return (short) (
 			(th3 == null || !th3 ? 0: 1 << INDEX_TH3) + 
 			(enviroscan == null || !enviroscan ? 0: 1 << INDEX_ENVIROSCAN) + 
+			(decagonmux == null || !decagonmux ? 0: 1 << INDEX_DECAGONMUX) +
+			(teg == null || !teg ? 0: 1 << INDEX_TEG) +
 			(modbus == null || !modbus ? 0: 1 << INDEX_MODBUS) + 
 			(wgps == null || !wgps ? 0: 1 << INDEX_WGPS)
 		);
@@ -264,13 +266,14 @@ public class SensorNodeConfiguration {
 				bothNullOrEqual(sc.events, this.events) &&
 				bothNullOrEqual(sc.rssi, this.rssi) &&
 				bothNullOrEqual(sc.statecounter, this.statecounter) &&
-				bothNullOrEqual(sc.decagonmux, this.decagonmux) &&
 				bothNullOrEqual(sc.powerswitch, this.powerswitch) &&
 				bothNullOrEqual(sc.powerswitch_p1, this.powerswitch_p1) &&
 				bothNullOrEqual(sc.powerswitch_p2, this.powerswitch_p2) &&
 				bothNullOrEqual(sc.vaisala_wxt520, this.vaisala_wxt520) &&
 				bothNullOrEqual(sc.th3, this.th3) &&
 				bothNullOrEqual(sc.enviroscan, this.enviroscan) &&
+				bothNullOrEqual(sc.decagonmux, this.decagonmux) &&
+				bothNullOrEqual(sc.teg, this.teg) &&
 				bothNullOrEqual(sc.modbus, this.modbus) &&
 				bothNullOrEqual(sc.wgps, this.wgps) &&
 				bothNullOrEqual(sc.querytype, this.querytype);
@@ -290,13 +293,14 @@ public class SensorNodeConfiguration {
 			"\nevents: "+events+
 			"\nrssi: "+rssi+
 			"\nstatecounter: "+statecounter+
-			"\ndecagonmux: "+decagonmux+
 			"\npowerswitch: "+powerswitch+
 			"\npowerswitch_p1: "+powerswitch_p1+
 			"\npowerswitch_p2: "+powerswitch_p2+
 			"\nvaisala_wxt520: "+vaisala_wxt520+
 			"\nth3: "+th3+
 			"\nenviroscan: "+enviroscan+
+			"\ndecagonmux: "+decagonmux+
+			"\nteg: "+teg+
 			"\nmodbus: "+modbus+
 			"\nwgps: "+wgps+
 			"\nisquery: "+querytype+
