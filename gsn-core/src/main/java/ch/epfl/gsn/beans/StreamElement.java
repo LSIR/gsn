@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import ch.epfl.gsn.beans.json.*;
 import ch.epfl.gsn.beans.DataField;
 import ch.epfl.gsn.beans.DataTypes;
 import ch.epfl.gsn.beans.StreamElement;
@@ -575,4 +576,34 @@ public final class StreamElement implements Serializable {
 		verifyTypeCompatibility(fieldTypes[index], data);
 		setData(index,data);		
 	}
+
+	public String toJSON(String vs_name){
+
+		GeoJsonField[] fields = new GeoJsonField[getFieldNames().length+1];
+		fields[0] = new GeoJsonField();
+		fields[0].setName("timestamp");
+		fields[0].setType("time");
+		fields[0].setUnit("ms");
+		for(int i = 1; i < fields.length; i++){
+			fields[i] = new GeoJsonField();
+			fields[i].setName(getFieldNames()[i-1]);
+			fields[i].setType(DataTypes.TYPE_NAMES[getFieldTypes()[i-1]]);
+		}
+		Serializable[] values = new Serializable[fields.length];
+		values[0] = getTimeStamp();
+		for(int j = 1; j < fields.length; j++){
+			values[j] = fieldValues[j-1];
+		}
+		GeoJsonProperties prop = new GeoJsonProperties();
+		prop.setVs_name(vs_name);
+		prop.setFields(fields);
+		prop.setValues(new Serializable[][] {values});
+        GeoJsonFeature feature = new GeoJsonFeature();
+        feature.setPage_size(1);
+        feature.setTotal_size(1);
+		feature.setType("Feature");
+		feature.setProperties(prop);
+
+		return Json.toJson(feature).toString();
+    }
 }

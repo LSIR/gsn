@@ -1,0 +1,32 @@
+<virtual-sensor name="mqtt_sample" priority="11">
+	<processing-class>
+		<class-name>ch.epfl.gsn.networking.mqtt.MQTTExporterVS</class-name>
+		<init-params>
+			<param name="uri">tcp://broker.mqttdashboard.com:1883</param>
+			<param name="topic">forward/timestamp</param>
+		</init-params>
+		<output-structure>
+			<field name="raw_packet" type="binary" />
+		</output-structure>
+	</processing-class>
+	<description>Get data from a MQTT server</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Not yet specified</predicate>
+	</addressing>
+	<storage history-size="2h" />
+	<streams>
+		<stream name="input1">
+			<source alias="source1" sampling-rate="1" storage-size="1">
+				<address wrapper="mqtt">
+					<predicate key="uri">tcp://broker.mqttdashboard.com:1883</predicate>
+                    <predicate key="client_id">a_random_string_that_must_be_unique</predicate>
+                    <predicate key="topic">timestamp</predicate>
+                    <predicate key="qos">0</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from source1</query>
+		</stream>
+	</streams>
+</virtual-sensor>
