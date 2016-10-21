@@ -40,6 +40,7 @@ libraryDependencies ++= Seq(
   "com.esotericsoftware.kryo" % "kryo" % "2.23.0",
   "org.zeromq" % "jeromq" % "0.3.5",
   "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.1.0",
+  "org.eclipse.californium" % "californium-core" % "1.0.4",
   "junit" % "junit" % "4.11" %  "test",
   "ch.epfl.gsn" % "gsn-tools" % "2.0.0",
   "org.easymock" % "easymockclassextension" % "3.2" % "test",

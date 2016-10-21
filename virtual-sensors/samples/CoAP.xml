@@ -1,0 +1,25 @@
+<virtual-sensor name="coap_sample" priority="11">
+	<processing-class>
+		<class-name>ch.epfl.gsn.vsensor.BridgeVirtualSensor</class-name>
+		<output-structure>
+			<field name="raw_packet" type="binary" />
+		</output-structure>
+	</processing-class>
+	<description>Get data from a CoAP server</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Not yet specified</predicate>
+	</addressing>
+	<storage history-size="2h" />
+	<streams>
+		<stream name="input1">
+			<source alias="source1" sampling-rate="1" storage-size="1">
+				<address wrapper="coap">
+					<predicate key="uri">coap://coap.me:5683/hello</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from source1</query>
+		</stream>
+	</streams>
+</virtual-sensor>
