@@ -58,7 +58,7 @@ public class CommHealthMsg implements Message {
 		
 		try {
 			uptime = payload.getInt() & 0xffffffffL; 			// uint32_t: uptime in seconds
-			temp = payload.getShort() & 0xffff; 				// int16_t: temperature value in 100x °C
+			temp = (int) payload.getShort(); 					// int16_t: temperature value in 100x °C
 			vcc = payload.getShort() & 0xffff; 					// uint16_t: supply voltage (raw ADC value)
 			cpu_dc = payload.getShort() & 0xffff; 				// uint16_t: cpu duty cycle in per thousands
 			rf_dc = payload.getShort() & 0xffff; 				// uint16_t: radio duty cycle in per thousands
