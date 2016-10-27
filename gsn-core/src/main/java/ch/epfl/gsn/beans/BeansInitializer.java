@@ -170,7 +170,6 @@ public class BeansInitializer {
 	  ArrayList<KeyValue> ini=new ArrayList<KeyValue>();
       Iterable<String> initkeys=JavaConversions.asJavaIterable(init.keys());
 	  for (String ik:initkeys){
-		  logger.trace("keys:"+ik);
 		  ini.add(new KeyValueImp(ik.toLowerCase(),init.apply(ik)));
 	  }
 	  v.setMainClassInitialParams(ini);

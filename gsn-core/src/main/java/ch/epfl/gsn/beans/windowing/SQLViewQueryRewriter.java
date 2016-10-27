@@ -106,10 +106,7 @@ public abstract class SQLViewQueryRewriter extends QueryRewriter {
             query.append(" set timed=").append(timestamp).append(" where u_id='").append(streamSource.getUIDStr());
             query.append("' ");
             storageManager.executeUpdate(query);
-            if (storageManager.isThereAnyResult(new StringBuilder("select * from ").append(streamSource.getUIDStr()))) {
-                logger.debug(streamSource.getWrapper().getWrapperName() + " - Output stream produced/received from a wrapper " + streamSource.toString());
-                return streamSource.windowSlided();
-            }
+            return streamSource.windowSlided();
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         }

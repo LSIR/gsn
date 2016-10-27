@@ -314,7 +314,7 @@ public class JDBCWrapper extends AbstractWrapper {
         long latest = -1;
         StringBuilder query = new StringBuilder("select max(timed) from ").append(this.getActiveAddressBean().getVirtualSensorName());
         try {
-            data = sm.executeQuery(query, false);
+            data = Main.getDefaultStorage().executeQuery(query, false);
             logger.warn("Running query " + query);
 
             while (data.hasMoreElements()) {

@@ -74,6 +74,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     private DataDistributer() {
         try {
             thread = new Thread(this);
+            thread.setName("DataDistributer");
             thread.start();
             // Start the keep alive Timer -- Note that the implementation is backed by one single thread for all the RestDelivery instances.
             keepAliveTimer = new  javax.swing.Timer(getKeepAlivePeriod(), new ActionListener() {
@@ -167,6 +168,7 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
         logger.debug("Updating the candidate list [" + listener.toString() + " (removed)].");
         if (candidatesForNextRound.contains(listener)) {
             candidateListeners.put(listener, makeDataEnum(listener));
+            locker.add(listener);
             candidatesForNextRound.remove(listener);
         } else {
             locker.remove(listener);
@@ -254,7 +256,9 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
                     removeListener(item.getKey());
                 else {
                     if (!item.getValue().hasMoreElements()) {
-                        removeListenerFromCandidates(item.getKey());
+                    	synchronized(listeners){
+                    		removeListenerFromCandidates(item.getKey());
+                    	}
                         // As we are limiting the number of elements returned by the JDBC driver
                         // we consume the eventual remaining items.
                         consume(null, item.getKey().getVSensorConfig());
@@ -302,17 +306,43 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
     private DataEnumerator makeDataEnum(DistributionRequest listener) {
 
         PreparedStatement prepareStatement = preparedStatements.get(listener);
-        try {
-        	//last time can be also used, but must change > to >= in the query for non-unique timestamps
-        	//and it works only with totally ordered streams
+        DataEnumerator dataEnum = null;
+        try{
+            //last time can be also used, but must change > to >= in the query for non-unique timestamps
+            //and it works only with totally ordered streams
             prepareStatement.setLong(1, listener.getStartTime());
             prepareStatement.setLong(2, listener.getLastVisitedPk());
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-            return new DataEnumerator();
+            dataEnum = new DataEnumerator(Main.getStorage(listener.getVSensorConfig().getName()), prepareStatement, false, true);
+        }catch(Exception e){
+            try {	
+	        	logger.error("Connection to Database was unexpectedly closed, trying to reconnect...");
+	    		preparedStatements.remove(listener);
+	            boolean needsAnd = SQLValidator.removeSingleQuotes(SQLValidator.removeQuotes(listener.getQuery())).indexOf(" where ") > 0;
+	            String query = SQLValidator.addPkField(listener.getQuery());
+	            if (needsAnd)
+	                query += " AND ";
+	            else
+	                query += " WHERE ";
+                query += " timed > ? and pk > ? order by pk asc "; //both have to be parameters to force the optimizer of Postgres < 9.2 to not scan on timed index
+	            PreparedStatement prepareStatementnew = null;
+	            prepareStatementnew = getPersistantConnection(listener.getVSensorConfig()).prepareStatement(query); //prepareStatement = StorageManager.getInstance().getConnection().prepareStatement(query);
+	            prepareStatementnew.setMaxRows(1000); // Limit the number of rows loaded in memory.
+	            preparedStatements.put(listener, prepareStatement);
+	            //last time can be also used, but must change > to >= in the query for non-unique timestamps
+                //and it works only with totally ordered streams
+                prepareStatement.setLong(1, listener.getStartTime());
+                prepareStatement.setLong(2, listener.getLastVisitedPk());
+	            dataEnum = new DataEnumerator(Main.getStorage(listener.getVSensorConfig().getName()), prepareStatement, false, true);
+            } catch (Exception e0) {
+        	    logger.error(e0.getMessage(), e0);
+                try {
+				    prepareStatement.close();
+			    } catch (SQLException e1) {
+				    logger.error(e1.getMessage(), e1);
+			    }
+                return new DataEnumerator();
+            }
         }
-
-        DataEnumerator dataEnum = new DataEnumerator(Main.getStorage(listener.getVSensorConfig().getName()), prepareStatement, false, true);
         return dataEnum;
     }
 

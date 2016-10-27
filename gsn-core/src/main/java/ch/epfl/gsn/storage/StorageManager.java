@@ -68,7 +68,7 @@ public abstract class StorageManager {
         pool.setMaxActive(maxDBConnections);
         pool.setMaxIdle(maxDBConnections);
 
-        pool.setRemoveAbandoned(true);    // removing unused connections, used to clean after poorly written code
+        pool.setRemoveAbandoned(false);    // removing unused connections, used to clean after poorly written code
         pool.setRemoveAbandonedTimeout(300);    // 5 minutes
         //
         Connection con = null;
@@ -78,7 +78,7 @@ public abstract class StorageManager {
         } catch (Exception e) {
             logger.error(new StringBuilder().append("Connecting to the database with the following properties failed :").append("\n\t UserName :").append(username).append("\n\t Password : ").append(password).append("\n\t Driver class : ").append(databaseDriver).append("\n\t Database URL : ").append(databaseURL).toString());
             logger.info(new StringBuilder().append(e.getMessage()).append(", Please refer to the logs for more detailed information.").toString());
-            logger.info("Make sure in the ch.epfl.gsn.xml file, the <storage ...> element is correct.");
+            logger.info("Make sure in the gsn.xml file, the <storage ...> element is correct.");
             logger.error(e.getMessage(), e);
         } finally {
             close(con);
@@ -87,7 +87,7 @@ public abstract class StorageManager {
 
     public void initDatabaseAccess(Connection con) throws Exception {}
 
-    public abstract byte convertLocalTypeToGSN(int jdbcType, int precision);
+    public abstract byte convertLocalTypeToGSN(int jdbcType, int precision,boolean signed);
 
     public abstract String getStatementDropIndex();
 
@@ -200,9 +200,10 @@ public abstract class StorageManager {
                 if (colName.equalsIgnoreCase("pk")) continue;
                 if (colName.equalsIgnoreCase("timed")) continue;
                 int colType = structure.getColumnType(i);
+                boolean signed = structure.isSigned(i);
                 String colTypeName = structure.getColumnTypeName(i);
                 int precision = structure.getPrecision(i);
-                byte colTypeInGSN = convertLocalTypeToGSN(colType);
+                byte colTypeInGSN = convertLocalTypeToGSN(colType,signed);
                 if (colTypeInGSN == -100){
                     logger.error("The type can't be converted to GSN form - error description: virtual sensor name is: "+tableName+", field name is: "+colName + ", query is: " + sb);
                 }
@@ -498,6 +499,26 @@ public abstract class StorageManager {
     public DataEnumerator executeQuery(StringBuilder query, boolean binaryFieldsLinked, Connection connection) throws SQLException {
         logger.debug("Executing query: " + query + "( Binary Field Linked:" + binaryFieldsLinked + ")");
         return new DataEnumerator(this, connection.prepareStatement(query.toString()), binaryFieldsLinked);
+    }
+    
+    public DataEnumerator executeQueryIfNotEmpty(StringBuilder query, boolean binaryFieldsLinked){
+    	boolean toreturn = false;
+        Connection connection = null;
+        ResultSet resultSet = null;
+        try {
+            connection = getConnection();
+            PreparedStatement prepareStatement = connection.prepareStatement(query.toString());
+            resultSet = prepareStatement.executeQuery();
+            toreturn = resultSet.next();
+        } catch (SQLException error) {
+            logger.error(error.getMessage(), error);
+        }
+        if (toreturn){
+        	return new DataEnumerator(this, resultSet, binaryFieldsLinked,false,true);
+        }else{
+            close(connection);
+            return null;
+        }
     }
 
     /**
@@ -814,7 +835,7 @@ public abstract class StorageManager {
 
     /**
      * Obtains the default database connection.
-     * The conneciton comes from the data source which is configured through ch.epfl.gsn.xml file.
+     * The conneciton comes from the data source which is configured through gsn.xml file.
      * @return
      * @throws SQLException
      */

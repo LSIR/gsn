@@ -99,27 +99,37 @@ public class DataEnumerator implements DataEnumeratorIF {
 	}
 	
 	public DataEnumerator ( StorageManager storageManager, PreparedStatement preparedStatement , boolean binaryLinked ,boolean manualClose) {
-		this.storageManager = storageManager;
-        this.manualCloseConnection=manualClose;
+		
 		if ( preparedStatement == null ) {
 			logger.debug( new StringBuilder( ).append( "resultSetToStreamElements" ).append( " is supplied with null input." ).toString( ) );
 			hasNext = false;
 			return;
 		}
+		try {
+			ResultSet r = preparedStatement.executeQuery( );
+			boolean _hasNext = r.next( );
+			initialize(storageManager,r,binaryLinked,manualClose,_hasNext);
+		} catch (Exception e) {
+			logger.error("Trying to create DataEnumerator with:\n"+preparedStatement.toString());
+            logger.error( e.getMessage( ) , e );
+			hasNext = false;
+		}
+	}
 		
-//		try {
-//			preparedStatement.setFetchSize(50);
-//		} catch (SQLException e1) {
-//			logger.warn(e1.getMessage(),e1);
-//			return;
-//		}
-
+	public DataEnumerator (StorageManager storageManager, ResultSet resultSet , boolean binaryLinked ,boolean manualClose,boolean _hasNext) {
+			initialize(storageManager, resultSet , binaryLinked ,manualClose,_hasNext);
+		}
+	        
+	        
+	private void initialize(StorageManager storageManager, ResultSet resultSet , boolean binaryLinked ,boolean manualClose,boolean _hasNext){
+	    this.storageManager=storageManager;
+	    this.manualCloseConnection=manualClose;
 		this.linkBinaryData = binaryLinked;
+		this.resultSet = resultSet;
+		this.hasNext = _hasNext;
 		Vector < String > fieldNames = new Vector < String >( );
 		Vector < Byte > fieldTypes = new Vector < Byte >( );
 		try {
-			this.resultSet = preparedStatement.executeQuery( );
-			hasNext = resultSet.next( );
 			// Initializing the fieldNames and fieldTypes.
 			// Also setting the values for <code> hasTimedFieldInResultSet</code>
 			// if the timed field is present in the result set.
@@ -143,7 +153,6 @@ public class DataEnumerator implements DataEnumeratorIF {
                         logger.warn("Table name: " + tableName);
                         logger.warn("Column name: " +colName);
                         logger.warn("Column type name: " +resultSet.getMetaData().getColumnTypeName(i));
-                        logger.warn("Query result: " +preparedStatement.toString());
                         problematicColumn = i;
                     }
 					fieldTypes.add( gsnType );
@@ -160,7 +169,7 @@ public class DataEnumerator implements DataEnumeratorIF {
 			dataFieldTypes = fieldTypes.toArray( new Byte [ ] {} );
 			if ( indexofPK == -1 && linkBinaryData ) throw new RuntimeException( "The specified query can't be used with binaryLinked paramter set to true." );
 		} catch ( Exception e ) {
-			logger.error("Trying to create DataEnumerator with:\n"+preparedStatement.toString());
+			logger.error("Trying to create DataEnumerator with a resultSet\n");
             logger.error( e.getMessage( ) , e );
 			hasNext = false;
 		}finally {

@@ -64,6 +64,14 @@ public class Helpers {
         DateTime dt = new DateTime(timestamp);
         return fmt.print(dt);
 	}
+    
+    public static <T> boolean contains( final T[] array, final T v ) {
+	    for ( final T e : array )
+	        if ( e == v || v != null && v.equals( e ) )
+	            return true;
+
+	    return false;
+	}
 
 }
 

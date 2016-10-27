@@ -172,6 +172,9 @@ public class VSensorLoader extends Thread {
         for (VSensorConfig configFile : removeIt) {
             removeVirtualSensor(configFile);
         }
+        try {// to avoid concurrent modifications of pipe lists in ZMQ
+			Thread.sleep(100);
+		} catch (InterruptedException e1) {}
         for (VSensorConfig vs : addIt) {
         	try{
                 loadPlugin(vs);

@@ -203,8 +203,8 @@ public class ContainerConfig {
 	}
 
 	public void writeConfigurations ( ) throws FileNotFoundException , IOException {
-		StringTemplateGroup templateGroup = new StringTemplateGroup( "ch.epfl.gsn" );
-		StringTemplate st = templateGroup.getInstanceOf( "ch.epfl.gsn/gui/templates/templateConf" );
+		StringTemplateGroup templateGroup = new StringTemplateGroup( "gsn" );
+		StringTemplate st = templateGroup.getInstanceOf( "gsn/gui/templates/templateConf" );
 		st.setAttribute( "db_user" , storage.getJdbcUsername( ) );
 		st.setAttribute( "db_password" , storage.getJdbcPassword( ) );
 		st.setAttribute( "db_driver" , storage.getJdbcDriver( ) );

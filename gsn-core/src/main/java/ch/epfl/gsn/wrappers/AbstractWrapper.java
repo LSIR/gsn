@@ -80,7 +80,8 @@ public abstract class AbstractWrapper extends Thread implements Monitorable {
 
 	private Hashtable<Object,Long> lastInOrderTimestamp = new Hashtable<Object, Long>();
 
-	public static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 2;
+
+	public static final int GARBAGE_COLLECT_AFTER_SPECIFIED_NO_OF_ELEMENTS = 5;
 	
 	private Long oooCount = 0L;
 	

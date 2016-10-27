@@ -77,7 +77,7 @@ public class H2StorageManager extends StorageManager {
     }
 
     @Override
-    public byte convertLocalTypeToGSN(int jdbcType, int precision) {
+    public byte convertLocalTypeToGSN(int jdbcType, int precision,boolean signed) {
         switch (jdbcType) {
                     case Types.BIGINT:
                         return DataTypes.BIGINT;
