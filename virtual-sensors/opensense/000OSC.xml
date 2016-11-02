@@ -1,0 +1,39 @@
+<virtual-sensor name="osc" priority="20">
+	<processing-class>
+		<class-name>ch.epfl.gsn.vsensor.OpensenseBridgeVirtualSensor</class-name>
+		<unique-timestamps>false</unique-timestamps>
+		<web-input>
+			<command name="send">
+                <field name="id" type="text">Node ID, as advertised in the command request function</field>
+                <field name="command" type="text">close --station_id--, telnet_set --station_id--, rstsys, reboot, setPeriod --station_id--,--T1--,--T2--, server --name-- --port--</field>
+                <field name="force" type="checkbox:ok">Force sending of the command. Will send it without waiting for the request packet.</field>
+            </command>
+            <command name="clear">
+                <field name="clear" type="checkbox:ok">Confirmation</field>
+            </command>
+		</web-input>
+		<output-structure>
+                        <field name="timestamp" type="bigint" />
+                        <field name="station" type="smallint" />
+                        <field name="type" type="smallint" />
+                        <field name="payload" type="binary" />
+		</output-structure>
+	</processing-class>
+	<description>Main entry for all data loggers</description>
+	<life-cycle pool-size="10" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	<storage history-size="-1" />
+	<streams>
+		<stream name="connector">
+			<source alias="connector" sampling-rate="1" storage-size="1">
+				<address wrapper="opensense-connector">
+					<predicate key="port">22025</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from connector</query>
+		</stream>
+	</streams>
+</virtual-sensor>

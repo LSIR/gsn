@@ -1,0 +1,54 @@
+<virtual-sensor name="geo_osfph" priority="11">
+	<processing-class>
+		<class-name>ch.epfl.gsn.vsensor.ModellingVirtualSensor</class-name>
+		<unique-timestamps>false</unique-timestamps>
+    	<init-params>
+            <param name="model">ch.epfl.gsn.utils.models.StreamInterpolateJoinModel</param>
+            <param name="model.0.historysize">1000</param>
+            <param name="model.0.f_latitude">gsl_interp_cspline</param>
+            <param name="model.0.f_longitude">gsl_interp_cspline</param>
+            <param name="model.0.f_hdop">gsl_interp_linear</param>
+            <param name="model.0.f_altitude">gsl_interp_linear</param>
+		</init-params>
+		<output-structure>
+           <field name="station" type="smallint" />
+           <field name="ufp_temp" type="float" />
+           <field name="ufp_RH" type="smallint" />
+           <field name="ufp_flow" type="float" />
+           <field name="ufp_warning" type="smallint" />
+           <field name="ufp_bat" type="float" />
+           <field name="latitude" type="double" />
+           <field name="longitude" type="double" />
+           <field name="altitude" type="float" />
+           <field name="HDOP" type="float" />
+		</output-structure>
+	</processing-class>
+	<description>Map GPS onto FPH</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	<storage history-size="-1" />
+	<streams>
+		<stream name="A">
+			<source alias="A"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq-async" partial-order-key="station">
+					<predicate key="address">inproc://stream/p_osgps</predicate>
+					<predicate key="vsensor">p_osgps</predicate>
+				</address>
+				<query>select timed,station,latitude,longitude,altitude,HDOP from wrapper</query>
+			</source>
+			<query>select * from A</query>
+		</stream>
+		<stream name="B">
+			<source alias="B"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq-async" partial-order-key="station">
+					<predicate key="address">inproc://stream/p_osfph</predicate>
+					<predicate key="vsensor">p_osfph</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from B</query>
+		</stream>
+	</streams>
+</virtual-sensor>

@@ -1,0 +1,37 @@
+<virtual-sensor name="geo_osfpm" priority="11">
+	<processing-class>
+		<class-name>ch.epfl.gsn.vsensor.BridgeVirtualSensor</class-name>
+		<unique-timestamps>false</unique-timestamps>
+    	
+		<output-structure>
+           <field name="station" type="smallint" />
+           <field name="LDSA" type="float" />
+           <field name="idiff" type="float" />
+           <field name="HV" type="smallint" />
+           <field name="EM" type="float" />
+           <field name="latitude" type="double" />
+           <field name="longitude" type="double" />
+           <field name="altitude" type="float" />
+           <field name="HDOP" type="float" />
+		</output-structure>
+	</processing-class>
+	<description>Partector measurements</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	 <storage history-size="-1" user="gsn" password="opensense" driver="org.postgresql.Driver" url="jdbc:postgresql://127.0.0.1:5433/opensense" />
+	<streams>
+		
+		<stream name="B">
+			<source alias="B"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq-sync" partial-order-key="station">
+					<predicate key="address">tcp://disalsrv6.epfl.ch</predicate>
+					<predicate key="vsensor">geo_osfpm</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from B</query>
+		</stream>
+	</streams>
+</virtual-sensor>

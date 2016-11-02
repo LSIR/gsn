@@ -1,0 +1,35 @@
+<virtual-sensor name="p_osfph" priority="11">
+	<processing-class>
+		<class-name>ch.epfl.gsn.vsensor.OpensenseSplitterVSensor</class-name>
+		<unique-timestamps>false</unique-timestamps>
+		<init-params>
+		    <param name="type">FPH</param> 
+		</init-params>
+		<output-structure>
+           <field name="station" type="smallint" />
+           <field name="ufp_temp" type="float" />
+           <field name="ufp_RH" type="smallint" />
+           <field name="ufp_flow" type="float" />
+           <field name="ufp_warning" type="smallint" />
+           <field name="ufp_bat" type="float" />
+		</output-structure>
+	</processing-class>
+	<description>Parse Partector health packets</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	<storage history-size="-1" />
+	<streams>
+		<stream name="input1">
+			<source alias="source1"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq-async" partial-order-key="station">
+					<predicate key="address">inproc://stream/osc</predicate>
+					<predicate key="vsensor">osc</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from source1 where type = '13'</query>
+		</stream>
+	</streams>
+</virtual-sensor>

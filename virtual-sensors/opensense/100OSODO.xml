@@ -1,0 +1,31 @@
+<virtual-sensor name="p_osodo" priority="11">
+	<processing-class>
+		<class-name>ch.epfl.gsn.vsensor.OpensenseSplitterVSensor</class-name>
+		<unique-timestamps>false</unique-timestamps>
+		<init-params>
+		    <param name="type">ODO</param> 
+		</init-params>
+		<output-structure>
+           <field name="station" type="smallint" />
+           <field name="odometer" type="smallint" />
+		</output-structure>
+	</processing-class>
+	<description>Parse Odometer packets</description>
+	<life-cycle pool-size="100" />
+	<addressing>
+		<predicate key="geographical">Lausanne, Switzerland</predicate>
+	</addressing>
+	<storage history-size="-1" />
+	<streams>
+		<stream name="input1">
+			<source alias="source1"  sampling-rate="1" storage-size="1">
+				<address wrapper="zeromq-async" partial-order-key="station">
+					<predicate key="address">inproc://stream/osc</predicate>
+					<predicate key="vsensor">osc</predicate>
+				</address>
+				<query>select * from wrapper</query>
+			</source>
+			<query>select * from source1 where type = '1'</query>
+		</stream>
+	</streams>
+</virtual-sensor>
