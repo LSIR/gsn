@@ -100,7 +100,15 @@ public abstract class StorageManager {
     public abstract StringBuilder getStatementUselessDataRemoval(String virtualSensorName, long storageSize);
 
     public byte convertLocalTypeToGSN(int jdbcType) {
-        return convertLocalTypeToGSN(jdbcType, 0);
+        return convertLocalTypeToGSN(jdbcType, 0,true);
+    }
+    
+    public byte convertLocalTypeToGSN(int jdbcType,int precision) {
+        return convertLocalTypeToGSN(jdbcType, precision, true);
+    }
+    
+    public byte convertLocalTypeToGSN(int jdbcType,boolean signed){
+    	return convertLocalTypeToGSN(jdbcType,0,signed);
     }
 
 

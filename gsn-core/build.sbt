@@ -47,12 +47,7 @@ libraryDependencies ++= Seq(
   "org.httpunit" % "httpunit" % "1.7.2" % "test" exclude("xerces","xercesImpl") exclude("xerces","xmlParserAPIs") exclude("javax.servlet","servlet-api")
 )
 
-unmanagedJars in Compile <++= baseDirectory map { base =>
-    val libs = base / "lib"
-    val option = libs / "optional"
-    val dirs = (option / "modeling")
-    (dirs ** "*.jar").classpath
-}
+javaCppPresetLibs ++= Seq("gsl" -> "1.16")
 
 mainClass := Some("ch.epfl.gsn.Main")
 

@@ -10,6 +10,8 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.1.2")
 
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")  
 
+addSbtPlugin("org.bytedeco" % "sbt-javacpp" % "1.4")
+
 //addSbtPlugin("org.xerial.sbt" % "sbt-pack" % "0.6.2")  // for sbt-0.13.x or higher
 
 //addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % "1.0.0")
