@@ -1,9 +1,15 @@
 <virtual-sensor name="Dirruhorn_GPS_L2__conv" priority="10" >
     <processing-class>
-        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <class-name>gsn.vsensor.ConditionalDeleteVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="position_mapping" />
+            
+            <param name="field1">DEVICE_ID</param>
+            <param name="operation1">=</param>
+            <param name="join2">AND</param>
+            <param name="field2">GENERATION_TIME</param>
+            <param name="operation2">=</param>
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" />

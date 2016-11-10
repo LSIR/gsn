@@ -17,18 +17,19 @@ import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 
 public class HttpGetWrapper extends AbstractWrapper {
    
-	private int						DEFAULT_RATE		= 2000;
+	private long						DEFAULT_RATE			= 2000;
+	private String						DEFAULT_FILE_EXTENSION	= ".jpg";
 
 	private final transient Logger	logger				= Logger.getLogger( HttpGetWrapper.class );
 
 	private URL						url;
-	private int						rate;
+	private long					rate;
+	private String					file_extension;
 	private File					directory			= null;
 	private String					subdirectory		= null;
 	private Integer					deviceId			= null;
@@ -164,7 +165,13 @@ public class HttpGetWrapper extends AbstractWrapper {
 		if ( inputRate == null || inputRate.trim( ).length( ) == 0 )
 			rate = DEFAULT_RATE;
 		else
-			rate = Integer.parseInt( inputRate );
+			rate = Long.parseLong( inputRate );
+		
+		String fileExtension = addressBean.getPredicateValue( "file-extension" );
+		if ( fileExtension == null || fileExtension.trim( ).length( ) == 0 )
+			file_extension = DEFAULT_FILE_EXTENSION;
+		else
+			file_extension =  fileExtension;
 		
 		String format = addressBean.getPredicateValue("folder-datetime-format");
 		if (format != null) {
@@ -203,7 +210,7 @@ public class HttpGetWrapper extends AbstractWrapper {
 				    File f = new File(directory+"/"+datedir);
 				    if (!f.exists())
 				    	f.mkdirs();
-				    String name = datedir + "/" + format.format(new java.util.Date(timestamp))+".jpg";
+				    String name = datedir + "/" + format.format(new java.util.Date(timestamp))+file_extension;
 				    
 					arrayOutputStream.writeTo(new FileOutputStream (new File(directory, name)));
 					if (deviceId == null)

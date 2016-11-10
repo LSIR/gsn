@@ -53,15 +53,15 @@
     <description>Parsed GPS L2 station data from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
-    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-test-binaries/" history-size="1" />
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from ETZ_GPS_L2__files__mapped</predicate>
+                    <predicate key="query"> select * from ETZ_GPS_L2__mapped</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select TIMED, DEVICE_ID, LABEL, DEVICE_TYPE, RELATIVE_FILE1 as FILE, SIZE_FILE1 as SIZE from wrapper </query>
+                <query> select TIMED, DEVICE_ID, LABEL, DEVICE_TYPE, RELATIVE_FILE as FILE, SIZE from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>

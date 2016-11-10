@@ -1,0 +1,42 @@
+<virtual-sensor name="Saastal_GPS_L2" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                    LABEL = "KREB";
+                    DEVICE_TYPE = "gps-l2";
+                ]]>
+            </param>
+        </init-params>
+       	<output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+			<field name="LABEL" type="VARCHAR(4)" />
+			<field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
+            <field name="RELATIVE_FILE" type="VARCHAR(255)"/>
+			<field name="SIZE" type="INTEGER" />
+       	</output-structure>
+    </processing-class>
+    <description>GPS L2 data for Saastal deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage storage-directory="/home/perma/permasense_vault/gsn-binaries/" />
+    <streams>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="http-get">
+                    <predicate key="url">http://hera.ethz.ch/.misc/tijm9043vn043/tik/COGEAR/KREB_static.enh</predicate>
+                    <predicate key="subdirectory-name">gps-l2</predicate>
+                    <predicate key="rate">86400000</predicate>
+                    <predicate key="file-extension">.enh</predicate>
+                    <predicate key="device-id">4002</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

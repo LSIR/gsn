@@ -76,7 +76,8 @@ ETZ_DPP_NodeInfo__conv.xml
 ETZ_DPP_NodeInfo__mapped.xml
 ETZ_GPS_Inclinometer.xml
 ETZ_GPS_L2__conv.xml
-ETZ_GPS_L2__files__mapped.xml
+#ETZ_GPS_L2__files__mapped.xml
+ETZ_GPS_L2__mapped.xml
 ETZ_GPS_L2__parsed.xml
 ETZ_GPS_Differential__batch.xml
 ETZ_GPS_Differential__batch__daily.xml
