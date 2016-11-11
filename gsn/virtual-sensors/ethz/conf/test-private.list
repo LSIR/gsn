@@ -42,7 +42,8 @@ ETZ_DPP_Comm_Cmd.xml
 ETZ_DPP_Comm_Status.xml
 ETZ_DPP_Log.xml
 ETZ_DPP_NodeInfo.xml
-ETZ_GPS_L2.xml
+#ETZ_GPS_L2.xml
+#ETZ_GPS_L2__files.xml
 ETZ_GPS_Logger__files.xml
 ETZ_GPS_RAW.xml
 ETZ_IMIS__files.xml
