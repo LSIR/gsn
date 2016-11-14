@@ -371,7 +371,9 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 				processPerDeviceData(inputStreamName, data, streamElementBuffer.get(match1));
 			}
 			else {
-				super.dataAvailable("mergedStream", new StreamElement(data, statisticsDataFields, generateStats(null, data)));
+				StreamElement se = new StreamElement(data, statisticsDataFields, generateStats(null, data));
+				se.setTimeStamp(System.currentTimeMillis());
+				super.dataAvailable("mergedStream", se);
 			}
 			
 			if (logger.isDebugEnabled())
@@ -502,7 +504,6 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 		private ArrayList<StreamElement> streamElements;
 		private StreamElement newSE;
 		private StreamElement oldSE;
-		private Long timestampSE = null;
 		private Long bucketStartTime = null;
 		private Long bucketEndTime = null;
 		
@@ -511,7 +512,6 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 			streamElements.add(streamElement);
 			newSE = streamElement;
 			oldSE = streamElement;
-			timestampSE = streamElement.getTimeStamp();
 			
 			if (bucketSizeInMs != null) {
 				Long time = (Long) streamElement.getData(timeline);
@@ -557,8 +557,6 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 				bucketEndTime = bucketStartTime+bucketSizeInMs;
 			}
 			
-			if (streamElement.getTimeStamp() > timestampSE)
-				timestampSE = streamElement.getTimeStamp();
 			if (((Long)streamElement.getData(timeline)).compareTo((Long)newSE.getData(timeline)) > 0)
 				newSE = streamElement;
 			if (((Long)streamElement.getData(timeline)).compareTo((Long)oldSE.getData(timeline)) < 0)
@@ -603,7 +601,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 				}
 			}
 			
-			return new StreamElement(mergedDataFields, mergedData, timestampSE);
+			return new StreamElement(mergedDataFields, mergedData);
 		}
 
 		private Serializable newFnc(DataField dataField) {
