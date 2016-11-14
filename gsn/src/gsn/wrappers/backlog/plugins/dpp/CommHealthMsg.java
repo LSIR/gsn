@@ -29,7 +29,8 @@ public class CommHealthMsg implements Message {
 			new DataField("LWB_SLEEP_CNT", "SMALLINT"),
 			new DataField("LWB_T_TO_RX", "INTEGER"),
 			new DataField("LWB_T_FLOOD", "INTEGER"),
-			new DataField("LWB_N_RX_STARTED", "SMALLINT")};
+			new DataField("LWB_N_RX_STARTED", "SMALLINT"),
+			new DataField("TEST_BYTE", "SMALLINT")};
 
 	@Override
 	public Serializable[] receivePayload(ByteBuffer payload) throws Exception {
@@ -55,6 +56,7 @@ public class CommHealthMsg implements Message {
 		Integer lwb_t_to_rx = null;
 		Integer lwb_t_flood = null;
 		Short lwb_n_rx_started = null;
+		Short test_byte = null;
 		
 		try {
 			uptime = payload.getInt() & 0xffffffffL; 			// uint32_t: uptime in seconds
@@ -79,12 +81,13 @@ public class CommHealthMsg implements Message {
 			lwb_t_to_rx = payload.getShort() & 0xffff;			// uint16_t: time[us] to first rx (offset to glossy_start)
 			lwb_t_flood = payload.getShort() & 0xffff;			// uint16_t: flood duration [us]
 			lwb_n_rx_started = (short) (payload.get() & 0xff);	// uint8_t: preambles+sync det. in last flood
+			test_byte = (short) (payload.get() & 0xff);			// uint8_t: test byte
 		} catch (Exception e) {
 		}
         
 		return new Serializable[]{uptime, temp, vcc, cpu_dc, rf_dc, lwb_rx_cnt, lwb_n_rx_hops, rf_per, rf_snr, lwb_rssi1, lwb_rssi2, 
 				lwb_rssi3, lwb_fsr, lwb_tx_buf, lwb_rx_buf, lwb_tx_drop, lwb_rx_drop, lwb_bootstrap_cnt, lwb_sleep_cnt, lwb_t_to_rx, 
-				lwb_t_flood, lwb_n_rx_started};
+				lwb_t_flood, lwb_n_rx_started, test_byte};
 	}
 
 	@Override

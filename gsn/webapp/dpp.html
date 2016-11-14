@@ -222,6 +222,13 @@ $(document).ready(function() {
           position: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],
         }]
       },
+      { title:"Test Byte",
+        signals: [{
+          vsensor:".*_dpp_comm_status__conv",
+          field:["test_byte"],
+          position: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],
+        }]
+      },
     ]);
     
     $.ajax({

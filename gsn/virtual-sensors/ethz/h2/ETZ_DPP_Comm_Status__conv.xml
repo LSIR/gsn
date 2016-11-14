@@ -73,6 +73,7 @@
             <field name="LWB_T_TO_RX" type="INTEGER" unit="us" />
             <field name="LWB_T_FLOOD" type="INTEGER" unit="us" />
             <field name="LWB_N_RX_STARTED" type="SMALLINT" />
+            <field name="TEST_BYTE" type="SMALLINT" />
         </output-structure>
     </processing-class>
     <description>Converted DPP Communication Processor Status messages from the ETZ deployment</description>
