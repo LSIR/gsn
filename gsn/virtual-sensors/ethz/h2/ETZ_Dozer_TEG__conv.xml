@@ -7,8 +7,6 @@
             <param name="scriptlet">
                 <![CDATA[
                 	try {
-                		def offsetMap = [ 2085:0.13, 2112:0.06 ];
-                		
                 		TEMP_AIR_SIDE = TEMP_MTN_SIDE = RECTIFIED_TEG_VOLTAGE = BAT_CHARGE_CURRENT = null;
                 		
                 		if (PAYLOAD_A4 != null && PAYLOAD_A4 != 0) {
@@ -28,10 +26,7 @@
 						}
                 		
                 		if (PAYLOAD_TN_A1 != null && PAYLOAD_TN_A1 != 0xffff) {
-                			offset = offsetMap.get(DEVICE_ID);
-                			if (offset == null)
-                				offset = 0;
-                			BAT_CHARGE_CURRENT = ((double)PAYLOAD_TN_A1) * 1.5 / 4096.0 * 10.0 - offset;
+                			BAT_CHARGE_CURRENT = ((double)PAYLOAD_TN_A1) * 1.5 / 4096.0 * 10.0;
                 		}
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);

@@ -1,0 +1,93 @@
+<virtual-sensor name="ETZ_TEG" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.StreamMergingVirtualSensor</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="maximum_buffered_stream_age_in_days">90</param>
+            <param name="streams_needed_to_merge">2</param>
+            <param name="timeline">GENERATION_TIME</param>
+            <param name="default_merge_operator">ADD</param>
+            <param name="merge_bucket_size_in_minutes">2</param>
+            <param name="merge_bucket_edge_type">dynamic</param>
+            <param name="matching_field1">DEVICE_ID</param>
+            <param name="filter_duplicates">true</param>
+            <param name="duplicates_ignore_field1">GENERATION_TIME</param>
+            <param name="duplicates_ignore_field2">TIMESTAMP</param>
+            <param name="duplicates_ignore_field3">HEADER_ATIME</param>
+            <param name="duplicates_ignore_field4">TEMP_AIR_SIDE</param>
+            <param name="duplicates_ignore_field5">TEMP_MTN_SIDE</param>
+            <param name="duplicates_ignore_field6">RECTIFIED_TEG_VOLTAGE</param>
+            <param name="duplicates_ignore_field7">BAT_CHARGE_CURRENT</param>
+            <param name="duplicates_ignore_field8">RECTIFIED_TEG_VOLTAGE_A3</param>
+            <param name="duplicates_ignore_field9">BAT_CHARGE_CURRENT_A2</param>
+            
+            <param name="POSITION">OLD</param>
+            <param name="DEVICE_ID">OLD</param>
+            <param name="GENERATION_TIME">OLD</param>
+            <param name="TIMESTAMP">OLD</param>
+            <param name="SENSORTYPE">OLD</param>
+            <param name="SENSORTYPE_SERIALID">OLD</param>
+            <param name="HEADER_SEQNR">OLD</param>
+            <param name="HEADER_ORIGINATORID">OLD</param>
+            <param name="HEADER_ATIME">OLD</param>
+            <param name="PAYLOAD_SAMPLE_VALID">MIN</param>
+            <param name="PAYLOAD_SAMPLE_NO">OLD</param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="SENSORTYPE" type="VARCHAR(100)" />
+            <field name="SENSORTYPE_SERIALID" type="BIGINT" />
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
+            <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
+            
+            <field name="TEMP_AIR_SIDE" type="DOUBLE" unit="°C" />
+            <field name="TEMP_MTN_SIDE" type="DOUBLE" unit="°C" />
+            <field name="RECTIFIED_TEG_VOLTAGE" type="DOUBLE" unit="mV" />
+            <field name="BAT_CHARGE_CURRENT" type="DOUBLE" unit="mA" />
+            
+            <field name="RECTIFIED_TEG_VOLTAGE_A3" type="DOUBLE" unit="mV" />
+            <field name="BAT_CHARGE_CURRENT_A2" type="DOUBLE" unit="mA" />
+            
+            <field name="MERGED_STREAMS" type="INTEGER"/>
+            <field name="BUFFERED_STREAMS_FOR_MATCHING_FIELD1" type="BIGINT"/>
+            <field name="TOTAL_BUFFERED_STREAMS" type="BIGINT"/>
+        </output-structure>
+    </processing-class>
+    <description>Merged TEG data from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data0">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_Dozer_Teg__conv where timed > 1475280000000</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper where position = 2052 or position = 2112</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from ETZ_Dozer_AdcComDiff__mapped where timed > 1475280000000</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE,
+                               SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,
+                               PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
+                               (PAYLOAD_A2 * 2.56 / 65536.0 * 10.0) as BAT_CHARGE_CURRENT_A2,
+                               (PAYLOAD_A3 * 2.56 / 65536.0 * 1000.0) as RECTIFIED_TEG_VOLTAGE_A3 from wrapper
+                               where position = 2052 or position = 2112</query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

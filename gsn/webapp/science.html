@@ -1104,22 +1104,22 @@
 										},
 									    { title:"TEG Temperatures",
 									        signals: [ {
-									            vsensor:"jungfraujoch_dozer_teg__conv",
+									            vsensor:"jungfraujoch_teg",
 									            field:["temp_air_side","temp_mtn_side"],
 									            position: [28,29,31],
 											} ]
 										},
 									    { title:"TEG Rectified Voltage",
 									          signals: [ {
-									            vsensor:"jungfraujoch_dozer_teg__conv",
-									            field:["rectified_teg_voltage"],
+									            vsensor:"jungfraujoch_teg",
+									            field:["rectified_teg_voltage","RECTIFIED_TEG_VOLTAGE_A3"],
 									            position: [28,29,31],
 											} ]
 										},
 									    { title:"TEG Current into Battery",
 									          signals: [ {
-									            vsensor:"jungfraujoch_dozer_teg__conv",
-									            field:["bat_charge_current"],
+									            vsensor:"jungfraujoch_teg",
+									            field:["bat_charge_current","BAT_CHARGE_CURRENT_A2"],
 									            position: [28,29,31],
 											} ]
 										},

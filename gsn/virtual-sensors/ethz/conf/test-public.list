@@ -102,6 +102,7 @@ ETZ_Schedule__mapped.xml
 ETZ_Statistics__mapped.xml
 ETZ_SyslogNg__mapped.xml
 ETZ_SyslogNg__conv.xml
+ETZ_TEG.xml
 ETZ_Topology__public.xml
 ETZ_Temperature__tttn.xml
 ETZ_Temperature__tttt.xml

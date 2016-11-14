@@ -55,6 +55,7 @@
             </source>
             <query> select * from source </query>
         </stream>
+        <!--
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
@@ -65,5 +66,6 @@
             </source>
             <query> select * from source </query>
         </stream>
+        -->
     </streams>
 </virtual-sensor>
