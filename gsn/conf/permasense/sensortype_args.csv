@@ -55,6 +55,10 @@
 "5","ccnn_dx0","50",
 "5","ccnn_dx1","150",
 
+# adccomdiff_nttn
+"1","nttn_t1","0.0",
+"1","nttn_t2","0.0",
+
 # nodehealth
 "0","sdivoltage","0.0046805046805","BaseBoard v2 r2.0"
 "0","sysvoltage","0.0007326007326","BaseBoard v2 r2.0"
