@@ -112,18 +112,19 @@ CamZillaPlugin = 90,
 # Sampler 6712
 Sampler6712Plugin = 100,
 
-# DPP
+# DPP Messages
 DPPPlugin = 110,
+
+# DPP Firmware
+DPPFirmwarePlugin = 111,
 
 TestPlugin = 126
 )
 
-# The maximum supported payload size (2^32-9bytes). This is due to
-# the sending mechanism. A sent message is defined by preceding
-# four bytes containing the message size. A message consists of
-# the type field (1 byte), the timestamp (8 bytes) and the payload
-# (max. ~4GB).
-MAX_PAYLOAD_SIZE = 4294967287
+# The maximum supported payload size (2^20). This is due to
+# the sending mechanism. A message consists of the type field (1 byte),
+# the timestamp (8 bytes) and the payload (max. 1MB).
+MAX_PAYLOAD_SIZE = 1048576
 
 
     
@@ -180,6 +181,8 @@ class BackLogMessageClass:
         
         if type < 0 or type > 255:
             raise TypeError('BackLog message type has to be in range 0 to 255')
+        if payload is not None and len(payload) > MAX_PAYLOAD_SIZE:
+            raise TypeError('BackLog message payload has to be smaller then MAX_PAYLOAD_SIZE')
         self._type = type
         self._timestamp = timestamp
         try:

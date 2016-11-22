@@ -11,6 +11,7 @@ import struct
 import time
 import logging
 import Queue
+import array
 from threading import Thread, Event, Lock
 
 import BackLogMessage
@@ -458,34 +459,41 @@ class GSNListener(Thread):
         
     def pktReadAndDestuff(self, length):
         recv = self.clientsocket.recv
-        out = self._stuffread
-        if length == 1 and out:
-            self._stuffread = ''
-            return out
-        while True:
-            c = recv(1)
-            if not c:
-                raise IOError('None returned from socket')
-            
-            if ord(c) == STUFFING_BYTE and not self._stuff:
-                self._stuff = True
-            elif self._stuff:
-                if ord(c) == STUFFING_BYTE:
-                    out += c
-                    self._stuff = False
+        unstuffed = ''
+        
+        missingLen = length
+        while missingLen != 0 and not self._gsnListenerStop:
+            if len(self._stuffread) < missingLen:
+                if (missingLen-len(self._stuffread)) < 4096:
+                    l = missingLen-len(self._stuffread)
                 else:
-                    self._logger.debug('stuffing mark reached')
-                    self._stuff = False
-                    self._stuffread = c
-                    return None
-            else:
-                out += c
+                    l = 4096
+                r = recv(l)
+                if not r:
+                    raise IOError('None returned from socket')
+                self._stuffread += r
+                continue
             
-            if len(out) == length:
-                break
+            for i in range(len(self._stuffread)):
+                if ord(self._stuffread[i]) != STUFFING_BYTE and not self._stuff:
+                    unstuffed += self._stuffread[i]
+                    missingLen -= 1
+                elif self._stuff:
+                    if ord(self._stuffread[i]) == STUFFING_BYTE:
+                        unstuffed += self._stuffread[i]
+                        missingLen -= 1
+                        self._stuff = False
+                    else:
+                        self._logger.debug('stuffing mark reached')
+                        self._stuff = False
+                        self._stuffread = self._stuffread[i:]
+                        return None
+                else:
+                    self._stuff = True
+                    
+            self._stuffread = ''
 
-        self._stuffread = ''
-        return out
+        return unstuffed
 
 
     def stop(self):

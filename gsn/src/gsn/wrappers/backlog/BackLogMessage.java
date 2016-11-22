@@ -183,6 +183,11 @@ public class BackLogMessage {
 	 *  {@link gsn.wrappers.backlog.plugins.DPPMessagePlugin DPPMessagePlugin}. */
 	public static final short DPP_MESSAGE_TYPE = 110;
 	
+	/** DPP
+     *  
+	 *  {@link gsn.wrappers.backlog.plugins.DPPFirmwarePlugin DPPFirmwarePlugin}. */
+	public static final short DPP_FIRMWARE_TYPE = 111;
+	
 	/** B4Sensor
      *  
 	 *  {@link gsn.wrappers.backlog.plugins.B4SensorPlugin B4SensorPlugin}. */
@@ -215,9 +220,9 @@ public class BackLogMessage {
 	
 
 	/** 
-	 * The maximum supported payload size (2^32bytes)
+	 * The maximum supported payload size (2^20)
 	 **/
-	public static int MAX_PAYLOAD_SIZE = (int) (Math.pow(2, 16));
+	public static final int MAX_PAYLOAD_SIZE = 1048576;
 	
 	private Serializable[] payload = {};
 	private byte [] payloadBin = null;

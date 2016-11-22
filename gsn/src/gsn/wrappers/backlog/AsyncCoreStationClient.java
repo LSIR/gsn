@@ -31,7 +31,7 @@ public class AsyncCoreStationClient extends Thread  {
     to the CoreStation in case of a connection loss. */
 	public static final int RECONNECT_TIMEOUT_SEC = 30;
 
-	private static final int PACKET_SIZE = 65536;
+	protected static final int PACKET_SIZE = gsn.wrappers.backlog.BackLogMessage.MAX_PAYLOAD_SIZE+4;
 	
 	protected final transient Logger logger = Logger.getLogger( AsyncCoreStationClient.class );
 	
@@ -41,24 +41,17 @@ public class AsyncCoreStationClient extends Thread  {
 	protected List<ChangeRequest> changeRequests = new LinkedList<ChangeRequest>();
 
 	// Maps a SocketChannel to a list of ByteBuffer instances
-	private Map<SocketChannel, PriorityQueue<PriorityDataElement>> pendingData = new HashMap<SocketChannel, PriorityQueue<PriorityDataElement>>();
+	private Map<SocketChannel, PriorityData> pendingData = new HashMap<SocketChannel, PriorityData>();
 
 	protected Map<SocketChannel,CoreStationListener> socketToListenerList = new Hashtable<SocketChannel,CoreStationListener>();
 	protected Map<CoreStationListener,SocketChannel> listenerToSocketList = new Hashtable<CoreStationListener,SocketChannel>();
 	private static Map<String,Map<Integer,CoreStationListener>> deploymentToIdListenerMapList = Collections.synchronizedMap(new HashMap<String,Map<Integer,CoreStationListener>>());
 
-	private ByteBuffer writeBuffer;
-	private ByteBuffer readBuffer;
-	
 	private boolean dispose = false;
 	
 	
 	private AsyncCoreStationClient() throws IOException {
 		this.selector = Selector.open();
-
-		writeBuffer = ByteBuffer.allocate(PACKET_SIZE*2);
-		readBuffer = ByteBuffer.allocate(PACKET_SIZE*2);
-		writeBuffer.flip();
 		
 		setName("AsyncCoreStationClient-Thread");
 	}
@@ -172,22 +165,28 @@ public class AsyncCoreStationClient extends Thread  {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
 
 	    try {
-	        // Clear out our read buffer so it's ready for new data
-	        readBuffer.clear();
-
-	        int numRead = socketChannel.read(readBuffer);
-	        if (numRead == -1) {
-				if (logger.isDebugEnabled())
-					logger.debug("connection closed");
-	        	// Remote entity shut the socket down cleanly. Do the
-	        	// same from our end and cancel the channel.
-				if (!dispose && socketToListenerList.containsKey(socketChannel))
-					reconnect(socketToListenerList.get(socketChannel));
-				return;
-	        }
+	    	int numRead;
+	    	byte [] data;
+			synchronized (this.pendingData) {
+				PriorityData pData = this.pendingData.get(socketChannel);
+		        // Clear out our read buffer so it's ready for new data
+				pData.readBuffer.clear();
+	
+		        numRead = socketChannel.read(pData.readBuffer);
+		        if (numRead == -1) {
+					if (logger.isDebugEnabled())
+						logger.debug("connection closed");
+		        	// Remote entity shut the socket down cleanly. Do the
+		        	// same from our end and cancel the channel.
+					if (!dispose && socketToListenerList.containsKey(socketChannel))
+						reconnect(socketToListenerList.get(socketChannel));
+					return;
+		        }
+		        data = pData.readBuffer.array();
+			}
 			
 		    // Hand the data over to our listener thread
-			socketToListenerList.get(socketChannel).processData(readBuffer.array(), numRead);
+			socketToListenerList.get(socketChannel).processData(data, numRead);
 	    } catch (IOException e) {
 			if (logger.isDebugEnabled())
 				logger.debug("connection closed: " + e.getMessage());
@@ -202,6 +201,9 @@ public class AsyncCoreStationClient extends Thread  {
 		if (key != null)
 			key.cancel();
     	if (sc != null) {
+			synchronized (this.pendingData) {
+				this.pendingData.remove(sc);
+			}
 	    	try {
 				sc.close();
 			} catch (IOException e) {
@@ -211,8 +213,6 @@ public class AsyncCoreStationClient extends Thread  {
 			listener = socketToListenerList.get(sc);
 			listener.connectionLost();
     	}
-    	writeBuffer.clear();
-    	writeBuffer.flip();
 	}
 	
 	
@@ -220,32 +220,32 @@ public class AsyncCoreStationClient extends Thread  {
 		SocketChannel socketChannel = (SocketChannel) key.channel();
 		try {
 			synchronized (this.pendingData) {
-				PriorityQueue<PriorityDataElement> queue = this.pendingData.get(socketChannel);
+				PriorityData pData = this.pendingData.get(socketChannel);
 
-				while (writeBuffer.hasRemaining()) {
-					if (socketChannel.write(writeBuffer) == 0)
+				while (pData.writeBuffer.hasRemaining()) {
+					if (socketChannel.write(pData.writeBuffer) == 0)
 						return;
 				}
 		      
 				// Write until there's not more data ...
-				while (!queue.isEmpty()) {
-					writeBuffer.clear();
+				while (!pData.queue.isEmpty()) {
+					pData.writeBuffer.clear();
 					try {
-						writeBuffer.put(queue.poll().getData());
+						pData.writeBuffer.put(pData.queue.poll().getData());
 					} catch (BufferOverflowException e) {
 						logger.error(e.getMessage(), e);
 					} finally {
-						queue.remove(0);
+						pData.queue.remove(0);
 					}
 					
-					writeBuffer.flip();
-					while (writeBuffer.hasRemaining()) {
-						if (socketChannel.write(writeBuffer) == 0)
+					pData.writeBuffer.flip();
+					while (pData.writeBuffer.hasRemaining()) {
+						if (socketChannel.write(pData.writeBuffer) == 0)
 							return;
 					}
 				}
 				
-				if (queue.isEmpty()) {
+				if (pData.queue.isEmpty()) {
 					// We wrote away all data, so we're no longer interested
 					// in writing on this socket. Switch back to waiting for
 					// data.
@@ -459,7 +459,7 @@ public class AsyncCoreStationClient extends Thread  {
 
 
 	private Serializable[] send(CoreStationListener listener, int priority, byte[] data, boolean stuff) throws IOException {
-		if (data.length > PACKET_SIZE-4) 
+		if (data.length > PACKET_SIZE-4)
 			throw new IOException("packet size limited to " + (PACKET_SIZE-4) + " bytes");
 		
 		SocketChannel socketChannel;
@@ -473,10 +473,10 @@ public class AsyncCoreStationClient extends Thread  {
 		      
 				// And queue the data we want written
 				synchronized (this.pendingData) {
-					PriorityQueue<PriorityDataElement> queue = this.pendingData.get(socketChannel);
-					if (queue == null) {
-						queue = new PriorityQueue<PriorityDataElement>();
-						this.pendingData.put(socketChannel, queue);
+					PriorityData pData = this.pendingData.get(socketChannel);
+					if (pData == null) {
+						pData = new PriorityData();
+						this.pendingData.put(socketChannel, pData);
 					}
 					if (stuff) {
 						ByteBuffer out = ByteBuffer.allocate(data.length + 4);
@@ -488,11 +488,11 @@ public class AsyncCoreStationClient extends Thread  {
 						out.get(arr);
 						byte [] tmp = pktStuffing(arr);
 						size = new Long(tmp.length);
-						queue.offer(new PriorityDataElement(priority, tmp));
+						pData.queue.offer(new PriorityDataElement(priority, tmp));
 					}
 					else {
 						size = new Long(data.length);
-						queue.offer(new PriorityDataElement(priority, data));
+						pData.queue.offer(new PriorityDataElement(priority, data));
 					}
 				}
 			}
@@ -521,8 +521,6 @@ public class AsyncCoreStationClient extends Thread  {
 		SocketChannel sc = listenerToSocketList.get(listener);
 		if (sc != null) {
 			try {
-				writeBuffer.clear();
-		    	writeBuffer.flip();
 				synchronized (changeRequests) {
 					if (logger.isDebugEnabled())
 						logger.debug("add reconnect request");
@@ -563,6 +561,21 @@ class ChangeRequest
 		this.socket = socket;
 		this.type = type;
 		this.ops = ops;
+	}
+}
+
+
+class PriorityData
+{
+	protected PriorityQueue<PriorityDataElement> queue;
+	protected ByteBuffer writeBuffer;
+	protected ByteBuffer readBuffer;
+	
+	public PriorityData() {
+		queue = new PriorityQueue<PriorityDataElement>();
+		writeBuffer = ByteBuffer.allocate(AsyncCoreStationClient.PACKET_SIZE*2);
+		readBuffer = ByteBuffer.allocate(AsyncCoreStationClient.PACKET_SIZE*2);
+		writeBuffer.flip();
 	}
 }
 
