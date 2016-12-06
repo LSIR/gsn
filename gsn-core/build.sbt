@@ -47,7 +47,7 @@ libraryDependencies ++= Seq(
   "org.httpunit" % "httpunit" % "1.7.2" % "test" exclude("xerces","xercesImpl") exclude("xerces","xmlParserAPIs") exclude("javax.servlet","servlet-api")
 )
 
-javaCppPresetLibs ++= Seq("gsl" -> "1.16")
+javaCppPresetLibs ++= Seq("gsl" -> "2.1")
 
 mainClass := Some("ch.epfl.gsn.Main")
 
@@ -61,7 +61,7 @@ NativePackagerKeys.maintainer in com.typesafe.sbt.SbtNativePackager.Windows := "
 
 NativePackagerKeys.maintainer in com.typesafe.sbt.SbtNativePackager.Linux := "LSIR EPFL <gsn@epfl.ch>"
 
-debianPackageDependencies in Debian += "java7-runtime"
+debianPackageDependencies in Debian += "default-jre"
 
 debianPackageRecommends in Debian ++= Seq("postgresql", "munin-node", "gsn-services")
 
@@ -78,7 +78,7 @@ mappings in Universal <+= baseDirectory map { base => (base / ".." / "conf" / "g
 mappings in Universal <+= sourceDirectory map { src => (src / "main" / "resources" / "wrappers.properties") -> "conf/wrappers.properties" }
 
 linuxPackageMappings in Debian <+= baseDirectory map { base => packageMapping(
-    (base / ".." / "virtual-sensors" / "packaged") -> "/usr/share/gsn-core/conf/virtual-sensors"
+    (base / ".." / "virtual-sensors" / "opensense") -> "/usr/share/gsn-core/conf/virtual-sensors"
   ) withUser "gsn" withGroup "root" withPerms "0775" withContents()
 }
 

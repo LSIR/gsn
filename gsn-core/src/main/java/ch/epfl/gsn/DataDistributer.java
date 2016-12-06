@@ -32,6 +32,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -270,15 +271,23 @@ public class DataDistributer implements VirtualSensorDataListener, VSensorStateC
 
     public boolean vsLoading(VSensorConfig config) {
     	synchronized (listeners) {
-    		if (Main.getContainerConfig().isZMQEnabled() && getInstance(ZeroMQDeliverySync.class) == this){
+    		if (Main.getContainerConfig().isZMQEnabled() && getInstance(ZeroMQDeliveryAsync.class) == this){
+    			StorageManager sm = Main.getStorage(config); 
+    			Connection conn = null;
     			try {
+    				long starting = 0;
+    		        conn = sm.getConnection();
+    		        ResultSet rs = sm.executeQueryWithResultSet(new StringBuilder("select max(timed) from ").append(config.getName()), conn);
+    		        if (rs.next()) starting = rs.getLong(1); 
     				DeliverySystem delivery = new ZeroMQDeliveryAsync(config.getName());
-					addListener(DefaultDistributionRequest.create(delivery, config, "select * from "+config.getName(),System.currentTimeMillis()));
+					addListener(DefaultDistributionRequest.create(delivery, config, "select * from "+config.getName(), starting));
 				} catch (IOException e1) {
 					logger.error(e1.getMessage(), e1);
 				} catch (SQLException e1) {
 					logger.error(e1.getMessage(), e1);
-				}
+				} finally {
+		            sm.close(conn);
+		        }
     		}
     	}
         return true;

@@ -309,16 +309,6 @@
 		        <enabled>true</enabled>
 		    </snapshots>
 		</repository>
-		<repository>
-			<id>LSIR</id>
-			<name>LSIR</name>
-			<url>http://osper.epfl.ch:8081/artifactory/gsn-release/</url>
-			<!-- <layout>default</layout> -->
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-
 	</repositories>
 
 </project>

@@ -1,4 +1,5 @@
-JAVA_OPTS="-Xms64m -Xmx1024m $JAVA_OPTS"
+JAVA_OPTS="-Xms64m -Xmx1024m -DmaxDBConnections=50 -DmaxSlidingDBConnections=50"
+export JAVA_OPTS
 
 CONFDIR="./conf"
 export CONFDIR
