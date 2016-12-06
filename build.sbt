@@ -7,14 +7,11 @@ lazy val commonSettings = Seq(
   resolvers ++= Seq(
     DefaultMavenRepository,
     "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-    "LSIR" at "http://osper.epfl.ch:8081/artifactory/gsn-release",
-    "LSIR remote" at "http://osper.epfl.ch:8081/artifactory/remote-repos",
     "osgeo" at "http://download.osgeo.org/webdav/geotools/",
     "play-authenticate (release)" at "https://oss.sonatype.org/content/repositories/releases/",
     "play-authenticate (snapshot)" at "https://oss.sonatype.org/content/repositories/snapshots/",
     "Local ivy Repository" at ""+Path.userHome.asFile.toURI.toURL+"/.ivy2/local"
   ),
-  //publishTo := Some("Artifactory Realm" at "http://osper.epfl.ch:8081/artifactory/gsn-release"),
     publishTo := Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"),
    // publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
 /*

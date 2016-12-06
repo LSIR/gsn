@@ -93,8 +93,4 @@
 
     <target name="packager" depends="pack-gsn" description="Build GSN Server Debian and RPM packages."/>
 
-	<artifact:remoteRepository id="lsir.release" url="http://osper.epfl.ch:8081/artifactory/gsn-release/">
-	    <releases enabled="true"/>
-	    <snapshots enabled="true"/>
-	</artifact:remoteRepository>
 </project>

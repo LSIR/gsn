@@ -68,11 +68,11 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
     sudo apt-get update
     sudo apt-get install -y openjdk-7-jre python3 python3-pip python3-virtualenv virtualenv nginx wget
-    sudo wget -q  "http://osper.epfl.ch:8081/artifactory/simple/ext-snapshot-local/gsn-core_2.0.0-SNAPSHOT_all.deb"
-    sudo wget -q "http://osper.epfl.ch:8081/artifactory/simple/ext-snapshot-local/gsn-services_2.0.0-SNAPSHOT_all.deb"
-    sudo wget -q "http://osper.epfl.ch:8081/artifactory/simple/ext-snapshot-local/gsn-webui_2.0.0_all.deb"
-    sudo dpkg -i gsn-core_2.0.0-SNAPSHOT_all.deb
-    sudo dpkg -i gsn-services_2.0.0-SNAPSHOT_all.deb
+    sudo wget -q  "https://github.com/LSIR/gsn/releases/download/gsn-release-2.0.0/gsn-core_2.0.0_all.deb"
+    sudo wget -q "https://github.com/LSIR/gsn/releases/download/gsn-release-2.0.0/gsn-services_2.0.0_all.deb"
+    sudo wget -q "https://github.com/LSIR/gsn/releases/download/gsn-release-2.0.0/gsn-webui_2.0.0_all.deb"
+    sudo dpkg -i gsn-core_2.0.0_all.deb
+    sudo dpkg -i gsn-services_2.0.0_all.deb
     sudo dpkg -i gsn-webui_2.0.0_all.deb
   SHELL
   
