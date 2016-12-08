@@ -173,14 +173,14 @@ $(document).ready(function() {
           position: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],
         }]
       },
-      { title:"Dropped tx packets since last health message",
+      { title:"Dropped tx packets",
         signals: [{
           vsensor:".*_dpp_comm_status__conv",
           field:["lwb_tx_drop"],
           position: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],
         }]
       },
-      { title:"Dropped rx packets since last health message",
+      { title:"Dropped rx packets",
         signals: [{
           vsensor:".*_dpp_comm_status__conv",
           field:["lwb_rx_drop"],

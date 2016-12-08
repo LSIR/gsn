@@ -20,9 +20,9 @@
                     	if (VCC != null)
                     		VCC = ((double)VCC * 4.0) / 1023.0;
                     	if (CPU_DC != null)
-                    		CPU_DC = (double)CPU_DC / 10.0;
+                    		CPU_DC = (double)CPU_DC / 100.0;
                     	if (RF_DC != null)
-                    		RF_DC = (double)RF_DC / 10.0;
+                    		RF_DC = (double)RF_DC / 100.0;
                     	if (RF_PER != null)
                     		RF_PER = (double)RF_PER / 100.0;
                     	if (LWB_FSR != null)
