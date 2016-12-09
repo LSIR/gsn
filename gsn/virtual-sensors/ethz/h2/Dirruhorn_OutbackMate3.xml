@@ -18,7 +18,7 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://permasense-rd-mon01.ethz.ch/Dev_status.cgi?&amp;Port=0</predicate>
+                    <predicate key="url">http://permasense-rd-mon01.ethz.ch/Dev_status.cgi?Port=0</predicate>
                     <predicate key="rate">120000</predicate>
                     <predicate key="device-id">9000</predicate>
                 </address>
