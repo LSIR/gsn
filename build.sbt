@@ -10,8 +10,8 @@ lazy val commonSettings = Seq(
     "osgeo" at "http://download.osgeo.org/webdav/geotools/",
     "play-authenticate (release)" at "https://oss.sonatype.org/content/repositories/releases/",
     "play-authenticate (snapshot)" at "https://oss.sonatype.org/content/repositories/snapshots/",
-    "Local ivy Repository" at ""+Path.userHome.asFile.toURI.toURL+"/.ivy2/local"
-    "Local cache" at "file://./lib/cache"
+    "Local ivy Repository" at ""+Path.userHome.asFile.toURI.toURL+"/.ivy2/local",
+    "Local cache" at ""+file(".").toURI.toURL+"/lib/cache"
   ),
     publishTo := Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"),
    // publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
