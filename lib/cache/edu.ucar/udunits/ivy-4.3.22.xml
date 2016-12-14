@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="edu.ucar"
+		module="udunits"
+		revision="4.3.22"
+		status="release"
+		publication="20140626114845"
+	>
+		<description homepage="http://www.unidata.ucar.edu/software/udunits//">
+		The ucar.units Java package is for decoding and encoding
+    formatted unit specifications (e.g. &quot;m/s&quot;), converting numeric values
+    between compatible units (e.g. between &quot;m/s&quot; and &quot;knot&quot;), and for
+    performing arithmetic operations on units (e.g. dividing one unit by
+    another, raising a unit to a power).
+		</description>
+		<m:dependency.management__edu.wisc.ssec__visad__version>2.0-20130124</m:dependency.management__edu.wisc.ssec__visad__version>
+		<m:dependency.management__edu.ucar__visadCdm__version>4.3.22</m:dependency.management__edu.ucar__visadCdm__version>
+		<m:properties__javax.servlet.version>2.5</m:properties__javax.servlet.version>
+		<m:properties__org.jfree.jcommon.version>1.0.17</m:properties__org.jfree.jcommon.version>
+		<m:dependency.management__org.apache.derby__derby__version>10.9.1.0</m:dependency.management__org.apache.derby__derby__version>
+		<m:properties__junit.version>4.11</m:properties__junit.version>
+		<m:properties__cas.version>2.1.1</m:properties__cas.version>
+		<m:properties__maven-javadoc-plugin.version>2.9.1</m:properties__maven-javadoc-plugin.version>
+		<m:properties__maven-assembly-plugin.version>2.4</m:properties__maven-assembly-plugin.version>
+		<m:dependency.management__org.slf4j__slf4j-log4j12__scope>runtime</m:dependency.management__org.slf4j__slf4j-log4j12__scope>
+		<m:dependency.management__jaxen__jaxen__version>1.1.4</m:dependency.management__jaxen__jaxen__version>
+		<m:dependency.management__org.slf4j__jcl-over-slf4j__version>1.7.5</m:dependency.management__org.slf4j__jcl-over-slf4j__version>
+		<m:dependency.management__json-taglib__json-taglib__version>0.4.1</m:dependency.management__json-taglib__json-taglib__version>
+		<m:dependency.management__org.springframework.security__spring-security-web__version>3.1.3.RELEASE</m:dependency.management__org.springframework.security__spring-security-web__version>
+		<m:dependency.management__org.springframework__spring-jdbc__version>3.2.2.RELEASE</m:dependency.management__org.springframework__spring-jdbc__version>
+		<m:dependency.management__net.jcip__jcip-annotations__version>1.0</m:dependency.management__net.jcip__jcip-annotations__version>
+		<m:properties__net.jcip.version>1.0</m:properties__net.jcip.version>
+		<m:dependency.management__com.sun.jna__jna__version>3.0.9</m:dependency.management__com.sun.jna__jna__version>
+		<m:dependency.management__junit__junit__scope>test</m:dependency.management__junit__junit__scope>
+		<m:dependency.management__cas__casclient__exclusion_0>commons-logging__commons-logging</m:dependency.management__cas__casclient__exclusion_0>
+		<m:properties__project.reporting.outputEncoding>UTF-8</m:properties__project.reporting.outputEncoding>
+		<m:dependency.management__org.slf4j__slf4j-jdk14__scope>runtime</m:dependency.management__org.slf4j__slf4j-jdk14__scope>
+		<m:dependency.management__edu.ucar__opendap__version>4.3.22</m:dependency.management__edu.ucar__opendap__version>
+		<m:dependency.management__org.jfree__jcommon__version>1.0.17</m:dependency.management__org.jfree__jcommon__version>
+		<m:dependency.management__EDS__threddsIso__scope>runtime</m:dependency.management__EDS__threddsIso__scope>
+		<m:properties__org.jdom2.version>2.0.4</m:properties__org.jdom2.version>
+		<m:dependency.management__org.slf4j__jcl-over-slf4j__scope>runtime</m:dependency.management__org.slf4j__jcl-over-slf4j__scope>
+		<m:dependency.management__jaxen__jaxen__exclusion_1>maven-plugins__maven-findbugs-plugin</m:dependency.management__jaxen__jaxen__exclusion_1>
+		<m:dependency.management__jaxen__jaxen__exclusion_0>maven-plugins__maven-cobertura-plugin</m:dependency.management__jaxen__jaxen__exclusion_0>
+		<m:properties__org.springframework.security.version>3.1.3.RELEASE</m:properties__org.springframework.security.version>
+		<m:dependency.management__cglib__cglib-nodep__version>2.2</m:dependency.management__cglib__cglib-nodep__version>
+		<m:dependency.management__edu.ucar__netcdf__scope>test</m:dependency.management__edu.ucar__netcdf__scope>
+		<m:dependency.management__com.lexicalscope.jewelcli__jewelcli__version>0.8.5</m:dependency.management__com.lexicalscope.jewelcli__jewelcli__version>
+		<m:dependency.management__taglibs__standard__version>1.1.2</m:dependency.management__taglibs__standard__version>
+		<m:dependency.management__junit__junit__version>4.11</m:dependency.management__junit__junit__version>
+		<m:dependency.management__log4j__log4j__version>1.2.17</m:dependency.management__log4j__log4j__version>
+		<m:dependency.management__org.geotoolkit__geotk-referencing__version>3.21</m:dependency.management__org.geotoolkit__geotk-referencing__version>
+		<m:dependency.management__edu.ucar__cdmvalidator__version>4.3.22</m:dependency.management__edu.ucar__cdmvalidator__version>
+		<m:properties__maven.build.timestamp.format>yyyyMMdd.HHmm</m:properties__maven.build.timestamp.format>
+		<m:dependency.management__edu.ucar__opendap__exclusion_0>javax.servlet__servlet-api</m:dependency.management__edu.ucar__opendap__exclusion_0>
+		<m:dependency.management__javax.servlet__servlet-api__scope>provided</m:dependency.management__javax.servlet__servlet-api__scope>
+		<m:dependency.management__org.springframework.security__spring-security-config__version>3.1.3.RELEASE</m:dependency.management__org.springframework.security__spring-security-config__version>
+		<m:dependency.management__com.sleepycat__je__version>4.0.92</m:dependency.management__com.sleepycat__je__version>
+		<m:dependency.management__net.sf.ehcache__ehcache-core__version>2.6.2</m:dependency.management__net.sf.ehcache__ehcache-core__version>
+		<m:dependency.management__edu.ucar__tdcommon__version>4.3.22</m:dependency.management__edu.ucar__tdcommon__version>
+		<m:dependency.management__EDS__threddsIso__exclusion_1>net.sf.saxon__saxon</m:dependency.management__EDS__threddsIso__exclusion_1>
+		<m:properties__org.geotoolkit.version>3.21</m:properties__org.geotoolkit.version>
+		<m:properties__sourceEncoding>UTF-8</m:properties__sourceEncoding>
+		<m:dependency.management__EDS__threddsIso__exclusion_0>javax.servlet__javax.servlet-api</m:dependency.management__EDS__threddsIso__exclusion_0>
+		<m:properties__org.jsoup.version>1.7.2</m:properties__org.jsoup.version>
+		<m:properties__net.sf.ehcache.version>2.6.2</m:properties__net.sf.ehcache.version>
+		<m:dependency.management__org.springframework__spring-webmvc__version>3.2.2.RELEASE</m:dependency.management__org.springframework__spring-webmvc__version>
+		<m:dependency.management__com.google.protobuf__protobuf-java__version>2.5.0</m:dependency.management__com.google.protobuf__protobuf-java__version>
+		<m:dependency.management__org.springframework__spring-core__version>3.2.2.RELEASE</m:dependency.management__org.springframework__spring-core__version>
+		<m:dependency.management__commons-httpclient__commons-httpclient__exclusion_0>commons-logging__commons-logging</m:dependency.management__commons-httpclient__commons-httpclient__exclusion_0>
+		<m:dependency.management__jaxen__jaxen__scope>runtime</m:dependency.management__jaxen__jaxen__scope>
+		<m:properties__oro.version>2.0.8</m:properties__oro.version>
+		<m:properties__atg.taglib.json.version>0.4.1</m:properties__atg.taglib.json.version>
+		<m:dependency.management__cas__casclient__version>2.1.1</m:dependency.management__cas__casclient__version>
+		<m:properties__com.jgoodies.version>1.6.0</m:properties__com.jgoodies.version>
+		<m:dependency.management__javax.servlet__jstl__version>1.2</m:dependency.management__javax.servlet__jstl__version>
+		<m:dependency.management__org.jdom__jdom2__version>2.0.4</m:dependency.management__org.jdom__jdom2__version>
+		<m:dependency.management__edu.ucar__dts__version>4.3.22</m:dependency.management__edu.ucar__dts__version>
+		<m:properties__org.jdom-legacy.version>1.1.3</m:properties__org.jdom-legacy.version>
+		<m:dependency.management__org.slf4j__slf4j-jdk14__version>1.7.5</m:dependency.management__org.slf4j__slf4j-jdk14__version>
+		<m:dependency.management__org.jsoup__jsoup__version>1.7.2</m:dependency.management__org.jsoup__jsoup__version>
+		<m:properties__commons-io.version>2.4</m:properties__commons-io.version>
+		<m:properties__com.sleepycat.version>4.0.92</m:properties__com.sleepycat.version>
+		<m:properties__build.timestamp>${maven.build.timestamp}</m:properties__build.timestamp>
+		<m:properties__javax.activation.version>1.1.1</m:properties__javax.activation.version>
+		<m:dependency.management__org.hibernate__hibernate-validator__version>4.3.1.Final</m:dependency.management__org.hibernate__hibernate-validator__version>
+		<m:properties__edu.wisc.version>2011-08-22</m:properties__edu.wisc.version>
+		<m:dependency.management__edu.ucar__udunits__version>4.3.22</m:dependency.management__edu.ucar__udunits__version>
+		<m:properties__org.slf4j.version>1.7.5</m:properties__org.slf4j.version>
+		<m:properties__maven-deploy-plugin.version>2.7</m:properties__maven-deploy-plugin.version>
+		<m:dependency.management__org.jfree__jfreechart__exclusion_0>com.lowagie__itext</m:dependency.management__org.jfree__jfreechart__exclusion_0>
+		<m:dependency.management__org.springframework__spring-core__exclusion_0>commons-logging__commons-logging</m:dependency.management__org.springframework__spring-core__exclusion_0>
+		<m:properties__org.springframework.version>3.2.2.RELEASE</m:properties__org.springframework.version>
+		<m:dependency.management__org.springframework__spring-context__version>3.2.2.RELEASE</m:dependency.management__org.springframework__spring-context__version>
+		<m:dependency.management__javax.servlet__jstl__scope>runtime</m:dependency.management__javax.servlet__jstl__scope>
+		<m:properties__uk.ac.rdg.resc.version>1.0.tds.4.3.20130918.0800</m:properties__uk.ac.rdg.resc.version>
+		<m:properties__maven-surefire-plugin.version>2.16</m:properties__maven-surefire-plugin.version>
+		<m:properties__org.apache.tomcat.version>7.0.53</m:properties__org.apache.tomcat.version>
+		<m:dependency.management__edu.ucar__tds__version>4.3.22</m:dependency.management__edu.ucar__tds__version>
+		<m:properties__derby.version>10.9.1.0</m:properties__derby.version>
+		<m:dependency.management__org.slf4j__slf4j-api__version>1.7.5</m:dependency.management__org.slf4j__slf4j-api__version>
+		<m:dependency.management__org.slf4j__slf4j-log4j12__version>1.7.5</m:dependency.management__org.slf4j__slf4j-log4j12__version>
+		<m:dependency.management__org.apache.commons__commons-lang3__version>3.1</m:dependency.management__org.apache.commons__commons-lang3__version>
+		<m:dependency.management__edu.ucar__grib__version>4.3.22</m:dependency.management__edu.ucar__grib__version>
+		<m:dependency.management__org.springframework__spring-test__version>3.2.2.RELEASE</m:dependency.management__org.springframework__spring-test__version>
+		<m:properties__visad.version>2.0-20130124</m:properties__visad.version>
+		<m:properties__eds.threddsIso.version>2.2.2</m:properties__eds.threddsIso.version>
+		<m:dependency.management__edu.ucar__visadCdm__exclusion_0>edu.wisc.ssec__visad</m:dependency.management__edu.ucar__visadCdm__exclusion_0>
+		<m:properties__saxon.version>8.7</m:properties__saxon.version>
+		<m:dependency.management__edu.ucar__wmotables__version>4.3.22</m:dependency.management__edu.ucar__wmotables__version>
+		<m:dependency.management__json-taglib__json-taglib__scope>runtime</m:dependency.management__json-taglib__json-taglib__scope>
+		<m:dependency.management__EDS__threddsIso__version>2.2.2</m:dependency.management__EDS__threddsIso__version>
+		<m:properties__maven-war-plugin.version>2.4</m:properties__maven-war-plugin.version>
+		<m:dependency.management__javax.activation__activation__version>1.1.1</m:dependency.management__javax.activation__activation__version>
+		<m:properties__maven-jar-plugin.version>2.4</m:properties__maven-jar-plugin.version>
+		<m:dependency.management__commons-fileupload__commons-fileupload__version>1.2.2</m:dependency.management__commons-fileupload__commons-fileupload__version>
+		<m:properties__maven-shade-plugin.version>2.1</m:properties__maven-shade-plugin.version>
+		<m:properties__commons-dbcp.version>1.4</m:properties__commons-dbcp.version>
+		<m:properties__joda-time.version>2.2</m:properties__joda-time.version>
+		<m:dependency.management__org.jdom__jdom-legacy__version>1.1.3</m:dependency.management__org.jdom__jdom-legacy__version>
+		<m:dependency.management__edu.ucar__netcdf__version>4.3.22</m:dependency.management__edu.ucar__netcdf__version>
+		<m:dependency.management__org.quartz-scheduler__quartz__version>2.1.1</m:dependency.management__org.quartz-scheduler__quartz__version>
+		<m:dependency.management__org.jfree__jfreechart__version>1.0.14</m:dependency.management__org.jfree__jfreechart__version>
+		<m:dependency.management__commons-dbcp__commons-dbcp__version>1.4</m:dependency.management__commons-dbcp__commons-dbcp__version>
+		<m:dependency.management__uk.ac.rdg.resc__ncwms__version>1.0.tds.4.3.20130918.0800</m:dependency.management__uk.ac.rdg.resc__ncwms__version>
+		<m:dependency.management__net.sf.saxon__saxon__version>8.7</m:dependency.management__net.sf.saxon__saxon__version>
+		<m:properties__maven-antrun-plugin.version>1.7</m:properties__maven-antrun-plugin.version>
+		<m:properties__commons-httpclient.version>3.1</m:properties__commons-httpclient.version>
+		<m:dependency.management__commons-httpclient__commons-httpclient__version>3.1</m:dependency.management__commons-httpclient__commons-httpclient__version>
+		<m:properties__com.google.protobuf.version>2.5.0</m:properties__com.google.protobuf.version>
+		<m:dependency.management__commons-io__commons-io__version>2.4</m:dependency.management__commons-io__commons-io__version>
+		<m:properties__commons-fileupload.version>1.2.2</m:properties__commons-fileupload.version>
+		<m:properties__maven-release-plugin.version>2.4.1</m:properties__maven-release-plugin.version>
+		<m:properties__javax.servlet.jstl.version>1.2</m:properties__javax.servlet.jstl.version>
+		<m:properties__jaxen.version>1.1.4</m:properties__jaxen.version>
+		<m:dependency.management__org.springframework__spring-beans__version>3.2.2.RELEASE</m:dependency.management__org.springframework__spring-beans__version>
+		<m:dependency.management__edu.ucar__bufr__version>4.3.22</m:dependency.management__edu.ucar__bufr__version>
+		<m:dependency.management__org.springframework.security__spring-security-taglibs__version>3.1.3.RELEASE</m:dependency.management__org.springframework.security__spring-security-taglibs__version>
+		<m:dependency.management__uk.ac.rdg.resc__ncwms__exclusion_0>org.slf4j__slf4j-jdk14</m:dependency.management__uk.ac.rdg.resc__ncwms__exclusion_0>
+		<m:properties__cglib.version>2.2</m:properties__cglib.version>
+		<m:dependency.management__uk.ac.rdg.resc__ncwms__exclusion_1>org.jfree__jcommon</m:dependency.management__uk.ac.rdg.resc__ncwms__exclusion_1>
+		<m:dependency.management__uk.ac.rdg.resc__ncwms__exclusion_2>org.jfree__jfreechart</m:dependency.management__uk.ac.rdg.resc__ncwms__exclusion_2>
+		<m:properties__log4j.version>1.2.17</m:properties__log4j.version>
+		<m:properties__project.build.sourceEncoding>UTF-8</m:properties__project.build.sourceEncoding>
+		<m:properties__skipTests>true</m:properties__skipTests>
+		<m:properties__org.hibernate.version>4.3.1.Final</m:properties__org.hibernate.version>
+		<m:properties__org.quartz-scheduler.version>2.1.1</m:properties__org.quartz-scheduler.version>
+		<m:dependency.management__javax.servlet__servlet-api__version>2.5</m:dependency.management__javax.servlet__servlet-api__version>
+		<m:properties__maven-compiler-plugin.version>3.1</m:properties__maven-compiler-plugin.version>
+		<m:dependency.management__net.sf.saxon__saxon-dom__version>8.7</m:dependency.management__net.sf.saxon__saxon-dom__version>
+		<m:properties__taglibs.version>1.1.2</m:properties__taglibs.version>
+		<m:dependency.management__com.jgoodies__jgoodies-forms__version>1.6.0</m:dependency.management__com.jgoodies__jgoodies-forms__version>
+		<m:properties__org.jfree.jfreechart.version>1.0.14</m:properties__org.jfree.jfreechart.version>
+		<m:dependency.management__joda-time__joda-time__version>2.2</m:dependency.management__joda-time__joda-time__version>
+		<m:dependency.management__org.springframework.security__spring-security-core__version>3.1.3.RELEASE</m:dependency.management__org.springframework.security__spring-security-core__version>
+		<m:dependency.management__oro__oro__version>2.0.8</m:dependency.management__oro__oro__version>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="udunits" type="jar" ext="jar" conf="master"/>
+	</publications>
+	<dependencies>
+		<dependency org="junit" name="junit" rev="4.11" force="true" conf="test->runtime(*),master(*)"/>
+		<override org="net.sf.ehcache" module="ehcache-core" matcher="exact" rev="2.6.2"/>
+		<override org="org.springframework" module="spring-jdbc" matcher="exact" rev="3.2.2.RELEASE"/>
+		<override org="edu.ucar" module="bufr" matcher="exact" rev="4.3.22"/>
+		<override org="org.springframework" module="spring-beans" matcher="exact" rev="3.2.2.RELEASE"/>
+		<override org="org.apache.derby" module="derby" matcher="exact" rev="10.9.1.0"/>
+		<override org="com.jgoodies" module="jgoodies-forms" matcher="exact" rev="1.6.0"/>
+		<override org="net.sf.saxon" module="saxon" matcher="exact" rev="8.7"/>
+		<override org="org.springframework.security" module="spring-security-config" matcher="exact" rev="3.1.3.RELEASE"/>
+		<override org="cglib" module="cglib-nodep" matcher="exact" rev="2.2"/>
+		<override org="com.sleepycat" module="je" matcher="exact" rev="4.0.92"/>
+		<override org="edu.wisc.ssec" module="visad" matcher="exact" rev="2.0-20130124"/>
+		<override org="com.sun.jna" module="jna" matcher="exact" rev="3.0.9"/>
+		<override org="org.jfree" module="jfreechart" matcher="exact" rev="1.0.14"/>
+		<override org="joda-time" module="joda-time" matcher="exact" rev="2.2"/>
+		<override org="javax.servlet" module="jstl" matcher="exact" rev="1.2"/>
+		<override org="org.springframework.security" module="spring-security-taglibs" matcher="exact" rev="3.1.3.RELEASE"/>
+		<override org="commons-httpclient" module="commons-httpclient" matcher="exact" rev="3.1"/>
+		<override org="org.springframework" module="spring-test" matcher="exact" rev="3.2.2.RELEASE"/>
+		<override org="commons-dbcp" module="commons-dbcp" matcher="exact" rev="1.4"/>
+		<override org="net.sf.saxon" module="saxon-dom" matcher="exact" rev="8.7"/>
+		<override org="edu.ucar" module="grib" matcher="exact" rev="4.3.22"/>
+		<override org="log4j" module="log4j" matcher="exact" rev="1.2.17"/>
+		<override org="jaxen" module="jaxen" matcher="exact" rev="1.1.4"/>
+		<override org="edu.ucar" module="tdcommon" matcher="exact" rev="4.3.22"/>
+		<override org="org.geotoolkit" module="geotk-referencing" matcher="exact" rev="3.21"/>
+		<override org="edu.ucar" module="wmotables" matcher="exact" rev="4.3.22"/>
+		<override org="org.springframework" module="spring-core" matcher="exact" rev="3.2.2.RELEASE"/>
+		<override org="taglibs" module="standard" matcher="exact" rev="1.1.2"/>
+		<override org="org.springframework.security" module="spring-security-web" matcher="exact" rev="3.1.3.RELEASE"/>
+		<override org="org.hibernate" module="hibernate-validator" matcher="exact" rev="4.3.1.Final"/>
+		<override org="edu.ucar" module="tds" matcher="exact" rev="4.3.22"/>
+		<override org="json-taglib" module="json-taglib" matcher="exact" rev="0.4.1"/>
+		<override org="org.apache.commons" module="commons-lang3" matcher="exact" rev="3.1"/>
+		<override org="com.lexicalscope.jewelcli" module="jewelcli" matcher="exact" rev="0.8.5"/>
+		<override org="org.slf4j" module="slf4j-log4j12" matcher="exact" rev="1.7.5"/>
+		<override org="oro" module="oro" matcher="exact" rev="2.0.8"/>
+		<override org="edu.ucar" module="cdmvalidator" matcher="exact" rev="4.3.22"/>
+		<override org="org.slf4j" module="slf4j-jdk14" matcher="exact" rev="1.7.5"/>
+		<override org="junit" module="junit" matcher="exact" rev="4.11"/>
+		<override org="org.jdom" module="jdom-legacy" matcher="exact" rev="1.1.3"/>
+		<override org="javax.activation" module="activation" matcher="exact" rev="1.1.1"/>
+		<override org="org.springframework" module="spring-webmvc" matcher="exact" rev="3.2.2.RELEASE"/>
+		<override org="com.google.protobuf" module="protobuf-java" matcher="exact" rev="2.5.0"/>
+		<override org="org.quartz-scheduler" module="quartz" matcher="exact" rev="2.1.1"/>
+		<override org="edu.ucar" module="netcdf" matcher="exact" rev="4.3.22"/>
+		<override org="org.jsoup" module="jsoup" matcher="exact" rev="1.7.2"/>
+		<override org="org.slf4j" module="slf4j-api" matcher="exact" rev="1.7.5"/>
+		<override org="net.jcip" module="jcip-annotations" matcher="exact" rev="1.0"/>
+		<override org="edu.ucar" module="visadCdm" matcher="exact" rev="4.3.22"/>
+		<override org="edu.ucar" module="dts" matcher="exact" rev="4.3.22"/>
+		<override org="edu.ucar" module="opendap" matcher="exact" rev="4.3.22"/>
+		<override org="org.springframework.security" module="spring-security-core" matcher="exact" rev="3.1.3.RELEASE"/>
+		<override org="org.slf4j" module="jcl-over-slf4j" matcher="exact" rev="1.7.5"/>
+		<override org="EDS" module="threddsIso" matcher="exact" rev="2.2.2"/>
+		<override org="javax.servlet" module="servlet-api" matcher="exact" rev="2.5"/>
+		<override org="commons-io" module="commons-io" matcher="exact" rev="2.4"/>
+		<override org="cas" module="casclient" matcher="exact" rev="2.1.1"/>
+		<override org="edu.ucar" module="udunits" matcher="exact" rev="4.3.22"/>
+		<override org="org.jdom" module="jdom2" matcher="exact" rev="2.0.4"/>
+		<override org="org.springframework" module="spring-context" matcher="exact" rev="3.2.2.RELEASE"/>
+		<override org="commons-fileupload" module="commons-fileupload" matcher="exact" rev="1.2.2"/>
+		<override org="uk.ac.rdg.resc" module="ncwms" matcher="exact" rev="1.0.tds.4.3.20130918.0800"/>
+		<override org="org.jfree" module="jcommon" matcher="exact" rev="1.0.17"/>
+	</dependencies>
+</ivy-module>

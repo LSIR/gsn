@@ -123,9 +123,10 @@ class SensorStore(ds:DataStore) extends Actor{
         val stat = stats(s)
         sensorStats put(sensorid,stat)
         val dLocation = Location(
-            extract_latest(stat.latestValues,"latitude").orElse(s.location.latitude), 
-            extract_latest(stat.latestValues,"longitude").orElse(s.location.longitude), 
-            extract_latest(stat.latestValues,"altitude").orElse(s.location.altitude))
+            extract_latest(stat.latestValues,s.location.latitudeRef.getOrElse("latitude")).orElse(s.location.latitude), 
+            extract_latest(stat.latestValues,s.location.longitudeRef.getOrElse("longitude")).orElse(s.location.longitude), 
+            extract_latest(stat.latestValues,s.location.altitudeRef.getOrElse("altitude")).orElse(s.location.altitude),
+            s.location.latitudeRef, s.location.longitudeRef, s.location.altitudeRef)
         sensors.update(sensorid, Sensor(s.name,s.implements, Platform(s.platform.name,dLocation), s.properties))
         
       }

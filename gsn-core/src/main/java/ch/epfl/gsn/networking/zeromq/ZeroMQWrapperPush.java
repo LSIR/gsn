@@ -33,6 +33,7 @@ import org.zeromq.ZContext;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.zeromq.ZMQ;
+import org.zeromq.ZMQException;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -107,6 +108,13 @@ public class ZeroMQWrapperPush extends AbstractWrapper {
 			        boolean success = postStreamElement(se);
 			        receiver.send(success ? new byte[]{(byte)0} : new byte[]{(byte)1});
 				}
+			}catch (ZMQException z){
+				logger.error("ZMQ wrapper error in zmq protocol (re-init socket): ",z);
+				receiver.close();
+				ZContext ctx = Main.getZmqContext();
+				receiver = ctx.createSocket(ZMQ.REP);
+				receiver.bind("tcp://*:"+lport);
+				receiver.setReceiveTimeOut(10000);
 			}catch (Exception e)
 			{
 				logger.error("ZMQ wrapper error: ",e);

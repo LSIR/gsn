@@ -71,7 +71,8 @@ class GsnMetadata(gsnServer:String) {
     val coord= (jsFeature \ "geometry" \ "coordinates")
     val location=Location(coord(0).asOpt[Double],
         coord(1).asOpt[Double],
-        coord(2).asOpt[Double])
+        coord(2).asOpt[Double],
+        None, None, None)
     lazy val platform=new Platform(vsName,location)
     lazy val s:Sensor= Sensor(vsName,fields,platform,Map())
     s

@@ -54,7 +54,11 @@ object Sensor{
       catch {case e:Exception=> None}
     val location=Location(coord(props,"latitude"),
         coord(props,"longitude"),
-        coord(props,"altitude"))
+        coord(props,"altitude"),
+        props.get("latitude_ref"),
+        props.get("longitude_ref"),
+        props.get("altitude_ref")
+        )
     val platform=new Platform(vsConf.name,location)
     Sensor(vsConf.name,output,platform,props)
   }
@@ -92,15 +96,22 @@ object Sensing{
 case class Location(
     latitude:Option[Double],
     longitude:Option[Double],
-    altitude:Option[Double])
+    altitude:Option[Double],
+    latitudeRef:Option[String],
+    longitudeRef:Option[String],
+    altitudeRef:Option[String]
+    )
 
 
 object Location{
-  def apply(lat:java.lang.Double,lon:java.lang.Double,alt:java.lang.Double)={
+  def apply(lat:java.lang.Double,lon:java.lang.Double,alt:java.lang.Double,latref:java.lang.String,lonref:java.lang.String,altref:java.lang.String)={
     val lt=if (lat==null) None else Some(lat.doubleValue())
     val lg=if (lon==null) None else Some(lon.doubleValue())
     val al=if (alt==null) None else Some(alt.doubleValue())
-    new Location(lt,lg,al)
+    val ltr=if (latref==null) None else Some(latref)
+    val lgr=if (lonref==null) None else Some(lonref)
+    val alr=if (altref==null) None else Some(altref)
+    new Location(lt,lg,al,ltr,lgr,alr)
   }
 }
 

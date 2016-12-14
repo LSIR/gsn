@@ -42,7 +42,8 @@ object BsonConverter{
         doc.getAs[String]("name").get,
         Location(doc.getAs[Double]("latitude"),
             doc.getAs[Double]("longitude"),
-            doc.getAs[Double]("altitude"))
+            doc.getAs[Double]("altitude"),
+            None, None, None)
     )
   }
 
