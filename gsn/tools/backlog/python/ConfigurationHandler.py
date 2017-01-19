@@ -170,8 +170,8 @@ class ConfigurationHandlerClass():
         servicewakeupminutes = None
         wlandutycyclewhileresending = None
         platformVersion = None
-        dpp_i2c_device = None
-        dpp_i2c_address = None
+        dppI2cDevice = None
+        dppI2cAddress = None
         dppI2cPollingIntervalSec = None
 
         try:
