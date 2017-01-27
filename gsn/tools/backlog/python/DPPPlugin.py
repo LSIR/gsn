@@ -8,7 +8,6 @@ __id__          = "$Id$"
 
 import time
 import struct
-from threading import Event
 
 import BackLogMessage
 import DPPTypes
@@ -22,17 +21,15 @@ class DPPPluginClass(AbstractPluginClass):
     
     data/instance attributes:
     _plugstop
-    _QueueClosedEvent
     '''
     
     def __init__(self, parent, config):
         AbstractPluginClass.__init__(self, parent, config, DEFAULT_BACKLOG)
         
         self._plugstop = False
-        self._QueueClosedEvent = Event()
         
-        # register all possible packet types (except for invalid and timesync messages)
-        self.registerDPPListener([DPPTypes.MSG_TYPE_INVALID, DPPTypes.MSG_TYPE_TIMESYNC], True)
+        # register all possible packet types (except for invalid, timesync and firmware messages)
+        self.registerDPPListener([DPPTypes.MSG_TYPE_INVALID, DPPTypes.MSG_TYPE_TIMESYNC, DPPTypes.MSG_TYPE_APP_FIRMWARE], True)
         
     
     def stop(self):

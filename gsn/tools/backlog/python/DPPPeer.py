@@ -37,7 +37,7 @@ I2C_HEADER_LENGTH = 2
 I2C_MSG_HEADER_LENGTH = 16
 I2C_MSG_CRC16_LENGTH = 2
 
-SEND_QUEUE_SIZE = 25
+SEND_QUEUE_SIZE = 50
 
 class DPPPeerClass(Thread, Statistics):
     '''
@@ -326,7 +326,7 @@ class DPPWriter(Thread):
             try:
                 self._sendqueue.put_nowait(packet)
             except Queue.Full:
-                self._logger.warning('DPP send queue is full')
+                self._logger.debug('DPP send queue is full')
                 return False
         return True
 

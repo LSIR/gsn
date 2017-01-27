@@ -71,6 +71,7 @@ ETZ_Dozer_EnviroScanParametersC__conv.xml
 ETZ_DPP_Comm_Cmd__mapped.xml
 ETZ_DPP_Comm_Status__mapped.xml
 ETZ_DPP_Comm_Status__conv.xml
+ETZ_DPP_Firmware__mapped.xml
 ETZ_DPP_Log__mapped.xml
 ETZ_DPP_NodeInfo__conv.xml
 ETZ_DPP_NodeInfo__mapped.xml

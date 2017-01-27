@@ -40,6 +40,7 @@ ETZ_Dozer_WXT520WindPth.xml
 ETZ_Dozer_WXT520Ident.xml
 ETZ_DPP_Comm_Cmd.xml
 ETZ_DPP_Comm_Status.xml
+ETZ_DPP_Firmware.xml
 ETZ_DPP_Log.xml
 ETZ_DPP_NodeInfo.xml
 #ETZ_GPS_L2.xml

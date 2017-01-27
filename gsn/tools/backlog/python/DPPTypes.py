@@ -26,6 +26,7 @@ MSG_TYPE_LOG            = 2
 MSG_TYPE_COMM_CMD       = 10
 MSG_TYPE_COMM_HEALTH    = 11
 
+MSG_TYPE_APP_FIRMWARE   = 50
 
 '''
  LWB commands
