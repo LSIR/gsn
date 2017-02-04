@@ -60,6 +60,6 @@ packageDjango := {
 
   "tar -czf ./gsn-webui/target/gsn-webui.tar.gz -C ./gsn-webui/target/gsn-webui ./" !
 
-  "fpm -s tar -t deb -a all -v 2.0.0 --deb-default ./gsn-webui/package/templates/etc-default  --after-install ./gsn-webui/package/DEBIAN/postinst --after-remove ./gsn-webui/package/DEBIAN/postrm --before-remove ./gsn-webui/package/DEBIAN/prerm --deb-custom-control ./gsn-webui/package/DEBIAN/control ./gsn-webui/target/gsn-webui.tar.gz" !
+  "fpm -s tar -t deb -a all -v 2.0.1 --deb-default ./gsn-webui/package/templates/etc-default  --after-install ./gsn-webui/package/DEBIAN/postinst --after-remove ./gsn-webui/package/DEBIAN/postrm --before-remove ./gsn-webui/package/DEBIAN/prerm --deb-custom-control ./gsn-webui/package/DEBIAN/control ./gsn-webui/target/gsn-webui.tar.gz" !
 
 }

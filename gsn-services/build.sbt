@@ -30,7 +30,7 @@ libraryDependencies ++= Seq(
   "org.zeromq" % "jeromq" % "0.3.5",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
   "org.scalatestplus" %% "play" % "1.1.0" % "test",
-  "ch.epfl.gsn" % "gsn-core" % "2.0.0" exclude("org.apache.logging.log4j", "log4j-slf4j-impl"),
+  "ch.epfl.gsn" % "gsn-core" % "2.0.1" exclude("org.apache.logging.log4j", "log4j-slf4j-impl"),
   "com.typesafe.play" %% "play-json" % "2.3.10",
   "com.typesafe.akka" %% "akka-actor" % "2.3.14"
   )

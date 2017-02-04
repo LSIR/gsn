@@ -42,7 +42,7 @@ libraryDependencies ++= Seq(
   "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.1.0",
   "org.eclipse.californium" % "californium-core" % "1.0.4",
   "junit" % "junit" % "4.11" %  "test",
-  "ch.epfl.gsn" % "gsn-tools" % "2.0.0",
+  "ch.epfl.gsn" % "gsn-tools" % "2.0.1",
   "org.easymock" % "easymockclassextension" % "3.2" % "test",
   "org.httpunit" % "httpunit" % "1.7.2" % "test" exclude("xerces","xercesImpl") exclude("xerces","xmlParserAPIs") exclude("javax.servlet","servlet-api")
 )

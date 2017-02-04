@@ -1,5 +1,14 @@
 ## GSN Change log
 
+### r2.0.1
+[commits](https://github.com/LSIR/gsn/commits/gsn-release-2.0.1)
+* Adding support for MQTT (wrapper to subscribe and VS to publish)        
+* Adding coap wrapper       
+* Removing references to decommissioned osper server      
+* Add reference to location fields 
+* Fixing recovery from unsynchronized zmq communication with services      
+* Fixing some configuration bugs
+
 ### r2.0.0
 [commits](https://github.com/LSIR/gsn/commits/gsn-release-2.0.0)
 * This is a major release and some of the changes below are NOT backward compatible.
