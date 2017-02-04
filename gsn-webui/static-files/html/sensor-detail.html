@@ -168,6 +168,57 @@
 
                     <div class="col-lg-12">
 
+
+                        <highchart ng-if="details.properties.values" id="chart1" config="chartConfig"></highchart>
+                        <br>
+
+                        <button class="btn btn-primary" ng-click="compare()" ng-disabled="!details.properties
+                        .values">
+                            Compare this graph
+                        </button>
+                        <br>
+                        <br>
+
+                        <button class="btn btn-info" ng-click="addFilter(1, '>', 1,filterFunctionList.length)">Add a
+                                                                                                               filter
+                        </button>
+
+                        <br>
+                        <br>
+
+                        <div class="form-group" ng-repeat="fil in filterFunctionList">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <select class=" form-control" ng-options="field as field.name for field in
+                            details
+                            .properties
+                            .fields"
+                                            ng-model="filterValuesList[$index][0]">
+                                        <option value="">-- choose a column --</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3">
+
+                                    <select class=" form-control" ng-options="op as op for op in filterOperators"
+                                            ng-model="filterValuesList[$index][1]">
+                                        <option value="">-- choose an operator --</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3">
+
+                                    <input type="number" class="form-control" value="12"
+                                           ng-model="filterValuesList[$index][2]">
+                                </div>
+
+                                <button class="btn btn-danger" ng-click="removeFilter($index)">Remove filter</button>
+                            </div>
+
+                        </div>
+                        <button class="btn btn-info" ng-click="applyFilterChanges();filter()"
+                                ng-disabled="!filterFunctionList.length">Apply
+                                                                         filters
+                        </button>
+
                         <div class="row">
 
                             <p style="float: left; display:inline-block" ng-if="details.properties.values">
@@ -261,60 +312,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        <br>
-
-                        <br>
-
-                        <highchart ng-if="details.properties.values" id="chart1" config="chartConfig"></highchart>
-                        <br>
-
-                        <button class="btn btn-primary" ng-click="compare()" ng-disabled="!details.properties
-                        .values">
-                            Compare this graph
-                        </button>
-                        <br>
-                        <br>
-
-                        <button class="btn btn-info" ng-click="addFilter(1, '>', 1,filterFunctionList.length)">Add a
-                                                                                                               filter
-                        </button>
-
-                        <br>
-                        <br>
-
-                        <div class="form-group" ng-repeat="fil in filterFunctionList">
-                            <div class="row">
-                                <div class="col-lg-3">
-                                    <select class=" form-control" ng-options="field as field.name for field in
-                            details
-                            .properties
-                            .fields"
-                                            ng-model="filterValuesList[$index][0]">
-                                        <option value="">-- choose a column --</option>
-                                    </select>
-                                </div>
-                                <div class="col-lg-3">
-
-                                    <select class=" form-control" ng-options="op as op for op in filterOperators"
-                                            ng-model="filterValuesList[$index][1]">
-                                        <option value="">-- choose an operator --</option>
-                                    </select>
-                                </div>
-                                <div class="col-lg-3">
-
-                                    <input type="number" class="form-control" value="12"
-                                           ng-model="filterValuesList[$index][2]">
-                                </div>
-
-                                <button class="btn btn-danger" ng-click="removeFilter($index)">Remove filter</button>
-                            </div>
-
-                        </div>
-                        <button class="btn btn-info" ng-click="applyFilterChanges();filter()"
-                                ng-disabled="!filterFunctionList.length">Apply
-                                                                         filters
-                        </button>
 
                     </div>
 

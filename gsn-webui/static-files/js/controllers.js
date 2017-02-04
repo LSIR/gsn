@@ -727,8 +727,82 @@ gsnControllers.controller('DashboardCtrl', ['$scope', '$http', '$interval', 'fav
             data.favorites_list.forEach(function (sensor_name) {
                 $http.get('dashboard/' + sensor_name).success(function (data, status, headers, config) {
                     $scope.sensors[sensor_name] = data
+                    $scope.sensors[sensor_name].graph = {
+                        options: {
+                            chart: {
+                                zoomType: 'none'
+                            },
+                            rangeSelector: {
+                                enabled: false
+                            },
+                            navigator: {
+                                enabled: false
+                            },
+                            legend: {
+                                enabled: true
+                            },
+                            plotOptions: {
+                                series: {
+                                    marker: {
+                                        enabled: false
+                                    }
+                                }
+                            }
+                        },
+                        series: [],
+                        title: {
+                            text: 'sensor_name'
+                        },
+                        useHighStocks: true,
+                        size: {
+                            height: 100
+                        },
+                        yAxis: {
+                            labels: {
+                                align: 'left'
+                            }
+                        }
+                    };
                     $scope.SensorDataStream.register(sensor_name.toLowerCase(), function (data){
                         if (data) {
+                            var k, offset = 0;
+
+                            if ($scope.sensors[sensor_name].graph.series === []){
+
+                                for (var key in data) {
+                                    $scope.sensors[sensor_name].graph.series.push({
+                                        name: key,
+                                        id: k,
+                                        data: []
+                                    });
+                                    k ++;
+                                }
+
+                    var i;
+                    for (i = 0; i < details.properties.values.length; i++) {
+
+                        if (typeof details.properties.values[i][k] === 'string' || details.properties.values[i][k] instanceof String) {
+                            offset++;
+                            break
+                        }
+                        var array = [details.properties.values[i][1], details.properties.values[i][k]];
+                        $scope.chartConfig.series[k - 2].data.push(array)
+
+                    }
+
+
+                    $scope.chartConfig.series[k - 2].data.sort(function (a, b) {
+                        return a[0] - b[0]
+                    });
+
+                }
+
+                $scope.chartConfig.series = $scope.chartConfig.series.filter(function (serie) {
+                    return serie.data.length > 0
+                });
+
+
+            }
                             for (var k = 0; k < $scope.sensors[sensor_name].fields.length; k++) {
                                     $scope.sensors[sensor_name].values[k] = data[$scope.sensors[sensor_name].fields[k].name.toLowerCase()];
                                 }
