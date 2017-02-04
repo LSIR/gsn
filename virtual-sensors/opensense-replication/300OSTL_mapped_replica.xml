@@ -26,7 +26,7 @@
 		
 		<stream name="B">
 			<source alias="B"  sampling-rate="1" storage-size="1">
-				<address wrapper="zeromq-sync" partial-order-key="station">
+				<address wrapper="zeromq-async" partial-order-key="station">
 					<predicate key="address">tcp://disalsrv6.epfl.ch</predicate>
 					<predicate key="vsensor">geo_ostl</predicate>
 				</address>

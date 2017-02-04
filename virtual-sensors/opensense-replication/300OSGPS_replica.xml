@@ -23,7 +23,7 @@
 	<streams>
 		<stream name="input1">
 			<source alias="source1"  sampling-rate="1" storage-size="1">
-				<address wrapper="zeromq-sync" partial-order-key="station">
+				<address wrapper="zeromq-async" partial-order-key="station">
 					<predicate key="address">tcp://disalsrv6.epfl.ch</predicate>
 					<predicate key="vsensor">p_osgps</predicate>
 				</address>
