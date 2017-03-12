@@ -30,6 +30,7 @@ import java.util.Date;
 import models.gsn.auth.User;
 import play.Routes;
 import play.data.Form;
+import play.i18n.Messages;
 import play.mvc.*;
 import play.mvc.Http.Session;
 import play.mvc.Result;
@@ -37,6 +38,7 @@ import providers.gsn.GSNUsernamePasswordAuthProvider;
 import providers.gsn.GSNUsernamePasswordAuthProvider.GSNLogin;
 import providers.gsn.GSNUsernamePasswordAuthProvider.GSNSignup;
 
+import providers.gsn.GSNUsernamePasswordAuthUser;
 import views.html.*;
 import be.objectify.deadbolt.java.actions.Group;
 import be.objectify.deadbolt.java.actions.Restrict;
@@ -108,6 +110,34 @@ public class LocalAuthController extends Controller {
 			// do something with your part of the form before handling the user
 			// signup
 			return UsernamePasswordAuthProvider.handleSignup(ctx());
+		}
+	}
+
+	public static Result adduser() {
+		return ok(adduser.render(GSNUsernamePasswordAuthProvider.SIGNUP_FORM));
+	}
+
+	public static Result doAdduser() {
+		com.feth.play.module.pa.controllers.Authenticate.noCache(response());
+		final Form<GSNSignup> filledForm = GSNUsernamePasswordAuthProvider.SIGNUP_FORM
+				.bindFromRequest();
+		if (filledForm.hasErrors()) {
+			return badRequest(adduser.render(filledForm));
+		} else {
+			GSNUsernamePasswordAuthUser guser = new GSNUsernamePasswordAuthUser(filledForm.get());
+			final User u = User.findByUsernamePasswordIdentity(guser);
+			if (u != null) {
+				flash(LocalAuthController.FLASH_ERROR_KEY,
+						Messages.get("playauthenticate.user.exists.message"));
+				return badRequest(adduser.render(filledForm));
+			}
+			// The user either does not exist or is inactive - create a new one
+			// manually created users are directly validated
+			@SuppressWarnings("unused")
+			final User newUser = User.create(guser);
+			newUser.emailValidated = true;
+			newUser.save();
+			return ok(adduser.render(GSNUsernamePasswordAuthProvider.SIGNUP_FORM));
 		}
 	}
 

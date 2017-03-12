@@ -165,6 +165,7 @@ gsn.access.vs.allowed.all=Visible par tous
 gsn.access.users=Utilisateurs
 gsn.access.users.title=Gestion des utilisateurs
 gsn.access.users.add=Ajouter
+gsn.access.users.add_title=Ajouter un utilisateur
 gsn.access.users.remove=Enlever
 gsn.access.roles=Rôles
 gsn.access.actions=Actions

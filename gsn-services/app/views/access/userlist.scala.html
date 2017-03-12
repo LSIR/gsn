@@ -17,6 +17,7 @@
 					<th>@Messages("playauthenticate.profile.lastname")</th>
 					<th>E-mail</th>
 					<th>@Messages("gsn.access.roles")</th>
+					<th>&nbsp;</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -24,7 +25,11 @@
 				<tr>
 					<td>@u.firstName</td>
 					<td>@u.lastName</td>
-					<td>@u.email</td>
+					<td>@u.email
+                        @if(u.emailValidated){
+                            [@Messages("playauthenticate.profile.verified")]
+                        }
+                    </td>
 					<td>
 						<ul class="list-inline">
 							@for(r <- u.roles) {
@@ -43,11 +48,19 @@
 							}
 						</ul>
 					</td>
+                    <td>
+                        @if(u == controllers.gsn.auth.LocalAuthController.getLocalUser(play.mvc.Controller.session())){
+                            -
+                        }else{
+                            <button type="button" class="btn btn-danger btn-xs" onclick="$.post('@controllers.gsn.auth.routes.PermissionsController.deleteuser(page)?user_id=' + @u.id, function(data){document.location='@controllers.gsn.auth.routes.PermissionsController.users(page)'});">@Messages("gsn.access.users.remove")</button>
+                        }
+                    </td>
 				</tr>
 				}
 			</tbody>
 		</table>
 		@paginate(page, pageLength, count, controllers.gsn.auth.routes.PermissionsController.users(_))
+        <div><a class="btn btn-primary pull-right" href="@controllers.gsn.auth.routes.LocalAuthController.adduser()">@Messages("gsn.access.users.add_title")</a></div>
 	</div>
 </div>
 <script type="text/javascript">

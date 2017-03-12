@@ -1,0 +1,43 @@
+@(addForm: play.data.Form[_])
+
+@import helper._
+@import play.core.j.PlayMagicForJava._
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrapBasic.f) }
+
+@main(Messages("gsn.access.users.add_title"),"Add user") {
+
+  <div class="row">
+    <div class="col-xs-12 col-sm-6 col-md-8">
+      <h1>@Messages("gsn.access.users.add_title")</h1>
+    </div>
+  </div>
+
+  <div id="add" class="row">
+
+    <div class="col-xs-6 col-md-4">
+    	@helper.form(controllers.gsn.auth.routes.LocalAuthController.doAdduser, 'class -> "form-horizontal", 'role -> "form") {
+
+            @if(addForm.hasGlobalErrors) {
+		        <p class="alert alert-danger">
+		          @addForm.globalError.message
+		     	</p>
+            }
+
+             @inputText(
+                addForm("name"),
+                '_label -> Messages("playauthenticate.signup.name")
+             )
+             
+             @_profilePartial(addForm)
+
+             @_emailPartial(addForm, true)
+
+             @_passwordPartial(addForm)
+
+            <button type="submit" class="btn btn-default">@Messages("gsn.access.users.add")</button>
+    	}
+    </div>
+
+  </div>
+
+}

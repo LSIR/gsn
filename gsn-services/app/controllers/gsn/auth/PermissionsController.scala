@@ -26,20 +26,23 @@ package controllers.gsn.auth
 
 import scala.concurrent.{Future, Promise}
 import akka.actor._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.mvc._
-import models.gsn.auth.{Group, User, DataSource, SecurityRole, UserDataSourceRead, GroupDataSourceRead, UserDataSourceWrite, GroupDataSourceWrite}
+import models.gsn.auth.{DataSource, Group, GroupDataSourceRead, GroupDataSourceWrite, SecurityRole, User, UserDataSourceRead, UserDataSourceWrite}
 import views.html._
 import be.objectify.deadbolt.scala.DeadboltActions
 import security.gsn.GSNScalaDeadboltHandler
 import controllers.gsn.Global
 import javax.inject.Inject
+
 import scala.collection.JavaConverters._
 import play.core.j.JavaHelpers
 import play.mvc.Http.Context
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
 import ch.epfl.gsn.data._
+import providers.gsn.GSNUsernamePasswordAuthProvider
       
 object PermissionsController extends Controller with DeadboltActions {
   
@@ -154,7 +157,7 @@ object PermissionsController extends Controller with DeadboltActions {
 		  }
       }
   }
-  
+
   def users(page:Int) = Restrict(Array(LocalAuthController.ADMIN_ROLE),new GSNScalaDeadboltHandler) { Action.async { implicit request => Future {
         //hack to work with java-style templates
         Context.current.set(JavaHelpers.createJavaContext(request))
@@ -163,6 +166,27 @@ object PermissionsController extends Controller with DeadboltActions {
 		  }
       }
   }
+
+  def deleteuser(page:Int) = Restrict(Array(LocalAuthController.ADMIN_ROLE),new GSNScalaDeadboltHandler) { Action { implicit request => {
+    //hack to work with java-style templates
+    Context.current.set(JavaHelpers.createJavaContext(request))
+    val count = User.find.findRowCount()
+    val u = request.queryString.get("user_id").map { x => User.find.byId(x.head.toLong) }
+
+    u.fold(BadRequest("Unknown user"))(user => {
+      //cleanup all references
+      user.groups.clear
+      user.saveManyToManyAssociations("groups")
+      user.permissions.clear
+      user.saveManyToManyAssociations("permissions")
+      user.roles.clear
+      user.saveManyToManyAssociations("roles")
+      user.trusted_clients.clear()
+      user.saveManyToManyAssociations("trusted_clients")
+      user.delete
+      Ok("OK")
+    })
+  }}}
   
   def addrole(page:Int) = Restrict(Array(LocalAuthController.ADMIN_ROLE),new GSNScalaDeadboltHandler) { Action { implicit request => {
       //hack to work with java-style templates
