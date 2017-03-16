@@ -13,8 +13,8 @@
                 <![CDATA[
                 	try {
                 		GENERATION_TIME = PROCESSING_TIME = null;
-						GENERATION_TIME = Date.parse('yyyy-MM-dd HH:mm:ss.SSS', GENERATION_YEAR.toInteger()+"-"+GENERATION_MONTH.toInteger()+"-"+GENERATION_DAY.toInteger()+" "+GENERATION_HOUR.toInteger()+":"+GENERATION_MINUTE.toInteger()+":"+GENERATION_SECOND).getTime();
-                    	PROCESSING_TIME = Date.parse('yyyy-MM-dd HH:mm:ss.SSS', PROCESSING_YEAR.toInteger()+"-"+PROCESSING_MONTH.toInteger()+"-"+PROCESSING_DAY.toInteger()+" "+PROCESSING_HOUR.toInteger()+":"+PROCESSING_MINUTE.toInteger()+":"+PROCESSING_SECOND).getTime();
+						GENERATION_TIME = Date.parse('yyyy-MM-dd HH:mm:ss.SSS z', GENERATION_YEAR.toInteger()+"-"+GENERATION_MONTH.toInteger()+"-"+GENERATION_DAY.toInteger()+" "+GENERATION_HOUR.toInteger()+":"+GENERATION_MINUTE.toInteger()+":"+GENERATION_SECOND+" UTC").getTime();
+                    	PROCESSING_TIME = Date.parse('yyyy-MM-dd HH:mm:ss.SSS z', PROCESSING_YEAR.toInteger()+"-"+PROCESSING_MONTH.toInteger()+"-"+PROCESSING_DAY.toInteger()+" "+PROCESSING_HOUR.toInteger()+":"+PROCESSING_MINUTE.toInteger()+":"+PROCESSING_SECOND+" UTC").getTime();
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
 					}
