@@ -147,14 +147,14 @@ $(document).ready(function() {
       },
       { title:"Aiguille du Midi Internal PV Temperature [°C]",
         signals: [{
-          vsensor:"adm_cr1000",
+          vsensor:"adm_cr1000__merged",
           field:["panel_temp"],
           select:"sensornode[position=7],sensornode[position=8],sensornode[position=9]"
         }]
       },
       { title:"Aiguille du Midi Internal PV Voltage Sense [V]",
         signals: [{
-          vsensor:"adm_cr1000",
+          vsensor:"adm_cr1000__merged",
           field:["battery"],
           select:"sensornode[position=7],sensornode[position=8],sensornode[position=9]"
         }]
