@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
+import java.util.concurrent.Semaphore;
 import java.util.Map.Entry;
 
 import gsn.beans.DataField;
@@ -31,7 +32,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 	private static final String FILTER_DUPLICATES = "filter_duplicates";
 	private static final String DUPLICATES_IGNORE_FIELDS = "duplicates_ignore_field";
 
-	private static final Long CLEANUP_TIMER_PERIOD = 86400000L;
+	private static final Long CLEANUP_TIMER_PERIOD = 300000L;
 	
 	private static enum BucketEdgeType {
 		STATIC, DYNAMIC
@@ -64,6 +65,8 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 	private Map<Serializable,Map<Serializable,ArrayList<StreamElementContainer>>> streamElementBuffer = new HashMap<Serializable,Map<Serializable,ArrayList<StreamElementContainer>>>();
 	private Map<String,Operator> FieldNameToOperatorMap = new HashMap<String,Operator>();
 	private Long bufferSizeInMs;
+	private Long bufferNow = null;
+	private Long newestData = 0L;
 	private Integer bucketSpace;
 	private String timeline;
 	private Long bucketSizeInMs = null;
@@ -74,11 +77,12 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 	private boolean filterDuplicates = false;
 	private String[] duplicatesIgnoreFields = null;
 	private DataField[] mergedDataFields;
+	private int totalBufferedStreams = 0; 
+	private Semaphore cleanupLock = new Semaphore(1);
 	Timer cleanupTimer = new Timer();
 
 	private static final DataField[] statisticsDataFields = {
 		new DataField("MERGED_STREAMS", "INTEGER"),
-		new DataField("BUFFERED_STREAMS_FOR_MATCHING_FIELD1", "BIGINT"),
 		new DataField("TOTAL_BUFFERED_STREAMS", "BIGINT")
 	};
 	
@@ -353,11 +357,12 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 		Serializable match1 = null;
 		if (matchingFieldName1 != null)
 			match1 = data.getData(matchingFieldName1);
-		try {	
-			Long startTime = 0L;
-			if (logger.isDebugEnabled())
-				startTime = System.currentTimeMillis();
-
+		try {
+			cleanupLock.acquire();
+		} catch (InterruptedException e) {
+			logger.error(e.getMessage(), e);
+		}
+		try {
 			// add missing fields to stream element
 			data = addMissingFields(data);
 			
@@ -367,20 +372,19 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 					logger.debug("New StreamElement buffer created for " + matchingFieldName1 + " " + match1);
 			}
 
-			if (((Long)data.getData(timeline)).compareTo(System.currentTimeMillis()-bufferSizeInMs) > 0) {
-				processPerDeviceData(inputStreamName, data, streamElementBuffer.get(match1));
-			}
-			else {
-				StreamElement se = new StreamElement(data, statisticsDataFields, generateStats(null, data));
-				se.setTimeStamp(System.currentTimeMillis());
-				super.dataAvailable("mergedStream", se);
-			}
-			
-			if (logger.isDebugEnabled())
-				logger.debug("merge time: " + (System.currentTimeMillis()-startTime) + "ms");
+			Long dataTime = (Long)data.getData(timeline);
+			if (bufferNow == null)
+				bufferNow = dataTime;
+			else if (dataTime.compareTo(bufferNow) > 0 && dataTime.compareTo(bufferNow+bufferSizeInMs) <= 0)
+				bufferNow = dataTime;
+			if (dataTime.compareTo(newestData) > 0)
+				newestData = dataTime;
+	
+			processPerDeviceData(inputStreamName, data, streamElementBuffer.get(match1));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
+		cleanupLock.release();
 	}
 	
 	private StreamElement addMissingFields(StreamElement data) {
@@ -437,7 +441,8 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 				return;
 			}
 		}
-		
+
+		totalBufferedStreams++;
 		StreamElementContainer sec = new StreamElementContainer(inputStreamName, data);
 		streamElementContainerList.add(sec);
 		streamElementContainerMap.put(match2, streamElementContainerList);
@@ -451,53 +456,57 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 	}
 	
 	private void cleanupBuffers(boolean cleanupAll) {
-		Iterator<Map<Serializable,ArrayList<StreamElementContainer>>> iter1 = streamElementBuffer.values().iterator();
-		while (iter1.hasNext()) {
-			Map<Serializable,ArrayList<StreamElementContainer>> buf = iter1.next();
-			Iterator<ArrayList<StreamElementContainer>> iter2 = buf.values().iterator();
-			while (iter2.hasNext()) {
-				ArrayList<StreamElementContainer> secList = iter2.next();
-				Iterator<StreamElementContainer> iter3 = secList.iterator();
-				while (iter3.hasNext()) {
-					StreamElementContainer sec = iter3.next();
-					if (cleanupAll || (sec.getNewestTimestamp().compareTo((System.currentTimeMillis()-bufferSizeInMs))) < 0) {
-						StreamElement mergedSE = sec.getMergedStreamElement();
-						int numberOfStreams = sec.getNumberOfStreams();
-						iter3.remove();
-						super.dataAvailable("mergedStream", new StreamElement(mergedSE, statisticsDataFields, generateStats(numberOfStreams, mergedSE)));
-					}
-				}
-				if (secList.isEmpty())
-					iter2.remove();
-			}
-			if (buf.isEmpty())
-				iter1.remove();
+		try {
+			cleanupLock.acquire();
+		} catch (InterruptedException e) {
+			logger.error(e.getMessage(), e);
 		}
+		try {
+				if (logger.isDebugEnabled())
+				logger.debug("cleanupBuffers: start");
+			if (bufferNow != null) {
+				Long bNow = bufferNow;
+				Long cleanups = 0L;
+				Iterator<Map<Serializable,ArrayList<StreamElementContainer>>> iter1 = streamElementBuffer.values().iterator();
+				while (iter1.hasNext()) {
+					Map<Serializable,ArrayList<StreamElementContainer>> buf = iter1.next();
+					Iterator<ArrayList<StreamElementContainer>> iter2 = buf.values().iterator();
+					while (iter2.hasNext()) {
+						ArrayList<StreamElementContainer> secList = iter2.next();
+						Iterator<StreamElementContainer> iter3 = secList.iterator();
+						while (iter3.hasNext()) {
+							StreamElementContainer sec = iter3.next();
+							if (cleanupAll || (sec.getNewestTimestamp().compareTo((bNow-bufferSizeInMs))) < 0) {
+								StreamElement mergedSE = sec.getMergedStreamElement();
+								int numberOfStreams = sec.getNumberOfStreams();
+								iter3.remove();
+								cleanups++;
+								super.dataAvailable("mergedStream", new StreamElement(mergedSE, statisticsDataFields, generateStats(numberOfStreams, mergedSE)));
+							}
+						}
+						if (secList.isEmpty())
+							iter2.remove();
+					}
+					if (buf.isEmpty())
+						iter1.remove();
+				}
+				
+				if (bNow.compareTo(newestData - bufferSizeInMs) < 0)
+					bufferNow = newestData;
+				
+				if (logger.isDebugEnabled())
+					logger.debug("cleanupBuffers: cleanups=" + cleanups);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		cleanupLock.release();
 	}
 
 	private Serializable[] generateStats(Integer mergedStreams, StreamElement se) {
-		Serializable [] stats = new Serializable [statisticsDataFields.length];
-		// MERGED_STREAMS
-		stats[0] = mergedStreams;
+		totalBufferedStreams -= mergedStreams;
 		
-		stats[1] = stats[2] = 0;
-		for (Entry<Serializable, Map<Serializable, ArrayList<StreamElementContainer>>> match1Buffer: streamElementBuffer.entrySet()) {
-			for (ArrayList<StreamElementContainer> secList: match1Buffer.getValue().values()) {
-				for (StreamElementContainer sec: secList) {
-					if (matchingFieldName1 != null) {
-						if (match1Buffer.getKey().equals(se.getData(matchingFieldName1))) {
-							// BUFFERED_STREAMS_FOR_MATCHING_FIELD1
-							stats[1] = ((Integer)stats[1]) + sec.getNumberOfStreams();
-						}
-					}
-					else
-						stats[1] = ((Integer)stats[1]) + sec.getNumberOfStreams();
-					// TOTAL_BUFFERED_STREAMS
-					stats[2] = ((Integer)stats[2]) + sec.getNumberOfStreams();
-				}
-			}
-		}
-		return stats;
+		return new Serializable [] {mergedStreams, totalBufferedStreams};
 	}
 	
 	class StreamElementContainer {
@@ -540,12 +549,13 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 				// discard duplicates
 				for (StreamElement se : streamElements) {
 					if (se.equalsIgnoreTimedAndFields(streamElement, duplicatesIgnoreFields)) {
-						logger.debug("discard duplicate in StreamElement container: [" + streamElement.toString() + "]");
+						logger.debug("discard duplicate in StreamElement container: (incoming)[" + streamElement.toString() + "], (existing)[" + se.toString() + "]");
 						return false;
 					}
 				}
 			}
-			
+
+			totalBufferedStreams++;
 			streamElements.add(streamElement);
 
 			if (bucketEdgeType != null && bucketEdgeType == BucketEdgeType.DYNAMIC) {

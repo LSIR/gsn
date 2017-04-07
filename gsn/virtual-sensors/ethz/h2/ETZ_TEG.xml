@@ -55,7 +55,6 @@
             <field name="BAT_CHARGE_CURRENT_A2" type="DOUBLE" unit="mA" />
             
             <field name="MERGED_STREAMS" type="INTEGER"/>
-            <field name="BUFFERED_STREAMS_FOR_MATCHING_FIELD1" type="BIGINT"/>
             <field name="TOTAL_BUFFERED_STREAMS" type="BIGINT"/>
         </output-structure>
     </processing-class>
@@ -67,25 +66,24 @@
         <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from ETZ_Dozer_Teg__conv where timed > 1475280000000</predicate>
+                    <predicate key="query"> select * from ETZ_Dozer_Teg__conv where timed > 1475280000000 and (position = 2052 or position = 2112)</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper where position = 2052 or position = 2112</query>
+                <query> select * from wrapper where</query>
             </source>
             <query> select * from source </query>
         </stream>
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from ETZ_Dozer_AdcComDiff__mapped where timed > 1475280000000</predicate>
+                    <predicate key="query"> select * from ETZ_Dozer_AdcComDiff__mapped where timed > 1475280000000 and (position = 2052 or position = 2112)</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE,
                                SENSORTYPE_SERIALID, HEADER_SEQNR, HEADER_ORIGINATORID, HEADER_ATIME,
                                PAYLOAD_SAMPLE_VALID, PAYLOAD_SAMPLE_NO,
                                (PAYLOAD_A2 * 2.56 / 65536.0 * 10.0) as BAT_CHARGE_CURRENT_A2,
-                               (PAYLOAD_A3 * 2.56 / 65536.0 * 1000.0) as RECTIFIED_TEG_VOLTAGE_A3 from wrapper
-                               where position = 2052 or position = 2112</query>
+                               (PAYLOAD_A3 * 2.56 / 65536.0 * 1000.0) as RECTIFIED_TEG_VOLTAGE_A3 from wrapper</query>
             </source>
             <query> select * from source </query>
         </stream>
