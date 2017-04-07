@@ -69,7 +69,7 @@
                     <predicate key="query"> select * from ETZ_Dozer_Teg__conv where timed > 1475280000000 and (position = 2052 or position = 2112)</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select * from wrapper where</query>
+                <query> select * from wrapper</query>
             </source>
             <query> select * from source </query>
         </stream>
