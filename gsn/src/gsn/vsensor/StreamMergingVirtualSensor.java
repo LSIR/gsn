@@ -32,7 +32,7 @@ public class StreamMergingVirtualSensor extends BridgeVirtualSensorPermasense {
 	private static final String FILTER_DUPLICATES = "filter_duplicates";
 	private static final String DUPLICATES_IGNORE_FIELDS = "duplicates_ignore_field";
 
-	private static final Long CLEANUP_TIMER_PERIOD = 300000L;
+	private static final Long CLEANUP_TIMER_PERIOD = 86400000L;
 	
 	private static enum BucketEdgeType {
 		STATIC, DYNAMIC
