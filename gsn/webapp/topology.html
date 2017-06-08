@@ -378,8 +378,10 @@ function PacketRate() {
 	if ($(this).attr("packet_count")) {
 	  if (!$(row).data("packetrate"))
 	    $(row).data("packetrate", new PacketRate());
-	  $(row).data("packetrate").update($(this).attr("packet_count"));
-	  $("td:last-child",row).text($(row).data("packetrate").rate);
+      if ($(row).data("packetrate")) {
+	    $(row).data("packetrate").update($(this).attr("packet_count"));
+	    $("td:last-child",row).text($(row).data("packetrate").rate);
+	  }
 	}
 	if ($(this).attr("timestamp") === undefined || now - $(data).attr("timestamp") > STANDBY_TIMEOUT_MS) {
 	  $(row).addClass("offline");
