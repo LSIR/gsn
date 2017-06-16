@@ -4,7 +4,7 @@
 <head>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
         <title>GSN</title>
-        
+
         <link rel="stylesheet" href="style/gsn.css" type="text/css" media="screen,projection" />
         <script type="text/javascript" src="js/jquery.min.js"></script>
         <script type="text/javascript" src="js/jquery-dom.js"></script>
@@ -32,7 +32,7 @@ $(document).ready(function() {
 
     // plot configuration
     GsnPlots.setConfig([
-      
+
       // OpenSense Data Latency
       { title:"Tram 1: Data Latency [ms]",
         signals: [{
@@ -129,7 +129,7 @@ $(document).ready(function() {
           deviceId: [8]
         }]
       },
-      
+
       // Dozer Health
       { title:"Dozer System Voltage",
         signals: [{
@@ -177,7 +177,19 @@ $(document).ready(function() {
         signals: [{
           vsensor:"dirruhorn_dozer_nodehealth__conv",
           field:["sdivoltage"],
-          select:"sensornode[position=15],sensornode[position=17],sensornode[position=25],sensornode[position=27],sensornode[position=55],sensornode[position=62],sensornode[position=63],sensornode[position=64],sensornode[position=82],sensornode[position=83],sensornode[position=84]"
+          select:"sensornode[position=15],
+                  sensornode[position=17],
+                  sensornode[position=25],
+                  sensornode[position=27],
+                  sensornode[position=55],
+                  sensornode[position=62],
+                  sensornode[position=63],
+                  sensornode[position=64],
+                  sensornode[position=82],
+                  sensornode[position=83],
+                  sensornode[position=84],
+                  sensornode[position=86],
+                  sensornode[position=87]"
         }]
       },
       { title:"Grabengufer PV Voltages",
@@ -454,7 +466,7 @@ $(document).ready(function() {
 //         }]
 //       },
     ]);
-    
+
     $.ajax({
       type: "GET",
       url: "/gsn?structure",
@@ -504,7 +516,7 @@ function showPlots(id) {
   // add graphs
   GsnPlots.addPlots($("#plot_"+id), id)
   $.cookie("deployment" , id);
-}	
+}
 //]]>-->
 </script>
 </head>
@@ -517,7 +529,7 @@ function showPlots(id) {
 	</div>
 	<div id="navigation">
 	</div>
-	
+
 	<div id="separator">
 		<div id="starttext">
 			<p>
@@ -531,10 +543,10 @@ function showPlots(id) {
 		<ul id="deployment_menu">
 		<li />
 		</ul>
-		</div>	
-		
+		</div>
+
 		<div id="plotscontainer" style="margin-top:5px"></div>
-		
+
 	</div>
 	<div class="separator">
 		<div id="footer">
