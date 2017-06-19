@@ -270,6 +270,7 @@ Jungfraujoch_Sensorrod.xml
 Jungfraujoch_Statistics__mapped.xml
 Jungfraujoch_SyslogNg__conv.xml
 Jungfraujoch_SyslogNg__mapped.xml
+Jungfraujoch_Temperature__nttn.xml
 Jungfraujoch_TEG.xml
 Jungfraujoch_Thermistorchain1.xml
 Jungfraujoch_Thermistorchain2.xml
@@ -398,7 +399,7 @@ Matterhorn_Sensorrod.xml
 Matterhorn_Statistics__mapped.xml
 Matterhorn_SyslogNg__conv.xml
 Matterhorn_SyslogNg__mapped.xml
-Matterhorn_Temperature_ntnn.xml
+Matterhorn_Temperature__ntnn.xml
 Matterhorn_Thermistorchain1.xml
 Matterhorn_Thermistorchain2.xml
 Matterhorn_Thermistorchain.xml
