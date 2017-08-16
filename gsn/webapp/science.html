@@ -190,7 +190,7 @@
 													     18, 19, 21, 23, 25, 27,
 													     29, 31, 33, 35, 39, 40,
 													     41, 43, 44, 55, 56, 57,
-													     62, 63, 64, 66, 67, 70, 
+													     62, 63, 64, 66, 67, 70,
                                                                                                              81, 82, 83, 84 ,86, 87]
 											} ],
 										},
@@ -204,7 +204,7 @@
 													     18, 19, 21, 23, 25, 27,
 													     29, 31, 33, 35, 39, 40,
 													     41, 43, 44, 55, 56, 57,
-													     62, 63, 64, 66, 67, 70, 
+													     62, 63, 64, 66, 67, 70,
                                                                                                              81, 82, 83, 84, 86, 87]
 											} ],
 										},
@@ -326,7 +326,7 @@
 												vsensor : "dirruhorn_gps_inclinometer",
 												field : [ "inclinometer_x" ],
 												position : [ 6, 9, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27,
-													     29, 31, 33, 35, 43, 44, 55, 56, 57, 62, 
+													     29, 31, 33, 35, 43, 44, 55, 56, 57, 62,
 													     63, 64, 70, 82, 83, 84, 86, 87 ]
 											} ],
 										},
@@ -336,7 +336,7 @@
 												vsensor : "dirruhorn_gps_inclinometer",
 												field : [ "inclinometer_y" ],
 												position : [ 6, 9, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27,
-													     29, 31, 33, 35, 43, 44, 55, 56, 57, 62, 
+													     29, 31, 33, 35, 43, 44, 55, 56, 57, 62,
 													     63, 64, 70, 82, 83, 84, 86, 87 ]
 											} ],
 										},
@@ -1032,6 +1032,30 @@
 												select : "sensornode[position=10]"
 											} ]
 										},
+                    {
+											title : "Temperatures Position 13 [°C]",
+											signals : [ {
+												vsensor : "jungfraujoch_temperature__nttn",
+												field : [ "nttn_t1", "nttn_t2"],
+												select : "sensornode[position=13]"
+											} ]
+										},
+                    {
+                      title : "Temperatures Position 14 [°C]",
+                      signals : [ {
+                        vsensor : "jungfraujoch_temperature__nttn",
+                        field : [ "nttn_t1", "nttn_t2"],
+                        select : "sensornode[position=14]"
+                      } ]
+                    },
+                    {
+                      title : "Temperatures Position 18 [°C]",
+                      signals : [ {
+                        vsensor : "jungfraujoch_temperature__nttn",
+                        field : [ "nttn_t1", "nttn_t2"],
+                        select : "sensornode[position=18]"
+                      } ]
+                    },
 										// 										{
 										// 											title : "Acoustic Emission Events Channel 1",
 										// 											signals : [ {
@@ -1436,7 +1460,7 @@
 //											} ]
 //										},
 
-										// Saastal GPS Locations 
+										// Saastal GPS Locations
 										{
 											title : "GPS Position East [m]",
 											signals : [ {
