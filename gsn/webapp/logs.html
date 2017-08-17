@@ -141,7 +141,17 @@ var EVENT_MSG = new Array(
 	 "WGPS: Modbus communication error (code: %s)." /* 98: EVENT_WGPS_MODBUS_ERROR */,
 	 "WGPS: Power state change (new state: %s)." /* 99: EVENT_WGPS_POWER_STATE_CHANGE */,
 	 "" /* not used 100: EVENT_WGPS_TIME_SYNC_FAILED */,
-	 "" /* not used 101: EVENT_WGPS_GPS_CRC_FAILURE */ );
+	 "" /* not used 101: EVENT_WGPS_GPS_CRC_FAILURE */,
+	 "" /* 102: */,
+	 "" /* 103: */,
+	 "" /* 104: */,
+	 "" /* 105: */,
+	 "" /* 106: */,
+	 "" /* 107: */,
+	 "" /* 108: */,
+	 "" /* 109: */,
+	 "" /* not used 110: EVENT_BOLT_CRC_FAILURE */,
+	 "BOLT: Communication error (code: %s)." /* 111: EVENT_BOLT_COMM_ERROR */ );
 		 
 var EVENT_MSG_NULL = new Array(
 	 "" /* 0: */,
@@ -245,7 +255,17 @@ var EVENT_MSG_NULL = new Array(
 	 "" /* 98: not used EVENT_WGPS_MODBUS_ERROR */,
 	 "" /* 99: not used EVENT_WGPS_POWER_STATE_CHANGE */,
 	 "WGPS: Time synchronization with Sam7 at start-up failed" /* 100: EVENT_WGPS_TIME_SYNC_FAILED */,
-	 "WGPS: GPS checksum match failure detected on Sam7" /* 101: EVENT_WGPS_GPS_CRC_FAILURE */ );
+	 "WGPS: GPS checksum match failure detected on Sam7" /* 101: EVENT_WGPS_GPS_CRC_FAILURE */,
+	 "" /* 102: */,
+	 "" /* 103: */,
+	 "" /* 104: */,
+	 "" /* 105: */,
+	 "" /* 106: */,
+	 "" /* 107: */,
+	 "" /* 108: */,
+	 "" /* 109: */,
+	 "BOLT: DPP message CRC checksum failure" /* 110: EVENT_BOLT_CRC_FAILURE */,
+	 "" /* 111: not used EVENT_BOLT_COMM_ERROR */ );
 		
 var EVENT_MSG_ERRORLEVELS = new Array(
 	 6 /* 0: */,
@@ -349,7 +369,17 @@ var EVENT_MSG_ERRORLEVELS = new Array(
 	 3 /* 98: EVENT_WGPS_MODBUS_ERROR */,
 	 4 /* 99: EVENT_WGPS_POWER_STATE_CHANGE */,
 	 3 /* 100: EVENT_WGPS_TIME_SYNC_FAILED */,
-	 4 /* 101: EVENT_WGPS_GPS_CRC_FAILURE */ );
+	 4 /* 101: EVENT_WGPS_GPS_CRC_FAILURE */,
+	 6 /* 102: */,
+	 6 /* 103: */,
+	 6 /* 104: */,
+	 6 /* 105: */,
+	 6 /* 106: */,
+	 6 /* 107: */,
+	 6 /* 108: */,
+	 6 /* 109: */,
+	 4 /* 110: EVENT_BOLT_CRC_FAILURE */,
+	 3 /* 111: EVENT_BOLT_COMM_ERROR */ );
 
 var deployments = new Array();
 var logContainers = new Array()
@@ -670,7 +700,7 @@ function generateEventMessageDiv(timestamp, position, deviceId, eventId, eventVa
 		if (EVENT_MSG_NULL[id])
 			logMsg += EVENT_MSG_NULL[id];
 		else
-			logMsg += 'Unknown event id: '+id';
+			logMsg += 'Unknown event id: '+id;
 	}
 	else {
 		if (EVENT_MSG[id])
