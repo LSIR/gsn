@@ -665,15 +665,24 @@ function generateSyslogNgMessageDiv(timestamp, msg) {
 function generateEventMessageDiv(timestamp, position, deviceId, eventId, eventValue) {
 	var id = parseInt(eventId);
 	var logMsg = generateDateString(new Date(parseFloat(timestamp))) + ": Position " + position + " (DeviceId " + deviceId + "): ";
-	if (eventValue.toLowerCase() == "null")
-		logMsg += EVENT_MSG_NULL[id];
-	else
-		logMsg += EVENT_MSG[id].replace('%s', eventValue);
+	
+	if (eventValue.toLowerCase() == "null") {
+		if (EVENT_MSG_NULL[id])
+			logMsg += EVENT_MSG_NULL[id];
+		else
+			logMsg += 'Unknown event id: '+id';
+	}
+	else {
+		if (EVENT_MSG[id])
+			logMsg += EVENT_MSG[id].replace('%s', eventValue);
+		else
+			logMsg += 'Unknown event id: '+id+' (value='+eventValue+')';
+	}
 	
 	var color = "";
 	if (EVENT_MSG_ERRORLEVELS[id] == 4)
 		color = "; color: chocolate";
-	else if (EVENT_MSG_ERRORLEVELS[id] <= 3)
+	else if (EVENT_MSG_ERRORLEVELS[id] <= 3 || EVENT_MSG_ERRORLEVELS[id] === undefined)
 		color = "; color: red";
 	
 	var display = "; display: none";
