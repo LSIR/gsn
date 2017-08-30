@@ -34,7 +34,7 @@ Dirruhorn_BackLogStatus_Static.xml
 Dirruhorn_Binary.xml
 Dirruhorn_Binary_Http.xml
 Dirruhorn_Binary_Upload.xml
-Dirruhorn_CamZilla.xml
+#Dirruhorn_CamZilla.xml
 Dirruhorn_CoreStationStatus_Hardware.xml
 Dirruhorn_CoreStationStatus_Software.xml
 Dirruhorn_CoreStationStatus_Static.xml
