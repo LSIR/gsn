@@ -4,45 +4,6 @@
         <unique-timestamps>false</unique-timestamps>
         <init-params>
             <param name="sensorvalue_conversion" />
-            <param name="persistant">true</param>
-            <param name="scriptlet">
-                <![CDATA[
-					try {
-						def LIMIT = 11.7;
-						def SIZE = 60;
-						def mailrecipients = ["permasense-admin@tik.ee.ethz.ch"];
-						if ( ! isdef('voltageMap')) { voltageMap = [:]; }
-						if (POSITION != null && GENERATION_TIME > System.currentTimeMillis()-2592000000) {
-							if (!voltageMap.containsKey(POSITION))
-								voltageMap.put(POSITION, [0, 0, []]);
-								
-							if (voltageMap.get(POSITION)[0] <= GENERATION_TIME) {
-								def ptr = voltageMap.get(POSITION)[1];
-								def voltageList = voltageMap.get(POSITION)[2];
-								
-								if (voltageList.size() == SIZE ) {
-									def averageBefore = voltageList.sum() / SIZE;
-									voltageList[ptr] = SDIVOLTAGE.toDouble();
-									
-									if ((voltageList.sum() / SIZE) <= LIMIT && averageBefore > LIMIT) {
-										// Notify by email
-										def emailTitle = "[PermaSense-GSN-Public] - VOLTAGE WARNING [" + (new Date(GENERATION_TIME)).format('dd/MM/yyyy HH:mm:ss') + "] - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + " - Battery voltage reaches critical state";
-										def emailContent = "VOLTAGE WARNING - " + vsname.split("_",2)[0].toUpperCase() + " POS " + POSITION + " (device_id=" + DEVICE_ID + "):\n\n Battery voltage dropped below " + LIMIT + "V.";
-										
-										sendEmail(mailrecipients, emailTitle, emailContent);
-									}
-								}
-								else { voltageList[ptr] = SDIVOLTAGE.toDouble(); }
-								
-								ptr = (ptr+1)%SIZE;
-								voltageMap.put(POSITION, [GENERATION_TIME, ptr, voltageList]);
-							}
-						}
-					} catch(Throwable e) {
-						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
-					}
-                ]]>
-            </param>
         </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
