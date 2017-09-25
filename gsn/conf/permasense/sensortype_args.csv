@@ -50,14 +50,29 @@
 "2","ccnn_dx1","150",
 "3","ccnn_dx0","100",
 "3","ccnn_dx1","150",
+# adccomdiff_ccnn, 150/150
 "4","ccnn_dx0","150",
 "4","ccnn_dx1","150",
+# adccomdiff_ccnn, 50/150
 "5","ccnn_dx0","50",
 "5","ccnn_dx1","150",
+# adccomdiff_ccnn, 100/200
+"6","ccnn_dx0","100",
+"6","ccnn_dx1","200",
 
 # adccomdiff_nttn
 "1","nttn_t1","0.0",
 "1","nttn_t2","0.0",
+
+# adcmux_sr_tttttt
+"428071886","sr_tttttt_t1","0.082",
+"428071886","sr_tttttt_t2","0.0388",
+"428071886","sr_tttttt_t3","0.0401",
+"428071886","sr_tttttt_t4","0.0469",
+"428071886","sr_tttttt_t5","0.0469",
+"428071886","sr_tttttt_t6","0.0523",
+"428071886","sr_tttttt_ref1","1.9713",
+"428071886","sr_tttttt_ref2","-9.6691",
 
 # nodehealth
 "0","sdivoltage","0.0046805046805","BaseBoard v2 r2.0"
