@@ -1,4 +1,4 @@
-<virtual-sensor name="Jungfraujoch_Sensorrod_tttttt" priority="10" >
+<virtual-sensor name="Jungfraujoch_Sensorrod__tttttt" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
