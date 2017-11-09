@@ -52,6 +52,7 @@ public class SensorNode {
 	public Integer uptime;
 	public Boolean corestation_online;
 	public Boolean iscorestation;
+	public Boolean iswgpsv2;
 	public Integer db_entries;
 	
 	public SensorNodeConfiguration configuration;
@@ -70,6 +71,7 @@ public class SensorNode {
 	
 	public SensorNode() {
 		links = new ArrayList<Link>();
+		iswgpsv2 = false;
 	}
 	
 	public SensorNode(Integer node_id) {
@@ -120,9 +122,13 @@ public class SensorNode {
 	public boolean isDozerNode() {
 		return isBBControl() || isAccessNode() || isAENode() || isWGPSNode() || isSibNode() || isPowerSwitch();
 	}
+
+	public boolean isWGPSv2() {
+		return iswgpsv2;
+	}
 	
 	public boolean hasSHT21() {
-		return isBBControl() || isAccessNode() || isAENode() || isWGPSNode();
+		return isBBControl() || isAccessNode() || isAENode() || (isWGPSNode() && !isWGPSv2());
 	}
 	
 	public boolean hasSHT15() {
@@ -340,6 +346,10 @@ public class SensorNode {
 		iscorestation = true;
 	}
 
+	public void setWGPSv2() {
+		iswgpsv2 = true;
+	}
+
 	public boolean isDozerSink() {
 		return node_id <= 1024;
 	}
@@ -362,6 +372,7 @@ public class SensorNode {
 		this.uptime = node.uptime;
 		this.corestation_online = node.corestation_online;
 		this.iscorestation = node.iscorestation;
+		this.iswgpsv2 = node.iswgpsv2;
 		this.db_entries = node.db_entries;
 		
 		this.configuration = node.configuration;

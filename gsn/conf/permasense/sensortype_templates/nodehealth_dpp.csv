@@ -1,0 +1,7 @@
+"SIGNAL_NAME","PHYSICAL_SIGNAL","CONVERSION","INPUT"
+"sdivoltage","sdivoltage","Multiplication","bolt"
+"sysvoltage","sysvoltage","Multiplication","bolt"
+"current","current","Multiplication","bolt"
+"msptemperature","msptemperature","Multiplication","bolt"
+"temperature","temperature","Multiplication","bolt"
+"humidity","humidity","Multiplication","bolt"

@@ -43,6 +43,8 @@
             
             <param name="dpp-stream-name">data28</param>
             
+            <param name="wgpsv2-imu-stream-name">data29</param>
+            
         </init-params>
         <web-input>
             <command name="dataconfiguration">
@@ -607,6 +609,17 @@
                       UPTIME as PAYLOAD_UPTIME,
                       VCC as PAYLOAD_SYSVOLTAGE,
                       TEMP as PAYLOAD_TEMPERATURE from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
+    <stream name="data29">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select  * from etz_dozer_wgpsimu
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
       </source>
       <query> select * from source </query>
     </stream>

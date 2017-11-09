@@ -48,6 +48,9 @@ ETZ_Dozer_StateCounter__mapped.xml
 ETZ_Dozer_TEG__conv.xml
 ETZ_Dozer_TEG__mapped.xml
 ETZ_Dozer_Wgps__config.xml
+ETZ_Dozer_WgpsIMU__mapped.xml
+ETZ_Dozer_WgpsNodeInfo__conv.xml
+ETZ_Dozer_WgpsNodeInfo__mapped.xml
 ETZ_Dozer_WgpsStatus__conv.xml
 ETZ_Dozer_WgpsStatus__mapped.xml
 ETZ_Dozer_WgpsSv__conv.xml

@@ -92,6 +92,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
         "backlogstatus-dynamic-stream-name",	// 27: this stream does not count to the packetcount
         "backlogstatus-db-entries-field",		// 28
         "dpp-stream-name",						// 29
+        "wgpsv2-imu-stream-name",				// 30
 	};
 	
 	private static final String commandConfigurationParameter = "dozer-command-vs";
@@ -352,6 +353,9 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 				else if (inputStreamName.equals(configuration[29])) { // dpp packets
 					if(!node.isAccessNode() && !node.isDPPNode())
 						node.setNodeType(SensorNode.DPP);
+				}
+				else if (inputStreamName.equals(configuration[30])) { // wgps v2 imu packets
+					node.setWGPSv2();
 				}
 				s = data.getData(configuration[1]);
 				if (s instanceof Integer) {

@@ -32,6 +32,8 @@ ETZ_Dozer_StateCounter.xml
 ETZ_Dozer_TEG.xml
 ETZ_Dozer_Th3Ident.xml
 ETZ_Dozer_Th3Temp.xml
+ETZ_Dozer_WgpsIMU.xml
+ETZ_Dozer_WgpsNodeInfo.xml
 ETZ_Dozer_WgpsStatus.xml
 ETZ_Dozer_WgpsSv.xml
 ETZ_Dozer_WXT520Prec.xml
