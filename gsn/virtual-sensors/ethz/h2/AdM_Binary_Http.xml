@@ -18,7 +18,7 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://www.chamonix.com/webcam/webcam-argentiere-glacier.jpg</predicate>
+                    <predicate key="url">https://www.chamonix.com/webcam/webcam-argentiere-glacier.jpg</predicate>
                     <predicate key="rate">300000</predicate>
                     <predicate key="subdirectory-name">webcam1</predicate>
                     <predicate key="device-id">6000</predicate>
@@ -30,7 +30,7 @@
         <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="http-get">
-                    <predicate key="url">http://www.chamonix.com/webcam/webcam-argentiere-mont-blanc.jpg</predicate>
+                    <predicate key="url">https://www.chamonix.com/webcam/webcam-argentiere-mont-blanc.jpg</predicate>
                     <predicate key="rate">300000</predicate>
                     <predicate key="subdirectory-name">webcam2</predicate>
                     <predicate key="device-id">6001</predicate>
