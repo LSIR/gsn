@@ -43,6 +43,8 @@
             
             <param name="dpp-stream-name">data28</param>
             
+            <param name="wgpsv2-imu-stream-name">data29</param>
+            
         </init-params>
         <!-- web-input>
             <command name="dataconfiguration">
