@@ -355,6 +355,7 @@ public class TopologyVirtualSensor extends AbstractVirtualSensor {
 						node.setNodeType(SensorNode.DPP);
 				}
 				else if (inputStreamName.equals(configuration[30])) { // wgps v2 imu packets
+					logger.debug("WGPSv2 IMU packet received");
 					node.setWGPSv2();
 				}
 				s = data.getData(configuration[1]);

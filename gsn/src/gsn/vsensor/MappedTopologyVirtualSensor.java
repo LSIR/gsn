@@ -54,91 +54,98 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 						for (int i=0; i<topology.sensornodes.size(); i++) {
 							SensorNode n = topology.sensornodes.get(i);
 							if (n.node_id !=null && n.generation_time != null) {
-
-								n.position = DataMappingWrapper.getPosition(n.node_id.intValue(), n.generation_time, deployment, getVirtualSensorConfiguration().getName(), inputStreamName, false);
-								if (n.position != null) {
-									MappedEntry mappedEntry = allPositions.get(n.position);
-									if (mappedEntry != null) {
-										mappedEntry.spotted = true;
-										allPositions.put(n.position, mappedEntry);
-									}
-									n.nodetype = DataMappingWrapper.getDeviceType(n.node_id.intValue(), n.generation_time, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
-									n.coordinate = DataMappingWrapper.getCoordinate(n.position.intValue(), deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
-									n.iscorestation = false;
-									for (int j=0; j<SensorNode.corestationTypes.length; j++)
-										if (n.nodetype.shortValue() == SensorNode.corestationTypes[j])
-											n.iscorestation = true;
-									
-									Integer vsys = null;
-									if (n.getVsysDbl() != null)
-										vsys = n.getVsysDbl().intValue();
-									Integer vsdi = null;
-									if (n.getVsdiDbl() != null)
-										vsdi = n.getVsdiDbl().intValue();
-									Integer current = null;
-									if (n.getCurrent() != null && !n.getCurrent().trim().isEmpty())
-										current = ((Double)Double.parseDouble(n.getCurrent())).intValue();
-									Integer temp = null;
-									if (n.getTemperature() != null && !n.getTemperature().trim().isEmpty())
-										temp = ((Double)Double.parseDouble(n.getTemperature())).intValue();
-									StreamElement se = new StreamElement(
-											new String[]{"position", "generation_time", "payload_sysvoltage", "payload_sdivoltage", "payload_current", "payload_temperature"}, 
-											new Byte[]{DataTypes.INTEGER, DataTypes.BIGINT, DataTypes.INTEGER, DataTypes.INTEGER, DataTypes.INTEGER, DataTypes.INTEGER},
-											new Serializable[] {n.position, n.generation_time, vsys, vsdi, current, temp});
-									se = DataMappingWrapper.getConvertedValues(se, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
-									
-									n.temperature = n.current = n.vsys = n.vsdi = null;
-									
-									String str = (String)se.getData("sdivoltage");
-									if (str != null)
-										n.setVsdi(Double.parseDouble(str));
-									
-									str = (String)se.getData("sysvoltage");
-									if (str != null) {
-										if (n.iscorestation || n.isWGPSNode() || n.isAENode() || n.isAccessNode() || n.isBBControl())
-											n.setVsys(n.getVsdi());
+								try {
+									n.position = DataMappingWrapper.getPosition(n.node_id.intValue(), n.generation_time, deployment, getVirtualSensorConfiguration().getName(), inputStreamName, false);
+									if (n.position != null) {
+										MappedEntry mappedEntry = allPositions.get(n.position);
+										if (mappedEntry != null) {
+											mappedEntry.spotted = true;
+											allPositions.put(n.position, mappedEntry);
+										}
+										n.nodetype = DataMappingWrapper.getDeviceType(n.node_id.intValue(), n.generation_time, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
+										n.coordinate = DataMappingWrapper.getCoordinate(n.position.intValue(), deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
+										n.iscorestation = false;
+										for (int j=0; j<SensorNode.corestationTypes.length; j++)
+											if (n.nodetype.shortValue() == SensorNode.corestationTypes[j])
+												n.iscorestation = true;
+										
+										Integer vsys = null;
+										if (n.getVsysDbl() != null)
+											vsys = n.getVsysDbl().intValue();
+										Integer vsdi = null;
+										if (n.getVsdiDbl() != null)
+											vsdi = n.getVsdiDbl().intValue();
+										Integer current = null;
+										if (n.getCurrent() != null && !n.getCurrent().trim().isEmpty())
+											current = ((Double)Double.parseDouble(n.getCurrent())).intValue();
+										Integer temp = null;
+										if (n.getTemperature() != null && !n.getTemperature().trim().isEmpty())
+											temp = ((Double)Double.parseDouble(n.getTemperature())).intValue();
+										StreamElement se = new StreamElement(
+												new String[]{"position", "generation_time", "payload_sysvoltage", "payload_sdivoltage", "payload_current", "payload_temperature"}, 
+												new Byte[]{DataTypes.INTEGER, DataTypes.BIGINT, DataTypes.INTEGER, DataTypes.INTEGER, DataTypes.INTEGER, DataTypes.INTEGER},
+												new Serializable[] {n.position, n.generation_time, vsys, vsdi, current, temp});
+										se = DataMappingWrapper.getConvertedValues(se, deployment, getVirtualSensorConfiguration().getName(), inputStreamName);
+										
+										n.temperature = n.current = n.vsys = n.vsdi = null;
+										
+										String str = (String)se.getData("sdivoltage");
+										if (str != null)
+											n.setVsdi(Double.parseDouble(str));
+										
+										str = (String)se.getData("sysvoltage");
+										if (str != null) {
+											if (n.iscorestation || n.isWGPSNode() || n.isAENode() || n.isAccessNode() || n.isBBControl())
+												n.setVsys(n.getVsdi());
+											else
+												n.setVsys(Double.parseDouble(str));
+										}
+	
+										str = (String)se.getData("current");
+										if (str != null)
+											n.current = Double.parseDouble(str);
 										else
-											n.setVsys(Double.parseDouble(str));
-									}
-
-									str = (String)se.getData("current");
-									if (str != null)
-										n.current = Double.parseDouble(str);
-									else
-										n.current = null;
-									
-
-									str = (String)se.getData("temperature");
-									if (str != null)
-										n.temperature = Double.parseDouble(str);
-									else
-										n.temperature = null;
-									
-									if (n.temperature != null && n.humidity != null) {
-										if (n.hasSHT15()) { // SHT15
-											Double hum_rel = new Double(-4 + (0.0405d * n.humidity) - 0.0000028d * Math.pow(n.humidity, 2));			
-											n.humidity = new Double((n.temperature - 25) * (0.01d + (0.00008d * n.humidity)) + hum_rel);
+											n.current = null;
+										
+	
+										str = (String)se.getData("temperature");
+										if (str != null)
+											n.temperature = Double.parseDouble(str);
+										else
+											n.temperature = null;
+										
+										if (n.temperature != null && n.humidity != null) {
+											if (n.isWGPSv2() != null && n.isWGPSv2()) { // WGPSv2
+												n.humidity = n.humidity / 100.0;
+											}
+											else if (n.hasSHT15()) { // SHT15
+												Double hum_rel = new Double(-4 + (0.0405d * n.humidity) - 0.0000028d * Math.pow(n.humidity, 2));			
+												n.humidity = new Double((n.temperature - 25) * (0.01d + (0.00008d * n.humidity)) + hum_rel);
+											}
+											else if (n.hasSHT21()) { // SHT21
+												n.humidity = -6d + 125d * n.humidity / Math.pow(2, 12);
+											}
 										}
-										else if (n.hasSHT21()) { // SHT21
-											n.humidity = -6d + 125d * n.humidity / Math.pow(2, 12);
-										}
+										else
+											n.humidity = null;
 									}
-									else
-										n.humidity = null;
-								}
-								else {
-									n.humidity = n.temperature = n.current = n.vsys = n.vsdi = null;
+									else {
+										n.humidity = n.temperature = n.current = n.vsys = n.vsdi = null;
+										
+										if (now - n.timestamp > TopologyVirtualSensor.STANDBY_TIMEOUT_MS && now - n.timestamp < TopologyVirtualSensor.NODE_TIMEOUT)
+											nodesToBeRemoved.add(n.node_id);
+									}
 									
-									if (now - n.timestamp > TopologyVirtualSensor.STANDBY_TIMEOUT_MS && now - n.timestamp < TopologyVirtualSensor.NODE_TIMEOUT)
-										nodesToBeRemoved.add(n.node_id);
+									if (nodes.containsKey(n.node_id)) {
+										SensorNode node = nodes.get(n.node_id);
+										node.updateNode(n);
+										topology.sensornodes.set(i, node);
+									}
+									nodes.put(n.node_id, topology.sensornodes.get(i));
+								} catch (Exception e) {
+									logger.error("device_id=" + n.node_id + ": " + e.getMessage(), e);
 								}
-								
-								if (nodes.containsKey(n.node_id)) {
-									SensorNode node = nodes.get(n.node_id);
-									node.updateNode(n);
-									topology.sensornodes.set(i, node);
-								}
-								nodes.put(n.node_id, topology.sensornodes.get(i));
+									
 							}
 						}
 						if (!nodesToBeRemoved.isEmpty()) {

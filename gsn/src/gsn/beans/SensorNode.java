@@ -71,7 +71,6 @@ public class SensorNode {
 	
 	public SensorNode() {
 		links = new ArrayList<Link>();
-		iswgpsv2 = false;
 	}
 	
 	public SensorNode(Integer node_id) {
@@ -123,7 +122,7 @@ public class SensorNode {
 		return isBBControl() || isAccessNode() || isAENode() || isWGPSNode() || isSibNode() || isPowerSwitch();
 	}
 
-	public boolean isWGPSv2() {
+	public Boolean isWGPSv2() {
 		return iswgpsv2;
 	}
 	
@@ -386,4 +385,28 @@ public class SensorNode {
 		this.coordinate = node.coordinate;
 	}
 
+	@Override
+	public String toString() {
+		String s = "SensorNode: ";
+		
+		s += "device_id=" + node_id + " / position=" + position + "\n";
+		s += "DozerNode: " + (isDozerNode()? "yes":"no") + "\n";
+		s += "DozerSink: " + (isDozerSink()? "yes":"no") + "\n";
+		s += "AccessNode: " + (isAccessNode()? "yes":"no") + "\n";
+		s += "SibNode: " + (isSibNode()? "yes":"no") + "\n";
+		s += "WGPSNode: " + (isWGPSNode()? "yes":"no") + "\n";
+		s += "WGPSv2: " + (isWGPSv2()? "yes":"no") + "\n";
+		s += "PowerSwitch: " + (isPowerSwitch()? "yes":"no") + "\n";
+		s += "AENode: " + (isAENode()? "yes":"no") + "\n";
+		s += "BBControl: " + (isBBControl()? "yes":"no") + "\n";
+		s += "DPPNode: " + (isDPPNode()? "yes":"no") + "\n";
+		s += "GPSL2Node: " + (isGPSL2Node()? "yes":"no") + "\n";
+		s += "IMISWeatherStationNode: " + (isIMISWeatherStationNode()? "yes":"no") + "\n";
+		s += "OutpackMate3Node: " + (isOutpackMate3Node()? "yes":"no") + "\n";
+		
+		s += "temperature=" + temperature + ", humidity=" + humidity + "\n";
+		s += "vsys=" + vsys + ", vsdi=" + vsdi + ", current=" + current;
+		
+		return s;
+	}
 }
