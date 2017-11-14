@@ -1,0 +1,49 @@
+<virtual-sensor name="Saastal_Dozer_WgpsNodeInfo__mapped" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="position_mapping" />
+            <param name="sensortype_mapping" />
+        </init-params>        
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="SENSORTYPE" type="VARCHAR(100)" />
+            <field name="SENSORTYPE_SERIALID" type="BIGINT" />
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            
+            <field name="PAYLOAD_RST_CNT" type="SMALLINT" />
+            <field name="PAYLOAD_RST_FLAG" type="SMALLINT" />
+            <field name="PAYLOAD_COMPILER_DESC1" type="SMALLINT" />
+            <field name="PAYLOAD_COMPILER_DESC2" type="SMALLINT" />
+            <field name="PAYLOAD_COMPILER_DESC3" type="SMALLINT" />
+            <field name="PAYLOAD_COMPILER_DESC4" type="SMALLINT" />
+            <field name="PAYLOAD_COMPILER_VER" type="INTEGER" />
+            <field name="PAYLOAD_COMPILE_DATE" type="BIGINT" />
+            <field name="PAYLOAD_FW_VER" type="INTEGER" />
+            <field name="PAYLOAD_SW_REV_ID" type="INTEGER" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerWgpsNodeInfoMsg) from Saastal deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="remote-rest">
+                    <predicate key="query"> select * from Saastal_Dozer_WgpsNodeInfo</predicate>
+                    <predicate key="remote-contact-point">http://tpvt.permasense.ethz.ch/streaming/</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

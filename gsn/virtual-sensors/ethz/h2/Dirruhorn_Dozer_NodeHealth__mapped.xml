@@ -5,6 +5,25 @@
         <init-params>
             <param name="position_mapping" />
             <param name="sensortype_mapping" />
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                    try {
+                        if (PAYLOAD_SYSVOLTAGE == 0xFFFF)
+                            PAYLOAD_SYSVOLTAGE = null;
+                        if (PAYLOAD_SDIVOLTAGE == 0xFFFF)
+                            PAYLOAD_SDIVOLTAGE = null;
+                        if (PAYLOAD_TEMPERATURE == 0xFFFF)
+                            PAYLOAD_TEMPERATURE = null;
+                        if (PAYLOAD_HUMIDITY == 0xFFFF)
+                            PAYLOAD_HUMIDITY = null;
+                        if (PAYLOAD_SIBCURRENT == 0xFFFF)
+                            PAYLOAD_SIBCURRENT = null;
+                    } catch(Throwable e) {
+                        org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+                    }
+                ]]>
+            </param>
         </init-params>        
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />

@@ -1,0 +1,54 @@
+<virtual-sensor name="Matterhorn_Dozer_WgpsIMU" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
+            <field name="HEADER_SEQNR" type="INTEGER" />
+            <field name="HEADER_ORIGINATORID" type="INTEGER" />
+            <field name="HEADER_ATIME" type="INTEGER" unit="s"/>
+            <field name="PAYLOAD_ACC_X" type="INTEGER" />
+            <field name="PAYLOAD_ACC_Y" type="INTEGER" />
+            <field name="PAYLOAD_ACC_Z" type="INTEGER" />
+            <field name="PAYLOAD_MAG_X" type="INTEGER" />
+            <field name="PAYLOAD_MAG_Y" type="INTEGER" />
+            <field name="PAYLOAD_MAG_Z" type="INTEGER" />
+            <field name="PAYLOAD_WGPS_STATUS_QUEUE" type="INTEGER" />
+            <field name="PAYLOAD_APP_HEALTH_QUEUE" type="INTEGER" />
+            <field name="PAYLOAD_EVENT_QUEUE" type="INTEGER" />
+            <field name="PAYLOAD_CARD_USAGE" type="BIGINT" />
+            <field name="PAYLOAD_STATUS" type="SMALLINT" />
+        </output-structure>
+    </processing-class>
+    <description>Dozer messages (DozerWgpsIMUMsg) from Matterhorn deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-mh-bs01.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWgpsIMUMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+        
+        <stream name="data0">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="backlog">
+                    <predicate key="remote-connection">permasense-mh-bs02.ethz.ch:9003</predicate>
+                    <predicate key="plugin-classname">gsn.wrappers.backlog.plugins.MigMessagePlugin</predicate>
+                    <predicate key="message-classname">ch.ethz.permasense.tinyos2x.messages.DozerWgpsIMUMsg</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>

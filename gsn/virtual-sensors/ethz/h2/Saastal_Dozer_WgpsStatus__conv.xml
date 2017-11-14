@@ -7,7 +7,7 @@
             <param name="scriptlet">
                 <![CDATA[
                 	try {
-                		if (SAM7_POWER == 0 || SAM7_VALID == 0)
+                		if ((SAM7_POWER == 0 && GPS_VOLTAGE != null) || SAM7_VALID == 0)
                 			INCLINOMETER_X = INCLINOMETER_Y = SAM7_UNIXTIME = GPS_SV_QUEUE = null;
 					} catch(Throwable e) {
 						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);

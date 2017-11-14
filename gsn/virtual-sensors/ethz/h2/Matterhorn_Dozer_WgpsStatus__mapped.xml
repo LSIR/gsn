@@ -5,6 +5,23 @@
         <init-params>
             <param name="position_mapping" />
             <param name="sensortype_mapping" />
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                    try {
+                        if (PAYLOAD_GPS_VOLTAGE == 0xFFFF)
+                            PAYLOAD_GPS_VOLTAGE = null;
+                        if (PAYLOAD_GPS_CURRENT == 0xFFFF)
+                            PAYLOAD_GPS_CURRENT = null;
+                        if (PAYLOAD_SAM7_CURRENT == 0xFFFF)
+                            PAYLOAD_SAM7_CURRENT = null;
+                        if (PAYLOAD_TN_PER_CURRENT == 0xFFFF)
+                            PAYLOAD_TN_PER_CURRENT = null;
+                    } catch(Throwable e) {
+                        org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+                    }
+                ]]>
+            </param>
         </init-params>        
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />

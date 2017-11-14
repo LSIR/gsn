@@ -595,5 +595,16 @@
       </source>
       <query> select * from source </query>
     </stream>
+    <stream name="data29">
+      <source alias="source" storage-size="1" sampling-rate="1">
+        <address wrapper="local">
+          <predicate key="query">
+            select  * from matterhorn_dozer_wgpsimu
+          </predicate>
+        </address>
+        <query>select * from wrapper</query>
+      </source>
+      <query> select * from source </query>
+    </stream>
     </streams>
 </virtual-sensor>

@@ -55,6 +55,8 @@ Dirruhorn_Dozer_NodeInfo.xml
 Dirruhorn_Dozer_PowerSwitch.xml
 Dirruhorn_Dozer_Rssi.xml
 Dirruhorn_Dozer_StateCounter.xml
+Dirruhorn_Dozer_WgpsIMU.xml
+Dirruhorn_Dozer_WgpsNodeInfo.xml
 Dirruhorn_Dozer_WgpsStatus.xml
 Dirruhorn_Dozer_WgpsSv.xml
 Dirruhorn_Dozer_WXT520Ident.xml
@@ -159,6 +161,8 @@ Matterhorn_Dozer_StateCounter.xml
 #Matterhorn_Dozer_TEG.xml
 Matterhorn_Dozer_Th3Ident.xml
 Matterhorn_Dozer_Th3Temp.xml
+Matterhorn_Dozer_WgpsIMU.xml
+Matterhorn_Dozer_WgpsNodeInfo.xml
 Matterhorn_Dozer_WgpsStatus.xml
 Matterhorn_Dozer_WgpsSv.xml
 Matterhorn_Dozer_WXT520Ident.xml
@@ -200,6 +204,8 @@ Saastal_Dozer_PowerSwitch.xml
 Saastal_Dozer_Rssi.xml
 Saastal_Dozer_StateCounter.xml
 #Saastal_Dozer_TEG.xml
+Saastal_Dozer_WgpsIMU.xml
+Saastal_Dozer_WgpsNodeInfo.xml
 Saastal_Dozer_WgpsStatus.xml
 Saastal_Dozer_WgpsSv.xml
 Saastal_GPS_L2.xml
