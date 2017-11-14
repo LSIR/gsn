@@ -123,7 +123,10 @@ public class SensorNode {
 	}
 
 	public Boolean isWGPSv2() {
-		return iswgpsv2;
+		if (iswgpsv2 == null)
+			return false;
+		else
+			return iswgpsv2;
 	}
 	
 	public boolean hasSHT21() {
