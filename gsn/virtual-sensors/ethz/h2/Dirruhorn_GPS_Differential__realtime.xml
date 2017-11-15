@@ -47,11 +47,16 @@
                     		SD_YZ = spl[14].toDouble();
                     	if (spl[15].isNumber())
                     		SD_ZX = spl[15].toDouble();
-                    	if (spl[16].isNumber())
+                    	if (spl[16].isNumber()) {
                     		E =  spl[16].toDouble();
-
-                    	if (spl[17].isNumber())
+                    		if (E < 2000000)
+                    			E = E + 2000000;
+                    	}
+                    	if (spl[17].isNumber()) {
                     		N =  spl[17].toDouble();
+                    		if (N < 1000000)
+                    			N = N + 1000000;
+                    	}
                     	if (spl[18].isNumber())
                     		H =  spl[18].toDouble();
                     	if (spl[19].isNumber())
