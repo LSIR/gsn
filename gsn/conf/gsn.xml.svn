@@ -17,7 +17,7 @@
 <!--
    <access-control>
       <enabled>true</enabled>
-      <storage user="USER" password="PASSWORD" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://taugwalder.ee.ethz.ch/DATABASE?autoReconnect=true&amp;profilerEventHandler=gsn.wrappers.MySQLProfilerEventHandler&amp;profileSQL=true&amp;logSlowQueries=true" />
+      <storage user="USER" password="PASSWORD" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://lochmatter.ee.ethz.ch/DATABASE?autoReconnect=true&amp;profilerEventHandler=gsn.wrappers.MySQLProfilerEventHandler&amp;profileSQL=true&amp;logSlowQueries=true" />
    </access-control>
 -->
 
@@ -27,7 +27,7 @@
 <!-- <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/gsn" /> --> 
 <!-- <storage user="gsn" password="gsn" driver="net.sourceforge.jtds.jdbc.Driver" url="jdbc:jtds:sqlserver://192.168.51.14:12345/gsn;cachemetadata=true;prepareSQL=3" /> -->
 <!-- <storage user="admin" password="" driver="org.postgresql.Driver" url="jdbc:postgresql://localhost/gsn" /> -->
-<!-- <storage user="USER" password="PASSWORD" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://taugwalder.ee.ethz.ch/DATABASE?autoReconnect=true&amp;profilerEventHandler=gsn.wrappers.MySQLProfilerEventHandler&amp;profileSQL=true&amp;logSlowQueries=true" /> -->
+<!-- <storage user="USER" password="PASSWORD" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://lochmatter.ee.ethz.ch/DATABASE?autoReconnect=true&amp;profilerEventHandler=gsn.wrappers.MySQLProfilerEventHandler&amp;profileSQL=true&amp;logSlowQueries=true" /> -->
 <!-- <storage user="root" password="" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/gsn" /> -->
 <!-- <storage user="gsn" password="gsn" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@localhost:1521" /> -->
 <!-- <storage user="gsn" password="ge-S3-ne" driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@dom.slf.local:1521:sdbt" /> -->

@@ -24,7 +24,7 @@
     <description>Sensor Mapping from Dirruhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
-    <storage user="permasense_pbl" password="CHANGEME" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://taugwalder.ee.ethz.ch/permasense_pbl_backuped?autoReconnect=true&amp;profilerEventHandler=gsn.wrappers.MySQLProfilerEventHandler&amp;profileSQL=true&amp;logSlowQueries=true"/>
+    <storage user="permasense_pbl" password="CHANGEME" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://lochmatter.ee.ethz.ch/permasense_pbl_backuped?autoReconnect=true&amp;profilerEventHandler=gsn.wrappers.MySQLProfilerEventHandler&amp;profileSQL=true&amp;logSlowQueries=true"/>
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">

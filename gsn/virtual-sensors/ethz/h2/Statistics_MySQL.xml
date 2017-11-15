@@ -25,7 +25,7 @@
     <description>Statistics about MySQL usage</description>
     <life-cycle pool-size="10" />
     <addressing />
-    <storage user="CHANGEME" password="CHANGEME" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://taugwalder.ee.ethz.ch/CHANGEME?autoReconnect=true&amp;profilerEventHandler=gsn.wrappers.MySQLProfilerEventHandler&amp;profileSQL=true&amp;logSlowQueries=true"/>
+    <storage user="CHANGEME" password="CHANGEME" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://lochmatter.ee.ethz.ch/CHANGEME?autoReconnect=true&amp;profilerEventHandler=gsn.wrappers.MySQLProfilerEventHandler&amp;profileSQL=true&amp;logSlowQueries=true"/>
     <streams>
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
