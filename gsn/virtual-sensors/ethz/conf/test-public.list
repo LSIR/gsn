@@ -86,6 +86,7 @@ ETZ_GPS_Inclinometer.xml
 ETZ_GPS_Differential__batch.xml
 ETZ_GPS_Differential__batch__daily.xml
 ETZ_GPS_Differential__realtime.xml
+ETZ_GPS_Differential__rtklib.xml
 ETZ_GPS_Differential__streaming.xml
 ETZ_GPS_Logger__config.xml
 ETZ_GPS_Logger__data__mapped.xml
@@ -96,6 +97,7 @@ ETZ_GPS_Logger__status.xml
 ETZ_GPS_RAW__binary__mapped.xml
 ETZ_GPS_RAW__single__conv.xml
 ETZ_GPS_RAW__tobinary__mapped.xml
+ETZ_GroundSurface_Temperature.xml
 ETZ_IMIS__files__mapped.xml
 ETZ_IMIS__conv.xml
 ETZ_Mapping_Chart.xml
@@ -103,6 +105,9 @@ ETZ_Mapping_Geo.xml
 ETZ_Mapping_Position.xml
 ETZ_Mapping_Sensor.xml
 ETZ_Schedule__mapped.xml
+ETZ_Sensorrod.xml
+ETZ_Sensorrod1.xml
+ETZ_Sensorrod2.xml
 ETZ_Sensorrod__tttttt.xml
 ETZ_Statistics__mapped.xml
 ETZ_SyslogNg__mapped.xml

@@ -43,6 +43,7 @@ AdM_Dozer_StateCounter__conv.xml
 AdM_Dozer_StateCounter__mapped.xml
 #AdM_Dozer_TEG__conv.xml
 #AdM_Dozer_TEG__mapped.xml
+AdM_GroundSurface_Temperature.xml
 AdM_Mapping_Chart.xml
 AdM_Mapping_Geo.xml
 AdM_Mapping_Position.xml
@@ -159,6 +160,7 @@ Dirruhorn_GPS_RAW__binary__mapped.xml
 #Dirruhorn_GPS_RAW__single__conv.xml
 #Dirruhorn_GPS_RAW__single__mapped.xml
 Dirruhorn_GPS_RAW__tobinary__mapped.xml
+Dirruhorn_GroundSurface_Temperature.xml
 Dirruhorn_IMIS__files__mapped.xml
 Dirruhorn_IMIS__conv.xml
 Dirruhorn_Mapping_Chart.xml
@@ -262,6 +264,7 @@ Jungfraujoch_Dozer_Th3Ident__conv.xml
 Jungfraujoch_Dozer_Th3Ident__mapped.xml
 Jungfraujoch_Dozer_Th3Temp__conv.xml
 Jungfraujoch_Dozer_Th3Temp__mapped.xml
+Jungfraujoch_GroundSurface_Temperature.xml
 Jungfraujoch_Mapping_Chart.xml
 Jungfraujoch_Mapping_Geo.xml
 Jungfraujoch_Mapping_Position.xml
@@ -389,6 +392,7 @@ Matterhorn_GPS_Logger__parsing.xml
 Matterhorn_GPS_Logger__status.xml
 Matterhorn_GPS_RAW__binary__mapped.xml
 Matterhorn_GPS_RAW__tobinary__mapped.xml
+Matterhorn_GroundSurface_Temperature.xml
 Matterhorn_Mapping_Chart.xml
 Matterhorn_Mapping_Geo.xml
 Matterhorn_Mapping_Position.xml
