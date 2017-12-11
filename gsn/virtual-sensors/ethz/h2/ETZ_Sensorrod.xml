@@ -1,4 +1,4 @@
-<virtual-sensor name="Matterhorn_Moisturechain" priority="10" >
+<virtual-sensor name="ETZ_Sensorrod" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.StreamMergingVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -42,27 +42,33 @@
             <field name="PAYLOAD_SAMPLE_VALID" type="TINYINT" />
             <field name="PAYLOAD_SAMPLE_NO" type="SMALLINT" />
             
-            <field name="TM_REF1" type="VARCHAR(30)" unit="MΩ" />
-            <field name="TM_REF2" type="VARCHAR(30)" unit="MΩ" />
-            <field name="TM_T1" type="VARCHAR(30)" unit="°C" />
-            <field name="TM_T2" type="VARCHAR(30)" unit="°C" />
-            <field name="TM_T3" type="VARCHAR(30)" unit="°C" />
-            <field name="TM_T4" type="VARCHAR(30)" unit="°C" />
-            <field name="TM_REF3" type="VARCHAR(30)" unit="MΩ" />
-            <field name="TM_REF4" type="VARCHAR(30)" unit="MΩ" />
-            <field name="TM_REF5" type="VARCHAR(30)" unit="MΩ" />
-            <field name="TM_M1" type="VARCHAR(30)" unit="MΩ" />
-            <field name="TM_M2" type="VARCHAR(30)" unit="MΩ" />
-            <field name="TM_M3" type="VARCHAR(30)" unit="MΩ" />
-            <field name="TM_M4" type="VARCHAR(30)" unit="MΩ" />
-            <field name="TM_REF6" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_REF1" type="VARCHAR(30)" unit="°C" />
+            <field name="SR_REF2" type="VARCHAR(30)" unit="°C" />
+            <field name="SR_T1" type="VARCHAR(30)" unit="°C" />
+            <field name="SR_T2" type="VARCHAR(30)" unit="°C" />
+            <field name="SR_T3" type="VARCHAR(30)" unit="°C" />
+            <field name="SR_T4" type="VARCHAR(30)" unit="°C" />
+            <field name="SR_REF3" type="VARCHAR(30)" unit="°C" />
+            <field name="SR_REF4" type="VARCHAR(30)" unit="°C" />
+            <field name="SR_REF5" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R1" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R2" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R3" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R4" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R12" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R23" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R34" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R31" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R42" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_R41" type="VARCHAR(30)" unit="MΩ" />
+            <field name="SR_REF6" type="VARCHAR(30)" unit="MΩ" />
             
             <field name="MERGED_STREAMS" type="INTEGER"/>
             <field name="BUFFERED_STREAMS_FOR_MATCHING_FIELD1" type="BIGINT"/>
             <field name="TOTAL_BUFFERED_STREAMS" type="BIGINT"/>
         </output-structure>
     </processing-class>
-    <description>Moisturechain/TM data (merged) from Matterhorn deployment</description>
+    <description>Sensorrod/SR data (merged) from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -70,7 +76,7 @@
         <stream name="data1">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Matterhorn_Moisturechain1 </predicate>
+                    <predicate key="query"> select * from ETZ_Sensorrod1 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
@@ -80,7 +86,7 @@
         <stream name="data2">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from Matterhorn_Moisturechain2 </predicate>
+                    <predicate key="query"> select * from ETZ_Sensorrod2 </predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>

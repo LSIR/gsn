@@ -1,0 +1,138 @@
+<virtual-sensor name="Matterhorn_GroundSurface_Temperature" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TEMPERATURE_5CM_t1" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_5CM_t2" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_10CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_20CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_30CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_35CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_50CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_60CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_85CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_100CM" type="VARCHAR(30)" unit="°C"/>
+        </output-structure>
+    </processing-class>
+    <description>Ground surface temperatures from Matterhorn deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+      <stream name="data0">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Dozer_Th3Temp__conv</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME,
+                TEMPERATURE_5CM as TEMPERATURE_5CM_t1,
+                TEMPERATURE_10CM,
+                TEMPERATURE_20CM,
+                TEMPERATURE_30CM,
+                TEMPERATURE_50CM,
+                TEMPERATURE_100CM
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+      </stream>
+      <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Sensorrod</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME,
+                SR_T1 as TEMPERATURE_10CM,
+                SR_T2 as TEMPERATURE_35CM,
+                SR_T3 as TEMPERATURE_60CM,
+                SR_T4 as TEMPERATURE_100CM
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+      </stream>
+      <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Sensorrod_tttttt</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME,
+                SR_TTTTTT_t1 as TEMPERATURE_5CM_t1,
+                SR_TTTTTT_t2 as TEMPERATURE_10CM,
+                SR_TTTTTT_t3 as TEMPERATURE_20CM,
+                SR_TTTTTT_t4 as TEMPERATURE_30CM,
+                SR_TTTTTT_t5 as TEMPERATURE_50CM,
+                SR_TTTTTT_t6 as TEMPERATURE_100CM
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+      </stream>
+      <stream name="data3">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Temperature__ntnn</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME,
+                NTNN_T1 as TEMPERATURE_5CM_t1
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+      </stream>
+      <stream name="data4">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Crackmeter__tctc</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME,
+                TCTC_T1 as TEMPERATURE_5CM_t1,
+                TCTC_T2 as TEMPERATURE_5CM_t2
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+      </stream>
+      <stream name="data5">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Crackmeter__nctt</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME,
+                NCTT_T1 as TEMPERATURE_5CM_t1,
+                NCTT_T2 as TEMPERATURE_5CM_t2
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+      </stream>
+      <stream name="data6">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Crackmeter__nctc</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME,
+                NCTC_T1 as TEMPERATURE_5CM_t1
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+      </stream>
+      <stream name="data7">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Matterhorn_Crackmeter__ccct</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME,
+                CCCT_T3 as TEMPERATURE_5CM_t1
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+      </stream>
+    </streams>
+</virtual-sensor>
