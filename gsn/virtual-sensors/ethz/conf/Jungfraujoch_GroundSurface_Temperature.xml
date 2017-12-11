@@ -1,0 +1,72 @@
+<virtual-sensor name="Jungfraujoch_GroundSurface_Temperature" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+            <field name="TEMPERATURE_5CM_t1" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_5CM_t2" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_10CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_20CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_30CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_35CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_50CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_60CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_85CM" type="VARCHAR(30)" unit="°C"/>
+            <field name="TEMPERATURE_100CM" type="VARCHAR(30)" unit="°C"/>
+        </output-structure>
+    </processing-class>
+    <description>Ground surface temperatures from Jungfraujoch deployment converted</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+      <stream name="data0">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Jungfraujoch_Dozer_Th3Temp__conv</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME,
+                TEMPERATURE_5CM as TEMPERATURE_5CM_t1,
+                TEMPERATURE_10CM,
+                TEMPERATURE_20CM,
+                TEMPERATURE_30CM,
+                TEMPERATURE_50CM,
+                TEMPERATURE_100CM
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+      </stream>
+      <stream name="data1">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Jungfraujoch_Sensorrod</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME,
+                SR_T1 as TEMPERATURE_10CM,
+                SR_T2 as TEMPERATURE_35CM,
+                SR_T3 as TEMPERATURE_60CM,
+                SR_T4 as TEMPERATURE_100CM
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+      </stream>
+      <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query"> select * from Jungfraujoch_Temperature__nttn</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME,
+                NTTN_T1 as TEMPERATURE_5CM_t1,
+                NTTN_T2 as TEMPERATURE_5CM_t2
+                from wrapper </query>
+            </source>
+            <query> select * from source </query>
+      </stream>
+    </streams>
+</virtual-sensor>
