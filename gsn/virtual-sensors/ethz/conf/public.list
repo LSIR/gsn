@@ -160,7 +160,6 @@ Dirruhorn_GPS_RAW__binary__mapped.xml
 #Dirruhorn_GPS_RAW__single__conv.xml
 #Dirruhorn_GPS_RAW__single__mapped.xml
 Dirruhorn_GPS_RAW__tobinary__mapped.xml
-Dirruhorn_GroundSurface_Temperature.xml
 Dirruhorn_IMIS__files__mapped.xml
 Dirruhorn_IMIS__conv.xml
 Dirruhorn_Mapping_Chart.xml

@@ -26,7 +26,7 @@
       <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query"> select * from AdM_Crackmeter__nctn</predicate>
+                    <predicate key="query"> select * from AdM_Temperature__nctn</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select timed, POSITION, DEVICE_ID, GENERATION_TIME,
