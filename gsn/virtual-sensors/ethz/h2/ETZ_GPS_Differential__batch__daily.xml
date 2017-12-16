@@ -10,34 +10,34 @@
             <param name="operation2">=</param>
         </init-params>
         <output-structure>
-            <field name="POSITION" type="INTEGER" index="true" />
-			<field name="LABEL" type="VARCHAR(4)" />
-            <field name="DEVICE_ID" type="INTEGER" />
-            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
-			<field name="PROCESSING_TIME" type="BIGINT" unit="unixtime" />
-			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
-			<field name="VERSION" type="SMALLINT" />
-			<field name="REFERENCE_LABEL" type="VARCHAR(4)" />
-			
-			<field name="E" type="DOUBLE" unit="m" />
-			<field name="N" type="DOUBLE" unit="m" />
-			<field name="H" type="DOUBLE" unit="m" />
-			<field name="SD_E" type="DOUBLE" unit="m" />
-			<field name="SD_N" type="DOUBLE" unit="m" />
-			<field name="SD_H" type="DOUBLE" unit="m" />
-			
-			<field name="V_E" type="DOUBLE" unit="cm/d" />
-			<field name="V_N" type="DOUBLE" unit="cm/d" />
-			<field name="V_H" type="DOUBLE" unit="cm/d" />
-			<field name="V_HORIZ" type="DOUBLE" unit="cm/d" />
-			<field name="V_3D" type="DOUBLE" unit="cm/d" />
-			<field name="SD_V_E" type="DOUBLE" unit="cm/d" />
-			<field name="SD_V_N" type="DOUBLE" unit="cm/d" />
-			<field name="SD_V_H" type="DOUBLE" unit="cm/d" />
-			<field name="SD_V_HORIZ" type="DOUBLE" unit="cm/d" />
-			<field name="SD_V_3D" type="DOUBLE" unit="cm/d" />
-			
-			<field name="RATIO_OF_FIXED_AMBIGUITIES" type="DOUBLE" unit="%" />
+          <field name="POSITION" type="INTEGER" index="true" />
+			    <field name="LABEL" type="VARCHAR(4)" />
+          <field name="DEVICE_ID" type="INTEGER" />
+          <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+			    <field name="PROCESSING_TIME" type="BIGINT" unit="unixtime" />
+          <field name="DEVICE_TYPE" type="VARCHAR(32)" />
+  			  <field name="VERSION" type="SMALLINT" />
+          <field name="REFERENCE_LABEL" type="VARCHAR(4)" />
+
+			    <field name="E" type="DOUBLE" unit="m" />
+			    <field name="N" type="DOUBLE" unit="m" />
+			    <field name="H" type="DOUBLE" unit="m" />
+			    <field name="SD_E" type="DOUBLE" unit="m" />
+			    <field name="SD_N" type="DOUBLE" unit="m" />
+			    <field name="SD_H" type="DOUBLE" unit="m" />
+
+			    <field name="V_E" type="DOUBLE" unit="cm/d" />
+			    <field name="V_N" type="DOUBLE" unit="cm/d" />
+			    <field name="V_H" type="DOUBLE" unit="cm/d" />
+			    <field name="V_HORIZ" type="DOUBLE" unit="cm/d" />
+			    <field name="V_3D" type="DOUBLE" unit="cm/d" />
+			    <field name="SD_V_E" type="DOUBLE" unit="cm/d" />
+			    <field name="SD_V_N" type="DOUBLE" unit="cm/d" />
+			    <field name="SD_V_H" type="DOUBLE" unit="cm/d" />
+			    <field name="SD_V_HORIZ" type="DOUBLE" unit="cm/d" />
+			    <field name="SD_V_3D" type="DOUBLE" unit="cm/d" />
+
+			    <field name="RATIO_OF_FIXED_AMBIGUITIES" type="DOUBLE" unit="%" />
         </output-structure>
     </processing-class>
     <description>Daily Differential GPS solutions from batch processing (only newest data points) from ETZ deployment</description>
@@ -67,5 +67,15 @@
             <query> select * from source </query>
         </stream>
         -->
+        <stream name="data2">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from ETZ_GPS_Differential__rtklib</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
     </streams>
 </virtual-sensor>
