@@ -1,0 +1,150 @@
+<virtual-sensor name="ETZ_GPS_Differential__rtklib" priority="10" >
+    <processing-class>
+        <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
+        <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="persistant">true</param>
+            <param name="scriptlet">
+                <![CDATA[
+                        try {
+                        POSITION = DEVICE_ID = DEVICE_TYPE = GENERATION_TIME = GPS_WEEK = GPS_TIME = X_ECEF = Y_ECEF = Z_ECEF = null;
+                        SD_X = SD_Y = SD_Z = SD_XY = SD_YZ = SD_ZX = E = N = H = SD_E = SD_N = SD_H = SD_EN = SD_EH = SD_NH = null;
+                        Q = NS = AGE = RATIO = VERSION = COMMENTS = LABEL = REFERENCE_LABEL = null;
+                        
+                        def spl = new String(RAW_PACKET, "UTF-8").split(",");
+                        
+                        if (spl[1].isNumber())
+                                POSITION = spl[1].toInteger();
+                        if (spl[2].isNumber())
+                                DEVICE_ID = spl[2].toInteger();
+			            if (spl[3].length()>0)
+				            DEVICE_TYPE = spl[3];
+                    	else
+                    		DEVICE_TYPE = null;
+                        if (spl[4].isNumber())
+                                GENERATION_TIME = spl[4].toLong();
+                                
+                        if (spl[5].isNumber())
+                                GPS_WEEK = spl[5].toShort();
+                        if (spl[6].isNumber())
+                                GPS_TIME = spl[6].toInteger();
+
+                    	if (spl[7].isNumber())
+                    		X_ECEF = spl[7].toDouble();
+                    	if (spl[8].isNumber())
+                    		Y_ECEF = spl[8].toDouble();
+                    	if (spl[9].isNumber())
+                    		Z_ECEF = spl[9].toDouble();
+                    	if (spl[10].isNumber())
+                    		SD_X = spl[10].toDouble();
+                    	if (spl[11].isNumber())
+                    		SD_Y = spl[11].toDouble();
+                    	if (spl[12].isNumber())
+                    		SD_Z = spl[12].toDouble();
+                    	if (spl[13].isNumber())
+                    		SD_XY = spl[13].toDouble();
+                    	if (spl[14].isNumber())
+                    		SD_YZ = spl[14].toDouble();
+                    	if (spl[15].isNumber())
+                    		SD_ZX = spl[15].toDouble();
+                    	if (spl[16].isNumber())
+                    		E =  spl[16].toDouble();
+
+                    	if (spl[17].isNumber())
+                    		N =  spl[17].toDouble();
+                    	if (spl[18].isNumber())
+                    		H =  spl[18].toDouble();
+                    	if (spl[19].isNumber())
+                    		SD_E =  spl[19].toDouble();
+			            if (spl[20].isNumber())
+                    		SD_N =  spl[20].toDouble();
+                    	if (spl[21].isNumber())
+                    		SD_H =  spl[21].toDouble();
+                    		
+                    	if (spl[22].isNumber())
+                    		SD_EN =  spl[22].toDouble();
+                    	if (spl[23].isNumber())
+                    		SD_EH =  spl[23].toDouble();
+                    	if (spl[24].isNumber())
+                    		SD_NH =  spl[24].toDouble();
+
+                    	if (spl[25].isNumber())
+                    		Q = spl[25].toInteger();
+                    	if (spl[26].isNumber())
+                    		NS = spl[26].toInteger();
+                    	if (spl[27].isNumber())
+                    		AGE = spl[27].toDouble();
+                    	if (spl[28].isNumber())
+                    		RATIO = spl[28].toDouble();
+                    	if (spl[29].isNumber())
+                    		VERSION = spl[29].toShort();
+			            if (spl.length >= 31 && spl[30].length()>0)
+				            COMMENTS = spl[30];
+			            if (spl.length >= 32 && spl[31].length()>0)
+				            LABEL = spl[31];
+			            if (spl.length >= 33 && spl[32].length()>0)
+				            REFERENCE_LABEL = spl[32];
+					} catch(Throwable e) {
+						org.apache.log4j.Logger.getLogger(gsn.processor.ScriptletProcessor.class).error(e);
+					}
+                ]]>
+            </param>
+        </init-params>
+        <output-structure>
+            <field name="POSITION" type="INTEGER" index="true" />
+			<field name="LABEL" type="VARCHAR(4)" />
+            <field name="DEVICE_ID" type="INTEGER" />
+            <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
+			<field name="DEVICE_TYPE" type="VARCHAR(32)" />
+			<field name="VERSION" type="SMALLINT" />
+			<field name="REFERENCE_LABEL" type="VARCHAR(4)" />
+
+            <field name="X_ECEF" type="DOUBLE" unit="m" />
+            <field name="Y_ECEF" type="DOUBLE" unit="m" />
+            <field name="Z_ECEF" type="DOUBLE" unit="m" />
+            <field name="SD_X" type="DOUBLE" unit="m" />
+            <field name="SD_Y" type="DOUBLE" unit="m" />
+            <field name="SD_Z" type="DOUBLE" unit="m" />
+            <field name="SD_XY" type="DOUBLE" unit="m^2" />
+            <field name="SD_YZ" type="DOUBLE" unit="m^2" />
+            <field name="SD_ZX" type="DOUBLE" unit="m^2" />
+
+            <field name="E" type="DOUBLE" unit="m" />
+            <field name="N" type="DOUBLE" unit="m" />
+            <field name="H" type="DOUBLE" unit="m" />
+            <field name="SD_E" type="DOUBLE" unit="m" />
+	        <field name="SD_N" type="DOUBLE" unit="m" />
+            <field name="SD_H" type="DOUBLE" unit="m" />
+            <field name="SD_EN" type="DOUBLE" unit="m^2" />
+	        <field name="SD_EH" type="DOUBLE" unit="m^2" />
+            <field name="SD_NH" type="DOUBLE" unit="m^2" />
+
+            <field name="Q" type="INTEGER" />
+            <field name="NS" type="INTEGER" />
+            <field name="AGE" type="DOUBLE" unit="s" />
+            <field name="RATIO" type="DOUBLE" />
+			
+			<field name="COMMENTS" type="VARCHAR(512)" />
+
+            <field name="GPS_WEEK" type="SMALLINT" />
+            <field name="GPS_TIME" type="INTEGER" unit="sec"/>
+
+        </output-structure>
+    </processing-class>
+    <description>Parsed differential GPS data from rtklib processing from ETZ deployment</description>
+    <life-cycle pool-size="10" />
+    <addressing />
+    <storage />
+    <streams>
+        <stream name="data">
+            <source alias="source" storage-size="1" sampling-rate="1">
+                <address wrapper="local">
+                    <predicate key="query">select * from ETZ_GPS_Differential__streaming where RAW_PACKET like '2,%'</predicate>
+                    <predicate key="start-time">continue</predicate>
+                </address>
+                <query> select * from wrapper </query>
+            </source>
+            <query> select * from source </query>
+        </stream>
+    </streams>
+</virtual-sensor>
