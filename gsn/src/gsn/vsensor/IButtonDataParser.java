@@ -1,11 +1,9 @@
-package gsn.vsensor.permasense;
+package gsn.vsensor;
 
 import java.io.Serializable;
 
 import gsn.beans.DataField;
 import gsn.beans.StreamElement;
-import gsn.vsensor.BridgeVirtualSensorPermasense;
-
 
 import org.apache.log4j.Logger;
 

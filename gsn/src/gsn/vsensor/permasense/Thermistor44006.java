@@ -3,19 +3,17 @@ package gsn.vsensor.permasense;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 
-import org.apache.log4j.Logger;
-
 public class Thermistor44006 implements Converter {
 	
 	private static final DecimalFormat decimal4 = new DecimalFormat("0.0000");
 	
-	private static final transient Logger logger = Logger.getLogger(Thermistor44006.class);
 	
-	
-	public String convert(Serializable input, String value) {
+	public String convert(Serializable signal_name, String value, Serializable input) {
+		if (signal_name == null)
+			return null;
+		
 		String result = null;
-		//long start = System.nanoTime();
-		int v = ((Integer) input).intValue();
+		int v = ((Integer) signal_name).intValue();
 		if (v < 64000 && v != 0) {
 			double cal = 0.0;
 			if (value != null)
@@ -26,8 +24,6 @@ public class Thermistor44006 implements Converter {
 			double steinhart_eq = 0.00103348 + (0.000238465 * ln_res) + (0.000000158948 * (ln_res * ln_res * ln_res));
 			result = decimal4.format((1.0 / steinhart_eq) - 273.15 - cal);
 		}
-		//if (logger.isDebugEnabled())
-		//	logger.debug("thermistor44006Conversion: " + Long.toString((System.nanoTime() - start) / 1000) + " us");				
 		return result;
 	}
 	

@@ -1,5 +1,5 @@
 "SIGNAL_NAME","PHYSICAL_SIGNAL","CONVERSION","INPUT"
-"dcx_floatarray0","dcx_p1-2","dcx_pressure",
-"dcx_floatarray1","dcx_p2","dcx_pressure",
-"dcx_floatarray2","dcx_tob1","dcx_pressure",
-"dcx_floatarray3","dcx_tob2","dcx_pressure",
+"dcx_floatarray0","dcx_p1-2","dcx_pressure",""
+"dcx_floatarray1","dcx_p2","dcx_pressure",""
+"dcx_floatarray2","dcx_tob1","dcx_pressure",""
+"dcx_floatarray3","dcx_tob2","dcx_pressure",""
