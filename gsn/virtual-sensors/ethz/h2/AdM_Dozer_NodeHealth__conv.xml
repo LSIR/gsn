@@ -48,7 +48,6 @@
                 CASEWHEN(locate(' dpp:', SENSORTYPE) != 0,PAYLOAD_TEMPERATURE-32767,PAYLOAD_TEMPERATURE) as PAYLOAD_TEMPERATURE
                 from wrapper </query>
             </source>
-            </source>
             <query> select * from source </query>
         </stream>
     </streams>
