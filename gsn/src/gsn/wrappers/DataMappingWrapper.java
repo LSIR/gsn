@@ -478,8 +478,11 @@ public class DataMappingWrapper extends AbstractWrapper {
 									converterList.put(convResult[1], (Converter)classTemplate.getConstructor().newInstance());
 								}
 								converter = converterList.get(convResult[1]);
-							}	
-							map.put(convResult[0], converter.convert(data.getData(convName), convResult[3]));
+							}
+							if (convResult[2].isEmpty())
+								map.put(convResult[0], converter.convert(data.getData(convName), convResult[3], null));
+							else
+								map.put(convResult[0], converter.convert(data.getData(convName), convResult[3], data.getData(convResult[2])));
 						} catch (Exception e) {
 							logger.error(e.getMessage(), e);
 						}
