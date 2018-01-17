@@ -459,10 +459,10 @@ public class DataMappingWrapper extends AbstractWrapper {
 		try {
 			while (list.hasNext()) {
 				convName = list.next().toLowerCase();
-				if (convName.startsWith("payload_") && !convName.startsWith("payload_sample_") && data.getData(convName) != null) {
+				if (data.getData(convName) != null) {
 					convResult = m.executeConversionSelect(((Integer) data.getData("position")).intValue(),
 									((Long) data.getData("generation_time")).longValue(),
-									convName.substring("payload_".length()));
+									convName);
 					
 					if (convResult != null) {
 						// physical_signal, conversion, input, value
@@ -487,7 +487,7 @@ public class DataMappingWrapper extends AbstractWrapper {
 							logger.error(e.getMessage(), e);
 						}
 					} else {
-						logger.debug(vsName+"[source="+inputStreamName+"]: no conversion found for >" + convName + "< (" + convName.substring("payload_".length()) + ")");
+						logger.debug(vsName+"[source="+inputStreamName+"]: no conversion found for >" + convName + "<");
 					}
 				} else {
 					logger.debug(vsName+"[source="+inputStreamName+"]: ignoring >" + convName + "<");

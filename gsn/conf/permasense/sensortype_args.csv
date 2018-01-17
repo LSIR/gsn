@@ -117,3 +117,11 @@
 "6","msptemperature","0.01","DPPAppHealth"
 "6","temperature","0.01","DPPAppHealth"
 "6","humidity","0.01","DPPAppHealth"
+
+# inclinometer rotation
+"350","inclinometer_x","350","350° rotation"
+"350","inclinometer_y","350","350° rotation"
+"223","inclinometer_x","223","223° rotation"
+"223","inclinometer_y","223","223° rotation"
+"22","inclinometer_x","22","22° rotation"
+"22","inclinometer_y","22","22° rotation"

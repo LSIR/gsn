@@ -1,4 +1,4 @@
 "SIGNAL_NAME","PHYSICAL_SIGNAL","CONVERSION","INPUT"
-"a1","nctt_dx1","dilatation",""
-"a2","nctt_t1","thermistor44006",""
-"a3","nctt_t2","thermistor44006",""
+"payload_a1","nctt_dx1","dilatation",""
+"payload_a2","nctt_t1","thermistor44006",""
+"payload_a3","nctt_t2","thermistor44006",""

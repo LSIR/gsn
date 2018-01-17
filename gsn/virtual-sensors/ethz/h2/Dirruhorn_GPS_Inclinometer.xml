@@ -2,13 +2,17 @@
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
+        <init-params>
+            <param name="sensortype_mapping" />
+            <param name="sensorvalue_conversion" />
+        </init-params>
         <output-structure>
             <field name="POSITION" type="INTEGER" index="true" />
             <field name="DEVICE_ID" type="INTEGER" />
             <field name="GENERATION_TIME" type="BIGINT" unit="unixtime" index="true"/>
             <field name="TIMESTAMP" type="BIGINT" unit="unixtime"/>
             <field name="GSN_TIMESTAMP" type="BIGINT" unit="unixtime" index="true" />
-			<field name="SENSORTYPE" type="VARCHAR(16)" />
+			<field name="SENSORTYPE" type="VARCHAR(100)" />
 
             <field name="INCLINOMETER_X" type="VARCHAR(30)" unit="°" />
             <field name="INCLINOMETER_Y" type="VARCHAR(30)" unit="°" />
@@ -25,7 +29,7 @@
                     <predicate key="query">select * from Dirruhorn_GPS_Logger__status</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, DEVICE_TYPE as SENSORTYPE, INCLINOMETER_X, INCLINOMETER_Y from wrapper</query>
+                <query> select GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, INCLINOMETER_X, INCLINOMETER_Y, INCLINOMETER_X as ROTATE_X, INCLINOMETER_Y as ROTATE_Y from wrapper</query>
             </source>
             <query> select * from source </query>
         </stream>
@@ -35,7 +39,7 @@
                     <predicate key="query">select * from Dirruhorn_Dozer_WgpsStatus__conv</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
-                <query> select timed as GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, SENSORTYPE, INCLINOMETER_X, INCLINOMETER_Y from wrapper where SAM7_VALID = 1</query>
+                <query> select timed as GSN_TIMESTAMP, POSITION, DEVICE_ID, GENERATION_TIME, TIMESTAMP, INCLINOMETER_X, INCLINOMETER_Y, INCLINOMETER_X as ROTATE_X, INCLINOMETER_Y as ROTATE_Y from wrapper where SAM7_VALID = 1</query>
             </source>
             <query> select * from source </query>
         </stream>

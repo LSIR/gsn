@@ -7,7 +7,7 @@
                 <field name="position" type="*text">the position to be mapped</field>
                 <field name="begin" type="date">the starting point of the mapping in UTC</field>
                 <field name="end" type="date">the end point of the mapping in UTC</field>
-                <field name="sensortype" type="*select:adccomdiff_cnnn|adccomdiff_ccnn|adccomdiff_ccct|adccomdiff_ncnn|adccomdiff_ntnn|adccomdiff_nttn|adccomdiff_tttn|adccomdiff_tttt|adccomdiff_nctn|adccomdiff_nctc|adccomdiff_nctt|adccomdiff_tctc|adccomdiff_nepn|adccomdiff_sp|adcmux_sr|adcmux_sr_tttttt|adcmux_tc|adcmux_tm|digital_ps|dm|nodehealth_sht11|nodehealth_sht21|nodehealth_dpp|serialid">the sensortype of the mapping</field>
+                <field name="sensortype" type="*select:adccomdiff_cnnn|adccomdiff_ccnn|adccomdiff_ccct|adccomdiff_ncnn|adccomdiff_ntnn|adccomdiff_nttn|adccomdiff_tttn|adccomdiff_tttt|adccomdiff_nctn|adccomdiff_nctc|adccomdiff_nctt|adccomdiff_tctc|adccomdiff_nepn|adccomdiff_sp|adcmux_sr|adcmux_sr_tttttt|adcmux_tc|adcmux_tm|digital_ps|inclinometer_rotation|dm|nodehealth_sht11|nodehealth_sht21|nodehealth_dpp|serialid">the sensortype of the mapping</field>
                 <field name="sensortype_args" type="text">the sensortype argument of the mapping</field>
                 <field name="comment" type="text">optional comment</field>
         	</command>

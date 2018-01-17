@@ -1,4 +1,4 @@
 "SIGNAL_NAME","PHYSICAL_SIGNAL","CONVERSION","INPUT"
-"a0","tttn_t1","thermistor44006",""
-"a1","tttn_t2","thermistor44006",""
-"a2","tttn_t3","thermistor44006",""
+"payload_a0","tttn_t1","thermistor44006",""
+"payload_a1","tttn_t2","thermistor44006",""
+"payload_a2","tttn_t3","thermistor44006",""
