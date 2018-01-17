@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_GPS_Differential__batch__daily" priority="10" >
+<virtual-sensor name="ETZ_GPS_Differential__rtklib__daily" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.ConditionalDeleteVirtualSensor</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -26,21 +26,10 @@
             <field name="SD_N" type="DOUBLE" unit="m" />
             <field name="SD_H" type="DOUBLE" unit="m" />
 
-            <field name="V_E" type="DOUBLE" unit="cm/d" />
-            <field name="V_N" type="DOUBLE" unit="cm/d" />
-            <field name="V_H" type="DOUBLE" unit="cm/d" />
-            <field name="V_HORIZ" type="DOUBLE" unit="cm/d" />
-            <field name="V_3D" type="DOUBLE" unit="cm/d" />
-            <field name="SD_V_E" type="DOUBLE" unit="cm/d" />
-            <field name="SD_V_N" type="DOUBLE" unit="cm/d" />
-            <field name="SD_V_H" type="DOUBLE" unit="cm/d" />
-            <field name="SD_V_HORIZ" type="DOUBLE" unit="cm/d" />
-            <field name="SD_V_3D" type="DOUBLE" unit="cm/d" />
-
             <field name="RATIO_OF_FIXED_AMBIGUITIES" type="DOUBLE" unit="%" />
         </output-structure>
     </processing-class>
-    <description>Daily Differential GPS solutions from batch processing (only newest data points) from ETZ deployment</description>
+    <description>Daily Differential GPS solutions from rtklib processing (only newest data points) from ETZ deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -48,24 +37,12 @@
         <stream name="data0">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from ETZ_GPS_Differential__batch</predicate>
+                    <predicate key="query">select * from ETZ_GPS_Differential__rtklib</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
             </source>
             <query> select * from source </query>
         </stream>
-        <!--
-        <stream name="data1">
-            <source alias="source" storage-size="1" sampling-rate="1">
-                <address wrapper="local">
-                    <predicate key="query">select * from ETZ_GPS_L2__conv</predicate>
-                    <predicate key="start-time">continue</predicate>
-                </address>
-                <query> select * from wrapper </query>
-            </source>
-            <query> select * from source </query>
-        </stream>
-        -->
     </streams>
 </virtual-sensor>

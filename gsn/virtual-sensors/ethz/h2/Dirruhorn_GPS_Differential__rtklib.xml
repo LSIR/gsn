@@ -1,4 +1,4 @@
-<virtual-sensor name="ETZ_GPS_Differential__rtklib" priority="10" >
+<virtual-sensor name="Dirruhorn_GPS_Differential__rtklib" priority="10" >
     <processing-class>
         <class-name>gsn.vsensor.BridgeVirtualSensorPermasense</class-name>
         <unique-timestamps>false</unique-timestamps>
@@ -128,7 +128,7 @@
             <field name="GPS_TIME" type="INTEGER" unit="sec"/>
         </output-structure>
     </processing-class>
-    <description>Parsed differential GPS data from rtklib processing from ETZ deployment</description>
+    <description>Parsed differential GPS data from rtklib processing from Dirruhorn deployment</description>
     <life-cycle pool-size="10" />
     <addressing />
     <storage />
@@ -136,7 +136,7 @@
         <stream name="data">
             <source alias="source" storage-size="1" sampling-rate="1">
                 <address wrapper="local">
-                    <predicate key="query">select * from ETZ_GPS_Differential__streaming where RAW_PACKET like '2,%'</predicate>
+                    <predicate key="query">select * from Dirruhorn_GPS_Differential__streaming where RAW_PACKET like '2,%'</predicate>
                     <predicate key="start-time">continue</predicate>
                 </address>
                 <query> select * from wrapper </query>
