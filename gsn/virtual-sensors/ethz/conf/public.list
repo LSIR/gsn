@@ -144,6 +144,8 @@ Dirruhorn_VaisalaWXT520Prec.xml
 Dirruhorn_GPS_Differential__batch.xml
 Dirruhorn_GPS_Differential__batch__daily.xml
 Dirruhorn_GPS_Differential__realtime.xml
+Dirruhorn_GPS_Differential__rtklib.xml
+Dirruhorn_GPS_Differential__rtklib__daily.xml
 Dirruhorn_GPS_Differential__streaming.xml
 Dirruhorn_GPS_Inclinometer.xml
 Dirruhorn_GPS_L2__conv.xml
@@ -377,6 +379,8 @@ Matterhorn_Earthpressure_nepn.xml
 Matterhorn_GPS_Differential__batch.xml
 Matterhorn_GPS_Differential__batch__daily.xml
 Matterhorn_GPS_Differential__realtime.xml
+Matterhorn_GPS_Differential__rtklib.xml
+Matterhorn_GPS_Differential__rtklib__daily.xml
 Matterhorn_GPS_Differential__streaming.xml
 Matterhorn_GPS_Inclinometer.xml
 Matterhorn_GPS_L2__conv.xml
@@ -421,6 +425,8 @@ Matterhorn_Topology__public.xml
 Permos_GPS_Differential__batch.xml
 Permos_GPS_Differential__batch__daily.xml
 Permos_GPS_Differential__realtime.xml
+Permos_GPS_Differential__rtklib.xml
+Permos_GPS_Differential__rtklib__daily.xml
 Permos_GPS_Differential__streaming.xml
 Permos_GPS_Inclinometer.xml
 Permos_GPS_Logger__config.xml
@@ -482,6 +488,8 @@ Saastal_Dozer_WgpsSv__mapped.xml
 Saastal_GPS_Differential__batch.xml
 Saastal_GPS_Differential__batch__daily.xml
 Saastal_GPS_Differential__realtime.xml
+Saastal_GPS_Differential__rtklib.xml
+Saastal_GPS_Differential__rtklib__daily.xml
 Saastal_GPS_Differential__streaming.xml
 Saastal_GPS_Inclinometer.xml
 Saastal_GPS_L2__conv.xml

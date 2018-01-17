@@ -87,6 +87,7 @@ ETZ_GPS_Differential__batch.xml
 ETZ_GPS_Differential__batch__daily.xml
 ETZ_GPS_Differential__realtime.xml
 ETZ_GPS_Differential__rtklib.xml
+ETZ_GPS_Differential__rtklib__daily.xml
 ETZ_GPS_Differential__streaming.xml
 ETZ_GPS_Logger__config.xml
 ETZ_GPS_Logger__data__mapped.xml
