@@ -81,10 +81,14 @@ $(document).ready(function() {
             signals: [ { vsensor:".*_vaisalawxt520windpth", field:["relative_humidity"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },{ title:"Air Pressure [hPa]",
             signals: [ { vsensor:".*_vaisalawxt520windpth", field:["air_pressure"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
-          },{ title:"Rain [mm]",
+          },{ title:"Rain Accumulation [mm]",
             signals: [ { vsensor:".*_vaisalawxt520prec", field:["rain_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
-          },{ title:"Hail [hits/cm²]",
+          },{ title:"Rain Peak Intensity [mm/h]",
+            signals: [ { vsensor:".*_vaisalawxt520prec", field:["rain_peak_intensity"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
+          },{ title:"Hail Accumulation [hits/cm²]",
             signals: [ { vsensor:".*_vaisalawxt520prec", field:["hail_accumulation"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
+          },{ title:"Hail Peak Intensity [hits/cm²h]",
+            signals: [ { vsensor:".*_vaisalawxt520prec", field:["hail_peak_intensity"], select:"sensornode[position]:has(configuration[vaisala_wxt520=true])"}]
           },
           { title:"Short Wave Energy Balance [W/m²]",
               signals: [ { vsensor:"matterhorn_radiometer__conv", field:["irradiance_shortwave_up","irradiance_shortwave_down","net_solar_radiation"], position:[15]}]
@@ -291,10 +295,6 @@ function showPlots(id) {
             			<b>Forecast Jungfraujoch</b><br/>
                         <img src="http://wetterstationen.meteomedia.de/messnetz/vorhersagegrafik/067300.png" alt="Weather Forecast Jungfraujoch"/>
                 </p>
-                <p style="text-align:center;margin-top:30px;">
-                		<b>Forecast Lauberhorn</b><br/>
-                		<img src="http://wetterstationen.meteomedia.ch/messnetz/vorhersagegrafik/067291.png" alt="Weather Forecast Lauberhorn"/>
-                </p>
 		<div class="scaledimages">
                 </div>
                 </div>
@@ -327,7 +327,7 @@ function showPlots(id) {
                 <table width="100%">
                      <tr><td>
                              <b>Heliport Air Zermatt</b><br/>
-                             <table><tr><td><a href="http://www.air-zermatt.ch/webcam/Heliport.jpg"><img style="margin-top:21px" src="http://www.air-zermatt.ch/webcam/Heliport.jpg" width="400" height="327" alt="Webcam Zermatt direction north"/></a></td></tr></table>
+                             <table><tr><td><a href="https://www.air-zermatt.ch/webcam/Platz_4.jpg"><img style="margin-top:21px" src="https://www.air-zermatt.ch/webcam/Platz_4.jpg" width="400" height="327" alt="Webcam Zermatt direction north"/></a></td></tr></table>
                          </td>
                          <td valign="top">
                                  <b>Weather-Info</b><br/>
