@@ -117,6 +117,7 @@ public class MappedTopologyVirtualSensor extends AbstractVirtualSensor {
 										if (n.temperature != null && n.humidity != null) {
 											if (n.isWGPSv2() != null && n.isWGPSv2()) { // WGPSv2
 												n.humidity = n.humidity / 100.0;
+												n.temperature = n.temperature - 327.67;
 											}
 											else if (n.hasSHT15()) { // SHT15
 												Double hum_rel = new Double(-4 + (0.0405d * n.humidity) - 0.0000028d * Math.pow(n.humidity, 2));			
