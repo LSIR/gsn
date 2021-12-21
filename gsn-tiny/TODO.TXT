@@ -1,8 +1,0 @@
-- Android Activity: recode
-- NotificationVirtual Sensor: recode using parameters
-- Publish Service for auto/opportunistic
-- Remote Wrapper configured from subscriptions (same logic as local), list subscriptions, edit/create: mode pull/push, get GSN infos
-- Edition of Virtual sensor parameters
-- Make VS resilient to any input SE
-- Const class moved to Settings at app level + add DB settings
-- Storage: clean manager and H2 (drop? add other?)

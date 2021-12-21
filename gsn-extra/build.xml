@@ -12,15 +12,16 @@
         <pathelement location="${extra-build.dir}/"/>
         <pathelement location="${env.JAVA_HOME}/lib/tools.jar"/>
         <pathelement location="${core-build.dir}/"/>
-        <fileset dir="${basedir}/gsn-extra/lib/">
-            <include name="**/*.jar"/>
+        <fileset dir="${basedir}/gsn-extra/lib/optional">
+            <include name="*.jar"/>
         </fileset>
         <fileset refid="gsnextradeps"/>
     </path>
 
     <target name="build-gsn-extra" depends="setup, build-gsn-core" description="Compile the cource code of gsn-extra.">
         <javac debug="true" srcdir="${extra-src.dir}" optimize="off"
-               destdir="${extra-build.dir}" failonerror="true" classpathref="extra-classpath">
+               destdir="${extra-build.dir}" failonerror="true" classpathref="extra-classpath"
+        	   includeantruntime="false">
         </javac>
     	<!--<copy todir="${extra-build.dir}">
     	    <fileset dir="${extra-resources.dir}" includes="**/*.conf,**/*.properties" />

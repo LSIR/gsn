@@ -17,3 +17,7 @@ csv-check-points/
 *.sqlite3
 *.sqlite
 *.pyc
+/.bsp
+/.idea
+/gsn-services/.bsp
+/gsn-webui/env3

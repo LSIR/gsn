@@ -34,7 +34,9 @@
         <mkdir dir="${dist}/src/main/resources"/>
         <mkdir dir="${build.dir}"/>
 
-        <javac debug="true" srcdir="${src.dir}" optimize="off" destdir="${build.dir}" failonerror="true" classpathref="classpath">
+        <javac debug="true" srcdir="${src.dir}" optimize="off" destdir="${build.dir}" 
+        	   failonerror="true" classpathref="classpath"
+        	   includeantruntime="false">
             <exclude name="**/msr/**"/>
             <exclude name="**/microsoft/**"/>
             <exclude name="**/tempuri/**"/>

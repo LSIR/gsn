@@ -25,8 +25,8 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>2.0.2</version>
 					<configuration>
-						<source>1.7</source>
-						<target>1.7</target>
+						<source>11</source>
+						<target>11</target>
 						<compilerArgument />
 					</configuration>
 				</plugin>
@@ -58,17 +58,6 @@
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-library</artifactId>
 			<version>2.11.2</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.epfl.gsn</groupId>
-			<artifactId>gsn-tools</artifactId>
-			<version>2.0.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-nop</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<!-- <dependency>
 			<groupId>ch.epfl.gsn</groupId>
@@ -179,11 +168,6 @@
 			<version>2.3</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.eclipse.paho</groupId>
-		    <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
-		    <version>1.1.0</version>
-		</dependency>
-		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
 			<version>1.4.5</version>
@@ -285,12 +269,22 @@
 			<artifactId>commons-collections</artifactId>
 			<version>3.2.1</version>
 		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.10.13</version>
+		</dependency>
+		<dependency>
+			<groupId>com.typesafe.play</groupId>
+			<artifactId>play_2.13</artifactId>
+			<version>2.8.10</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
 			<id>TypesafeRepository</id>
 			<name>Typesafe Repository</name>
-			<url>http://repo.typesafe.com/typesafe/releases/</url>
+			<url>https://repo.maven.apache.org/maven2</url>
 			<layout>default</layout>
 		</repository>
 		<repository>

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="maxH">200dip</dimen>
-    <dimen name="frag_rounding_radius">20dp</dimen>
-    <dimen name="progress_action_padding">8dp</dimen>
-</resources>

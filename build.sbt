@@ -2,12 +2,12 @@
 lazy val commonSettings = Seq(
   organization := "ch.epfl.gsn",
   version := "2.0.2_SNAPSHOT",
-  scalaVersion := "2.11.2",
-  javacOptions in (Compile, compile) ++= Seq("-source", "1.7", "-target", "1.7", "-bootclasspath", "/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/rt.jar"),
+  scalaVersion := "2.12.14", // or 2.11.12
+  Compile / compile / javacOptions ++= Seq("-source", "8", "-target", "11"),
   resolvers ++= Seq(
     DefaultMavenRepository,
-    "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-    "osgeo" at "http://download.osgeo.org/webdav/geotools/",
+    "Typesafe Repository" at "https://repo.maven.apache.org/maven2/",
+    "Geotools" at "https://repo.osgeo.org/repository/release/",
     "play-authenticate (release)" at "https://oss.sonatype.org/content/repositories/releases/",
     "play-authenticate (snapshot)" at "https://oss.sonatype.org/content/repositories/snapshots/",
     "Local ivy Repository" at ""+Path.userHome.asFile.toURI.toURL+"/.ivy2/local",
@@ -24,15 +24,15 @@ publishTo &lt;&lt;= version { v: String =&gt;
     Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }*/
 
-  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials-sonatype"),
+//  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials-sonatype"),
   publishMavenStyle := true,
-  publishArtifact in (Compile) := false,
-  publishArtifact in (Test) := false,
-  publishArtifact in (Compile, packageBin) := true,
-  publishArtifact in (Compile, packageSrc) := true,
-  publishArtifact in (Compile, packageDoc) := true,
+  Compile / publishArtifact := false,
+  Compile / packageBin / publishArtifact := true,
+  Compile / packageSrc / publishArtifact := true,
+  Compile / packageDoc / publishArtifact := true,
+  Test / publishArtifact := false,
   pomIncludeRepository := { x => false },
-  pomExtra := (
+  pomExtra :=
   <url>http://gsn.epfl.ch</url>
   <licenses>
     <license>
@@ -52,11 +52,11 @@ publishTo &lt;&lt;= version { v: String =&gt;
       <url>http://gsn.epfl.ch</url>
     </developer>
   </developers>
-),
+,
   crossPaths := false,
-  useGpg := true,
-  parallelExecution in Test := false,
-  EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
+  //useGpg := true,
+  Test / parallelExecution := false,
+  EclipseKeys.createSrc := EclipseCreateSrc.Default // + EclipseCreateSrc.Resource
 )
 
 usePgpKeyHex("DC900B5F")
@@ -68,7 +68,7 @@ lazy val root = (project in file(".")).
 lazy val core = (project in file("gsn-core")).
   dependsOn(tools).
   settings(commonSettings: _*).
-  enablePlugins(JavaServerAppPackaging, DebianPlugin)
+  enablePlugins(JavaServerAppPackaging, DebianPlugin, SystemdPlugin)
 
 lazy val extra = (project in file("gsn-extra")).
   dependsOn(core).
@@ -77,20 +77,19 @@ lazy val extra = (project in file("gsn-extra")).
 lazy val services = (project in file("gsn-services")).
   dependsOn(tools).
   settings(commonSettings: _*).
-  enablePlugins(PlayScala, DebianPlugin)
+  enablePlugins(DebianPlugin, SystemdPlugin)
+//  enablePlugins(PlayScala, PlayEbean, DebianPlugin, SystemdPlugin)
 
 lazy val tools = (project in file("gsn-tools")).
   settings(commonSettings: _*)
 
 lazy val webui = (project in file("gsn-webui")).
-  enablePlugins(JavaServerAppPackaging, DebianPlugin)
-
+  enablePlugins(JavaServerAppPackaging, DebianPlugin, SystemdPlugin)
 
 lazy val startAll = taskKey[Unit]("Start all the GSN modules")
 
-
 //startAll := {
-  //(webui/startDjango in webui).value
-//  (re-start in core).value
+//  (startDjango in webui).value
+//  (reStart in core).value
 //  (run in services).value
 //}

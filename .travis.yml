@@ -1,9 +1,9 @@
 language: scala
 scala:
-   - 2.11.2
+   - 2.12.14
 sudo: false
 jdk:
-  - openjdk7
+  - openjdk11
 script:
   - sbt compile
 branches:
