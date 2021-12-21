@@ -79,7 +79,7 @@ Then you can run the following tasks in sbt:
 * package: build jar packages
 * project [core|extra|tools|services|webui]: select a specific projet
 
-In the project core you can use ``re-start`` to launch gsn-core for development and ``debian:packageBin`` to build the debian package.
+In the project core you can use ``reStart`` to launch gsn-core for development and ``debian:packageBin`` to build the debian package.
 
 In the project services you can use ``run`` to start the web api in development mode  and ``debian:packageBin`` to build the debian package.
 

@@ -23,10 +23,8 @@ libraryDependencies ++= Seq(
   "commons-dbcp" % "commons-dbcp" % "1.4",
   "commons-collections" % "commons-collections" % "3.2.1",
   "commons-io" % "commons-io" % "2.4",
-//  "org.apache.logging.log4j" % "log4j-api" % "2.3",
-//  "org.apache.logging.log4j" % "log4j-core" % "2.3",
-//  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.3",
-//  "org.apache.logging.log4j" % "log4j-web" % "2.3",
+
+
   "net.sf.opencsv" % "opencsv" % "2.3",
   "com.thoughtworks.xstream" % "xstream" % "1.4.5",
   "org.antlr" % "stringtemplate" % "3.0",
@@ -43,14 +41,22 @@ libraryDependencies ++= Seq(
   "org.rxtx" % "rxtx" % "2.1.7",
   "com.esotericsoftware.kryo" % "kryo" % "2.23.0",
   "org.zeromq" % "jeromq" % "0.3.5",
-//  "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.1.0",
-//  "org.eclipse.californium" % "californium-core" % "1.0.4",
+
+  "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.1.0",
+  "org.eclipse.californium" % "californium-core" % "1.0.4",
+
 //  "junit" % "junit" % "4.11" %  "test",
 //  "ch.epfl.gsn" % "gsn-tools" % "2.0.1",
 //  "org.easymock" % "easymockclassextension" % "3.2" % "test",
 //  "org.httpunit" % "httpunit" % "1.7.2" % "test" exclude("xerces","xercesImpl") exclude("xerces","xmlParserAPIs") exclude("javax.servlet","servlet-api")
 
   "org.slf4j" % "slf4j-api" % "1.7.32",
+  "org.apache.logging.log4j" % "log4j-api" % "2.17.0",
+  "org.apache.logging.log4j" % "log4j-core" % "2.17.0",
+  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.17.0",
+  "org.apache.logging.log4j" % "log4j-web" % "2.17.0",
+  "org.apache.logging.log4j" % "log4j-jul" % "2.17.0",
+
   "com.typesafe.play" %% "play" % "2.7.9",
   "com.typesafe.play" %% "play-json" % "2.7.4"
 )

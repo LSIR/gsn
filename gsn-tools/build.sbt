@@ -27,8 +27,8 @@ libraryDependencies ++= Seq(
   //  "org.apache.jena" % "jena-core" % "4.3.1" exclude("log4j","log4j") exclude("org.slf4j","slf4j-log4j12"),
 
   "org.reactivemongo" %% "reactivemongo" % "1.0.8",
-  //  "org.reactivemongo" %% "reactivemongo-bson" % "0.20.13",
-  "org.reactivemongo" %% "reactivemongo-bson-api" % "1.0.8",
+    "org.reactivemongo" %% "reactivemongo-bson" % "0.20.13",
+//  "org.reactivemongo" %% "reactivemongo-bson-api" % "1.0.8",
 
   "edu.ucar" % "netcdf" % "4.3.22",
   "org.geotools" % "gt-shapefile" % "26.0",
